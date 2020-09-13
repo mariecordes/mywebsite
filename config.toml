@@ -38,7 +38,7 @@ disqusShortname = ""
   # Navigation Section
   [params.navigation]
     title = "Marie Cordes's Portfolio Website"
-    subtitle = "Learn more about me and what I do"
+    subtitle = ""
     menu = "Menu"
     # Optional logo as brand stored in img/
     # logo = "logo.png"
@@ -139,12 +139,9 @@ disqusShortname = ""
   # Section Type Two
   [params.two]
     enable = true
-    title = "Massa libero"
-    subtitle = """Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero. 
-    Mauris aliquet magna magna sed nunc rhoncus pharetra. 
-    Pellentesque condimentum sem. In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia pellentesque lorem ipsum dolor. 
-    Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis libero.
-    Mauris aliquet magna magna sed nunc rhoncus amet pharetra et feugiat tempus."""
+    title = "Learn more about me and what I do"
+    subtitle = """"Curious, enthusiastic and open-minded. Business & Management undergrad. Analytics & Management masters in 2021. Born and raised in Germany. Lived in Germany, the UK, Hong Kong & the US. Enjoy practicing yoga, making banana bread and wearing striped clothes. Food lover, world traveler and London explorer."
+"""
     buttonText = "Get Started"
     url = "blogs"
 
@@ -181,7 +178,7 @@ disqusShortname = ""
 
     [[params.contact.address]]
     title = "Address"
-    street = "London Business School\nRegent's Park"
+    street = "London Business School,\n Regent's Park"
     city = "London, NW1 4SA"
     country = "United Kingdom"
 
@@ -215,7 +212,6 @@ disqusShortname = ""
       icon = "fa-instagram"
       url= "https://www.instagram.com/schokomarie/"
       label = "Instagram"
-    
 
     [[params.footer.quicklinks]]
       text = "Design: "
