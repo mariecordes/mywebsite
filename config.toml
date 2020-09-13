@@ -81,8 +81,8 @@ disqusShortname = ""
   [params.banner]
     # To change the background image on the homepage banner, replace 'banner.jpg' in
     # the 'static/img' folder.
-    title = "Hi, my name is Marie - nice to meet you!"
-    subtitle = "This is my portfolio website full of information about me and the work I've done."
+    title = "Hi, my name is Marie"
+    subtitle = "This is my portfolio website full of information about me and the work I've done. Nice to meet you!"
     buttonText = "Get Started"
   
 
@@ -140,8 +140,8 @@ disqusShortname = ""
   [params.two]
     enable = true
     title = "Learn more about me and what I do"
-    subtitle = """"Curious, enthusiastic and open-minded. Business & Management undergrad. Analytics & Management masters in 2021. Born and raised in Germany. Lived in Germany, the UK, Hong Kong & the US. Enjoy practicing yoga, making banana bread and wearing striped clothes. Food lover, world traveler and London explorer."
-"""
+    subtitle = """Marie Cordes. That mean\nCurious, enthusiastic and open-minded.\nBusiness & Management undergrad in 2019.\nAnalytics & Management masters in 2021.\nBorn and raised in Germany.\nLived in Germany, the UK, Hong Kong & the US.\nEnjoy practicing yoga, making banana bread and wearing striped clothes.\nFood lover, world traveler and London explorer.\nAlwas up for a challenge.\nLooking to inspire and to be inspired."
+
     buttonText = "Get Started"
     url = "blogs"
 
