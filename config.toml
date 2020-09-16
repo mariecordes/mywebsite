@@ -101,19 +101,19 @@ disqusShortname = ""
     [[params.tiles.showcase]]
       title = "CV"
       subtitle = "Learn more about my career path"
-      image = "pic02.jpg"
+      image = "pic04.jpg"
       url = "blogs/cv"
 
     [[params.tiles.showcase]]
-      title = "Portfolio"
+      title = "Brexit Voting Analysis"
       subtitle = "Learn more about my work"
-      image = "pic03.jpg"
-      url = "blogs/portfolio"
+      image = "pic02.jpg"
+      url = "projects/project2"
 
     [[params.tiles.showcase]]
       title = "Blog"
       subtitle = "Learn more about my life"
-      image = "pic04.jpg"
+      image = "pic03.jpg"
       url = "blogs/blog"
 
     #[[params.tiles.showcase]]

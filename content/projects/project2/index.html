@@ -1,0 +1,421 @@
+---
+title: "Brexit Voting Analysis"
+author: "Marie Cordes"
+date: "16.09.2020"
+output:
+  html_document:
+    theme: flatly
+    highlight: zenburn
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+    code_folding: show
+---
+
+
+
+<div id="exploratory-data-analysis" class="section level1">
+<h1>Exploratory Data Analysis</h1>
+<p>In the following we will look at a dataset concerning the results of the 2016 Brexit vote in the UK.</p>
+<div id="raw-data" class="section level2">
+<h2>Raw Data</h2>
+<p>We will have a quick look at the results of the 2016 Brexit vote in the UK. First we read the data using <code>vroom</code> and have a quick glimpse at the data.</p>
+<pre class="r"><code>brexit_results &lt;- vroom::vroom(here::here(&quot;data&quot;,&quot;brexit_results.csv&quot;))
+
+
+glimpse(brexit_results)</code></pre>
+<pre><code>## Rows: 632
+## Columns: 11
+## $ Seat        &lt;chr&gt; &quot;Aldershot&quot;, &quot;Aldridge-Brownhills&quot;, &quot;Altrincham and Sale …
+## $ con_2015    &lt;dbl&gt; 50.6, 52.0, 53.0, 44.0, 60.8, 22.4, 52.5, 22.1, 50.7, 53.…
+## $ lab_2015    &lt;dbl&gt; 18.3, 22.4, 26.7, 34.8, 11.2, 41.0, 18.4, 49.8, 15.1, 21.…
+## $ ld_2015     &lt;dbl&gt; 8.82, 3.37, 8.38, 2.98, 7.19, 14.83, 5.98, 2.42, 10.62, 5…
+## $ ukip_2015   &lt;dbl&gt; 17.87, 19.62, 8.01, 15.89, 14.44, 21.41, 18.82, 21.76, 19…
+## $ leave_share &lt;dbl&gt; 57.9, 67.8, 38.6, 65.3, 49.7, 70.5, 59.9, 61.8, 51.8, 50.…
+## $ born_in_uk  &lt;dbl&gt; 83.1, 96.1, 90.5, 97.3, 93.3, 97.0, 90.5, 90.7, 87.0, 88.…
+## $ male        &lt;dbl&gt; 49.9, 48.9, 48.9, 49.2, 48.0, 49.2, 48.5, 49.2, 49.5, 49.…
+## $ unemployed  &lt;dbl&gt; 3.64, 4.55, 3.04, 4.26, 2.47, 4.74, 3.69, 5.11, 3.39, 2.9…
+## $ degree      &lt;dbl&gt; 13.87, 9.97, 28.60, 9.34, 18.78, 6.09, 13.12, 7.90, 17.80…
+## $ age_18to24  &lt;dbl&gt; 9.41, 7.33, 6.44, 7.75, 5.73, 8.21, 7.82, 8.94, 7.56, 7.6…</code></pre>
+<p>We find that the data set has 632 observations (rows) and 11 variables (coloumns).</p>
+<p>The variables are the following:
+- <code>Seat</code>: character; the respective name of the constituencies
+- <code>con_2015</code>: double; the share of the Conservative Party voters per constituency in 2015
+- <code>lab_2015</code>: double; the share of the Labour Party voters per constituency in 2015
+- <code>ld_2015</code>: double; the share of the Liberal Democrats party voters per constituency in 2015
+- <code>ukip_2015</code>: double; the share of the UK Independence Party voters per constituency in 2015
+- <code>leave_share</code>: double; the share of voters that voted for Brexit
+- <code>born_in_uk</code>: double; the share of people born in the UK in the respective constituency
+- <code>male</code>: double; the share of males in the respective constituency
+- <code>unemployed</code>: double; the share of people unemployed in the respective constituency
+- <code>degree</code>: <em>unsure of meaning</em>
+- <code>age_18to24</code>: double; the share of people aged 18 to 24 in the respective constituency</p>
+</div>
+<div id="summary-analysis" class="section level2">
+<h2>Summary Analysis</h2>
+<p>Next, we will skim the data.</p>
+<pre class="r"><code>skim(brexit_results)</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-1">Table 1: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">brexit_results</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">632</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">11</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">1</td>
+</tr>
+<tr class="odd">
+<td align="left">numeric</td>
+<td align="left">10</td>
+</tr>
+<tr class="even">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Seat</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">43</td>
+<td align="right">0</td>
+<td align="right">632</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">con_2015</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">36.60</td>
+<td align="right">16.22</td>
+<td align="right">0.00</td>
+<td align="right">22.09</td>
+<td align="right">40.85</td>
+<td align="right">50.84</td>
+<td align="right">65.88</td>
+<td align="left">▂▅▃▇▅</td>
+</tr>
+<tr class="even">
+<td align="left">lab_2015</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">32.30</td>
+<td align="right">16.54</td>
+<td align="right">0.00</td>
+<td align="right">17.67</td>
+<td align="right">31.20</td>
+<td align="right">44.37</td>
+<td align="right">81.30</td>
+<td align="left">▆▇▇▅▁</td>
+</tr>
+<tr class="odd">
+<td align="left">ld_2015</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">7.81</td>
+<td align="right">8.36</td>
+<td align="right">0.00</td>
+<td align="right">2.97</td>
+<td align="right">4.58</td>
+<td align="right">8.57</td>
+<td align="right">51.49</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">ukip_2015</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">13.10</td>
+<td align="right">6.47</td>
+<td align="right">0.00</td>
+<td align="right">9.19</td>
+<td align="right">13.73</td>
+<td align="right">17.11</td>
+<td align="right">44.43</td>
+<td align="left">▃▇▃▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">leave_share</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">52.06</td>
+<td align="right">11.44</td>
+<td align="right">20.48</td>
+<td align="right">45.33</td>
+<td align="right">53.69</td>
+<td align="right">60.15</td>
+<td align="right">75.65</td>
+<td align="left">▂▂▆▇▂</td>
+</tr>
+<tr class="even">
+<td align="left">born_in_uk</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">88.15</td>
+<td align="right">11.29</td>
+<td align="right">40.73</td>
+<td align="right">86.42</td>
+<td align="right">92.48</td>
+<td align="right">95.42</td>
+<td align="right">98.02</td>
+<td align="left">▁▁▁▂▇</td>
+</tr>
+<tr class="odd">
+<td align="left">male</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">49.07</td>
+<td align="right">0.80</td>
+<td align="right">46.86</td>
+<td align="right">48.61</td>
+<td align="right">49.02</td>
+<td align="right">49.43</td>
+<td align="right">53.05</td>
+<td align="left">▁▇▃▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">unemployed</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">4.37</td>
+<td align="right">1.42</td>
+<td align="right">1.84</td>
+<td align="right">3.23</td>
+<td align="right">4.19</td>
+<td align="right">5.21</td>
+<td align="right">9.53</td>
+<td align="left">▆▇▅▂▁</td>
+</tr>
+<tr class="odd">
+<td align="left">degree</td>
+<td align="right">59</td>
+<td align="right">0.91</td>
+<td align="right">16.71</td>
+<td align="right">8.36</td>
+<td align="right">5.10</td>
+<td align="right">10.79</td>
+<td align="right">14.69</td>
+<td align="right">19.59</td>
+<td align="right">51.10</td>
+<td align="left">▇▆▂▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">age_18to24</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">9.29</td>
+<td align="right">3.59</td>
+<td align="right">5.73</td>
+<td align="right">7.30</td>
+<td align="right">8.28</td>
+<td align="right">9.60</td>
+<td align="right">32.68</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+</tbody>
+</table>
+<p>We find that that none of the variables have missing values except for <code>degree</code>. This variable has 59 missing values. However, we will not go further into this as this variable is not relevant to us.
+We also find that our only character variable <code>Seat</code> has 632 unique values which lets us know that there are no duplicates in the list of constituencies.</p>
+<p>We will have a more detailed look at the statistics of our numeric variables using <code>favstats()</code> next.</p>
+<pre class="r"><code>favstats(brexit_results$con_2015)</code></pre>
+<pre><code>##  min   Q1 median   Q3  max mean   sd   n missing
+##    0 22.1   40.8 50.8 65.9 36.6 16.2 632       0</code></pre>
+<pre class="r"><code>favstats(brexit_results$lab_2015)</code></pre>
+<pre><code>##  min   Q1 median   Q3  max mean   sd   n missing
+##    0 17.7   31.2 44.4 81.3 32.3 16.5 632       0</code></pre>
+<pre class="r"><code>favstats(brexit_results$ld_2015)</code></pre>
+<pre><code>##  min   Q1 median   Q3  max mean   sd   n missing
+##    0 2.97   4.58 8.57 51.5 7.81 8.36 632       0</code></pre>
+<pre class="r"><code>favstats(brexit_results$ukip_2015)</code></pre>
+<pre><code>##  min   Q1 median   Q3  max mean   sd   n missing
+##    0 9.19   13.7 17.1 44.4 13.1 6.47 632       0</code></pre>
+<pre class="r"><code>favstats(brexit_results$leave_share)</code></pre>
+<pre><code>##   min   Q1 median   Q3  max mean   sd   n missing
+##  20.5 45.3   53.7 60.2 75.6 52.1 11.4 632       0</code></pre>
+<pre class="r"><code>favstats(brexit_results$born_in_uk)</code></pre>
+<pre><code>##   min   Q1 median   Q3 max mean   sd   n missing
+##  40.7 86.4   92.5 95.4  98 88.2 11.3 632       0</code></pre>
+<pre class="r"><code>favstats(brexit_results$male)</code></pre>
+<pre><code>##   min   Q1 median   Q3 max mean    sd   n missing
+##  46.9 48.6     49 49.4  53 49.1 0.805 632       0</code></pre>
+<pre class="r"><code>favstats(brexit_results$unemployed)</code></pre>
+<pre><code>##   min   Q1 median   Q3  max mean   sd   n missing
+##  1.84 3.23   4.19 5.21 9.53 4.37 1.42 632       0</code></pre>
+<pre class="r"><code>favstats(brexit_results$age_18to24)</code></pre>
+<pre><code>##   min  Q1 median  Q3  max mean   sd   n missing
+##  5.73 7.3   8.28 9.6 32.7 9.29 3.59 632       0</code></pre>
+<p>We will not go into too much detail but feel free to have a look at the minimum and maximum values, the mean and median or the standard deviation for each variable.</p>
+<p>Some conclusions we can, for example, draw is that those variables that have an equal (or similar) mean and median are roughly normally distributed. This is true for <code>lab_2015</code>, <code>ukip_2015</code>, <code>leave_share</code>, <code>male</code> and <code>unemployed</code>.</p>
+</div>
+<div id="visualizations" class="section level2">
+<h2>Visualizations</h2>
+<div id="correlations" class="section level3">
+<h3>Correlations</h3>
+<p>To get a sense of the data and the relationships between the variables, we plot create a <code>ggpairs</code> plot which shows each respective correlation and scatterplot for all two variable pairs.</p>
+<pre class="r"><code>brexit_results %&gt;% 
+  select(-Seat, -degree) %&gt;% 
+  GGally::ggpairs(alpha = 0.4) +
+      theme_minimal()</code></pre>
+<p><img src="/projects/project2/index_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>In the following, we describe a few findings based on these plots - no definitive results!</p>
+<p>We find an extremely high positive correlation at 0.85 between <code>leave_share</code> and <code>ukip_2015</code> as well as another significant positive correlations between <code>born_in_uk</code> and <code>leave_share</code>.</p>
+<p>The first observation may show that the majority of UKIP voters was also pro-Brexit. The latter relationship will be further investigated later on.</p>
+<p>We also find significant negative relationships, e.g. between <code>lab_2015</code> and <code>con_2015</code>, clearly indicating that the more Labour Party voters there are in a constituency, the less Conservative Party voters there are and vice versa (quite obvious as those are the two biggest parties in the UK). Further negative relationships include those between <code>unemployed</code> and <code>con_2015</code> as well as <code>age_18to24</code> and <code>con_2015</code> indicating that the Conservative Party does not necessarily have many unemployed voters or voters below 24 years of age.</p>
+<p>Another interesting dynamic stems from the negative correlations between <code>age_18to24</code> and <code>leave_share</code> as well as <code>born_in_uk</code>. This may indicate that the more younger voters are in a district, the fewer people are pro-Brexit. A common dynamic during the Brexit referendum was actually that older generations were generally pro Brexit while younger generations were against it. Further, the more voters are between the age of 18 to 24, the less voters were born in the UK. This may stem from many young immigrants settling in the UK.</p>
+<p>There are further similar relationships that can be seen in the graph but we will not go into all of them in detail.</p>
+</div>
+<div id="distribution" class="section level3">
+<h3>Distribution</h3>
+<p>To understand the data further, we plot a histogram and a density plot of the leave share in all constituencies.</p>
+<pre class="r"><code>ggplot(brexit_results, aes(x = leave_share)) +
+  geom_histogram(binwidth = 2.5) +
+  labs(title = &quot;Spread of &#39;leave-votes&#39; share&quot;,
+        subtitle = &quot;Histogram showing the spread of the proportion of &#39;leave the EU-votes&#39; over all constituencies&quot;,
+         x = &quot;Share of leave-votes&quot;,
+         y = &quot;Count of constituencies&quot;) +
+  #bbc_style()+
+  NULL</code></pre>
+<p><img src="/projects/project2/index_files/figure-html/brexit_histogram-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(brexit_results, aes(x = leave_share)) +
+  geom_density() +
+ labs(title = &quot;Density of &#39;leave-votes&#39; share&quot;,
+        subtitle = &quot;Density plot showing the spread/density of the proportion of &#39;leave the EU-votes&#39; over all constituencies&quot;,
+         x = &quot;Share of leave-votes&quot;,
+         y = &quot;Density over all constituencies&quot;) +
+  #bbc_style() +
+  NULL</code></pre>
+<p><img src="/projects/project2/index_files/figure-html/brexit_histogram-2.png" width="648" style="display: block; margin: auto;" /></p>
+</div>
+<div id="born-in-the-uk-vs.-leave-share" class="section level3">
+<h3>Born in the UK vs. Leave-share</h3>
+<p>One common explanation for the Brexit outcome was fear of immigration and opposition to the EU’s more open border policy. We can check the relationship (or correlation) between the proportion of native born residents (<code>born_in_uk</code>) in a constituency and its <code>leave_share</code> by calculating the correlation between the two variables.</p>
+<pre class="r"><code>brexit_results %&gt;% 
+  select(leave_share, born_in_uk) %&gt;% 
+  cor()</code></pre>
+<pre><code>##             leave_share born_in_uk
+## leave_share       1.000      0.493
+## born_in_uk        0.493      1.000</code></pre>
+<p>The correlation is almost <strong>0.5</strong>, which shows that the two variables are positively correlated.</p>
+<p>We can also create a scatterplot between these two variables using <code>geom_point</code>. We also add the best fit line, using <code>geom_smooth(method = "lm")</code>.</p>
+<pre class="r"><code>ggplot(brexit_results, aes(x = born_in_uk, y = leave_share)) +
+  geom_point(alpha=0.3) +
+  geom_smooth(method = &quot;lm&quot;) +
+  theme_bw() +
+  labs(title = &quot;Share of UK-born voters and share of leave-EU voters relationship&quot;,
+       subtitle = &quot;Relationship between the share of voters born in the UK and the share of voters that voted to leave the EU over all constituencies&quot;,
+       x = &quot;Share of UK-born voters&quot;,
+       y = &quot;Share of leave-voters&quot;) +
+  
+  NULL</code></pre>
+<p><img src="/projects/project2/index_files/figure-html/brexit_immigration_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Looking at the above graph and the derived correlation of 0.49, a positive relationship between the share of UK-born voters and voters that voted to leave the EU becomes visible. This means that the higher the share of UK-born voters a constituency in the UK has, the more likely the constituency is to also have a higher share of pro-Brexit voters. On the other hand, the higher the share of voters that were born outside of the UK belong to/vote in a constitucency, the lower the share of voters in favour of staying in the EU.</p>
+<p>This result is not surprising when we look at the pro and con arguments for Brexit. Brexit means leaving the EU and, thereby, returning the UK to its traditional values, seperated from the EU’s values and regulations. It also means focusing on the UK first and the British being able to govern the country as they like - without major interferences or guidelines from the EU. This means a return to a more traditional and historic UK with less influence from the rest of the continent. Obviously, this is more ingrained into people that were born in the UK and are interested in keeping its culture and values alive. Voters that were not born in the UK may be more interested in well-established international relations as well as a country that is more adapted to the rest of the continent and supports globalized values.</p>
+<p>Next to the topic of values and traditions, as mentioned above: <em>“One common explanation for the Brexit outcome was fear of immigration and opposition to the EU’s more open border policy.”</em> Here, it becomes clear that non-UK-born voters are immigrants themselves and, therefore, most probably support more open-minded policies regarding immigrants as well as open border policies. These non-UK-born voters may be interested in the UK being on good terms with their own home country. Further, they may be interested to be able to easily and freely travel to their home countries and back as well as work in the UK. These arguments support the observation that the higher the share of non-UK-born voters live in a constituency, the lower the share of leave-voters.</p>
+<p>Lastly, the graph clearly shows that there are more constituencies in the UK with a higher share (approx. 80% and above) of UK-born voters. This is not a surprise since the majority of the population in the UK is also UK-born. Nevertheless, the plot shows some outliers to the overall trend as a few constituencies with a high share of UK-born voters (e.g. &gt;90%) have a relatively low share of leave-voters (&lt;30%). Most of the constituencies with &lt;80% of UK-born voters are relatively widely-spread within a range of 20% to 60% share of leave-voters. There is a slight trend towards lower share of UK-born voters translating to lower share of leave-votes but overall, these observations are quite scattered and it’s difficult to determine a definitive, clear trend.
+Generally, the points in the plot clearly cluster in the upper right corner, showing that most of the consitutencies consist of mainly UK-born voters and have a relatively high share of leave-voters. In the end, this was logically followed by the UK voters deciding to leave the EU.</p>
+<p>In a next step, it would be interesting to also analyse the relationship between the <code>leave-share</code> variable and the <code>age_18to24</code> variable. As most often the younger generations in the UK were more likely to be in favour of keeping an alliance with the EU in order to stay globally connected, I would expect this analysis to show that a higher share of 18 to 24 year-olds in a constituency means a relatively lower share of leave-voters.</p>
+</div>
+<div id="political-affiliation-vs.-leave-share" class="section level3">
+<h3>Political affiliation vs. Leave-share</h3>
+<p>As we have found earlier, the <code>brexit_results.csv</code> data set involves 632 observations with 11 variables, including each constituency in the UK (<code>Seat</code>), the share of the four parties Conservative Party, Labour Party, Liberal Democrats, UK Independence Party (UKIP) in 2015 as well as the share of pro-brexit voters per constituency. There are further variables which are not necessary for this analysis; we will, therefore, eliminate them.</p>
+<p>As the four party share variables are all on the x-axis in the final plot, we will summarize them by using <code>pivot_longer</code>.</p>
+<pre class="r"><code>brexit &lt;- brexit_results %&gt;% 
+            select(Seat, con_2015, lab_2015, ld_2015, ukip_2015, leave_share) %&gt;%      #eliminate irrelevant variables
+            pivot_longer(2:5, names_to = &quot;party&quot;, values_to = &quot;percent&quot; )             #pivot longer to summarize party variables</code></pre>
+<p>With the manipulated data set, we can now reproduce the plot as above.</p>
+<pre class="r"><code>colours &lt;- c(&quot;#0087dc&quot;, &quot;#d50000&quot;, &quot;#FDBB30&quot;, &quot;#EFE600&quot;) #define vector with party-specific colours
+
+brexit_plot &lt;- brexit %&gt;% 
+                ggplot(aes(x=percent, y=leave_share)) +
+                geom_point(shape = 21, stroke = 0, alpha = 0.5, size = 2, #add scatter plot,
+                           aes(fill = party))+ #fill dots by party + make transparent 
+                scale_fill_manual(values = colours, #fill dots with party colour
+                                  breaks = c(&quot;con_2015&quot;, &quot;lab_2015&quot;, &quot;ld_2015&quot;,&quot;ukip_2015&quot;), #change labels
+                                  labels = c(&quot;Conservative&quot;, &quot;Labour&quot;, &quot;Lib Dems&quot;, &quot;UKIP&quot;))+   
+                scale_colour_manual(values = colours, #outline with party colour
+                                    breaks = c(&quot;con_2015&quot;, &quot;lab_2015&quot;, &quot;ld_2015&quot;,&quot;ukip_2015&quot;), #change labels
+                                    labels = c(&quot;Conservative&quot;, &quot;Labour&quot;, &quot;Lib Dems&quot;, &quot;UKIP&quot;))+
+                scale_x_continuous(limits = c(0, 82))+          #set limits of x scale
+                scale_y_continuous(limits = c(20, 100))+        #set limits of y scale
+                geom_smooth(method= lm, #add regression lines
+                            size = 0.5, #decrease line weight
+                            aes(group=party, color = party)) + #group and colour lines by party
+                theme_bw() + #ad black and white theme
+                theme(legend.position = &quot;bottom&quot;, #position legend at the bottom
+                      legend.title = element_blank()) + #delete legend title
+                labs(title = &quot;How political affiliation translated to Brexit Voting&quot;, #add title
+                     x = &quot;Party % in the UK 2015 general election&quot;, #add axis labels
+                     y = &quot;Leave % in the 2016 Brexit referendum&quot;) +
+                NULL
+
+ggsave(&quot;brexit_plot.png&quot;, plot = brexit_plot, width = 11, height = 7, path = here::here(&quot;data&quot;, &quot;images&quot;))
+knitr::include_graphics(here::here(&quot;data&quot;, &quot;images&quot;, &quot;brexit_plot.png&quot;))</code></pre>
+<p><img src="/Users/MarieCordes1/myrepo/mywebsite/data/images/brexit_plot.png" width="1650" style="display: block; margin: auto;" /></p>
+<p>In this final analysis we plot the respective share of voters for the Conservative Party, Labour Party, Liberal Democrats and UKIP per constituency in 2015 compared to the respective leave share in the Brexit referendum in 2016.</p>
+<p>We find that two positive relationships and two negative relationships. More precisely, we find a steep regression line between the UKIP share and leave-share and a slightly upward facing slope for the regression line between the Conservative Party share and the leave share. This would indicate that the higher the share of UKIP voters in a constituency, the higher the share of pro-Brexit voters.</p>
+<p>Despite the regression line being slightly positive, the scatterplot of the Conservative party does not allow for a clear interpretation. This is also true for the Labour Party, despite this regression line being slightly downward sloped.</p>
+<p>The scatterplot and regression line of the Liberal Democrats Party is also negatively sloped and is a little more clear on this relationship. This means, we can interpret that the lower the share of Liberal Democrat voters in a constituency, the higher the share of pro-Brexit voters.</p>
+<p>Only looking at this analysis, we would now conclude that there is no clear opinion on Brexit within voters of the Conservative- and Labour Party while there is a tendency that UKIP party voters support Brexit and Liberal Democrats do not support Brexit.</p>
+<p>This is, however, a rather superficial analysis and in order to find meaningful and definitive interpreations, we would have to look at relationships between further variables.</p>
+</div>
+</div>
+</div>

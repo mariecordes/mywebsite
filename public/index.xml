@@ -68,5 +68,16 @@ summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 2
 I am an open-minded, curious and enthusiastic person. I love to smile and I love to make others smile, too. Always up for a new adventure, I love going new places and trying new things. Athough I can be very stubborn, I am a loving person that puts all of her emotions into the people and things she loves.</description>
     </item>
     
+    <item>
+      <title>Brexit Voting Analysis</title>
+      <link>/projects/project2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/project2/</guid>
+      <description>Exploratory Data Analysis In the following we will look at a dataset concerning the results of the 2016 Brexit vote in the UK.
+Raw Data We will have a quick look at the results of the 2016 Brexit vote in the UK. First we read the data using vroom and have a quick glimpse at the data.
+brexit_results &amp;lt;- vroom::vroom(here::here(&amp;quot;data&amp;quot;,&amp;quot;brexit_results.csv&amp;quot;)) glimpse(brexit_results) ## Rows: 632 ## Columns: 11 ## $ Seat &amp;lt;chr&amp;gt; &amp;quot;Aldershot&amp;quot;, &amp;quot;Aldridge-Brownhills&amp;quot;, &amp;quot;Altrincham and Sale … ## $ con_2015 &amp;lt;dbl&amp;gt; 50.</description>
+    </item>
+    
   </channel>
 </rss>
