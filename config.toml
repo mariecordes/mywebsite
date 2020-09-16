@@ -95,7 +95,7 @@ disqusShortname = ""
     [[params.tiles.showcase]]
       title = "About me"
       subtitle = "Learn more about me"
-      image = "pic01.jpg"
+      image = "projects/project1.jpg"
       url = "projects/project1"
 
     [[params.tiles.showcase]]
@@ -168,12 +168,12 @@ disqusShortname = ""
     # You can add multiple emails, phone numbers, or addresses
     # by copying the corresponding map with frontmatter code.
     [[params.contact.email]]
-    title = "Available upon request"
-    #email = "example@domain.com"
+    title = "Email"
+    email = "Available upon request"
 
     [[params.contact.phone]]
-    title = "Available upon request"
-    #phone = "(000) 000-0000 x1234"
+    title = "Phone"
+    phone = "Available upon request"
 
     [[params.contact.address]]
     title = "Address"
