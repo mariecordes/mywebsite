@@ -1,0 +1,290 @@
+---
+title: 'Pre-programme Assignment 1'
+author: "Marie Cordes"
+date: "22/08/2020"
+output:
+  html_document:
+    highlight: zenburn
+    theme: flatly
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+---
+
+
+```{r load-libraries, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(gapminder)  # gapminder dataset
+library(here)
+```
+
+# Task 1: Short biography written using markdown
+
+
+
+
+## **Marie Cordes** - A short biography
+
+### Intro
+
+My name is Marie Cordes and I was born on December 6th, 1996 in Bremen, Germany.
+
+I am an open-minded, curious and enthusiastic person. I love to smile and I
+love to make others smile, too. Always up for a new adventure, I love going 
+new places and trying new things. Athough I can be very stubborn, I am a loving
+person that puts _all_ of her emotions into the people and things she loves. 
+
+I am a food lover and world traveler. If I'm home, I love to cook and bake
+and if I'm traveling I love (**love!**) trying out new food and eating from 
+the local cuisine.
+
+**Three of my favourite things**
+
+1. Practicing yoga
+2. Making banana bread 
+3. Wearing striped clothes
+
+If you want to learn more about me and my personality, read more in my [horoscope](https://www.astrology-zodiac-signs.com/zodiac-signs/sagittarius/) !
+
+### Over the years
+
+I was born in Germany and spent all my life there with my family until I was 18.
+
+This is my home town **Bremen**:
+
+![Bremen](https://a.cdn-hotels.com/gdcs/production129/d1584/99bef550-7f75-11e8-9bad-0242ac110002.jpg)
+
+
+After graduating from high school, I was ready to explore the world and wanted 
+to see something new. I moved to the UK and lived in **Bedford** as an au-pair 
+for a year. A year later, I moved to a small village in Germany called 
+**Vallendar** to start my bachelor's degree at WHU - Otto Beisheim School of 
+Management. I had an incredible 3 years at WHU, meeting great people, making 
+good friends, learning a whole lot more about the world (_learning a whole lot 
+more about myself, too_) and exploring the world.
+
+As part of my studies, I spent my first summer internship in **Hong Kong**, 
+working at a music-tech start-up. I loved living in Hong Kong, getting to 
+know the city, its people and its culture.
+
+My favourite dishes I got to know there are:
+
+- BBQ Pork Buns
+- Xiao Long Bao (Soup dumplings)
+- Vietnamese Rice Vermicelli
+
+_(If this makes you hungry, try [this](https://thewoksoflife.com/steamed-bbq-pork-buns-char-siu-bao/))_
+
+After spending some time back at uni and doing another internship in 
+**Frankfurt**, I spent a semester abroad at Tulane University in **New Orleans** 
+in the US. I had a great time there, exploring the American South and its unique culture. If you have not been there - go see yourself. There is no place like NOLA! 
+
+![NOLA](https://images.canusa.de/img/regionen/usa/suedstaaten/louisiana/new-orleans/no-content-pg-french-quarter-cathedral.cr3500x2328-0x0.1280x0.q50.jpg)
+
+_Don't forget to try the **beignets**!_
+
+After returning to Germany and graduating from university, I spent the last year
+as a _gap year_. I did several internships in **Berlin** and **Hamburg** and 
+traveled through Portugal and Italy (_since I wasn't able go to Asia as originally
+planned... - hopefully another time!_)
+
+Now I am ready for a new adventure and am looking forward to starting my new 
+chapter at LBS in **London**.
+
+
+
+
+# Task 2: `gapminder` country comparison
+
+The `gapminder` dataset has data on life expectancy, population, and GDP per capita for 142 countries from 1952 to 2007. To get a glipmse of the dataframe, namely to see the variable names, variable types, etc., we use the `glimpse` function. We can also have a look at the first 20 rows of data.
+
+```{r}
+glimpse(gapminder)
+
+head(gapminder, 20) # look at the first 20 rows of the dataframe
+
+```
+
+
+Here, I have created the `country_data` and `continent_data` with the code below. 
+
+```{r}
+country_data <- gapminder %>% 
+            filter(country == "Germany") # Choosing Germany because I am from Germany
+
+continent_data <- gapminder %>% 
+            filter(continent == "Europe")
+```
+
+
+In the following, I created a plot of life expectancy over time for Germany from 1952 to 2007 to see how life expectancy has changed over the years in my home country.
+
+```{r, lifeExp_one_country}
+plot1 <- ggplot(country_data, aes(x = year, y = lifeExp)) +
+     geom_point() +
+     geom_smooth(se = FALSE) +
+     NULL 
+
+plot1
+```
+
+
+Next, I added a title to the graph and named both the x and y axis by using the `labs()` function. 
+
+```{r, lifeExp_one_country_with_label}
+plot1 <- ggplot(country_data, aes(x = year, y = lifeExp)) +
+     geom_point() +
+     geom_smooth(se = FALSE) +
+     labs(title = "Life Expectancy in Germany (1957-2007)",
+         x = "Year",
+         y = "Life Expectancy in years of age") +
+     NULL
+
+
+print(plot1)
+```
+
+
+Next, I want to produce a graph to see how the life expectancy has changed over the years in Europe - the continent which Germany belongs to.
+
+Here, I created a plot with the continent data. I also colour-coded the countries - as a lot of countries in Europe are part of the data set, this plot becomes very messy when I map the `country` variable to the colour aesthetic.
+
+```{r lifeExp_one_continent}
+ggplot(continent_data, aes(x = year, y = lifeExp, colour = country)) +
+   geom_point() + 
+   geom_smooth(se = FALSE) +
+   labs(title = "Life Expectancy in Europe (1957-2007)",
+         x = "Year",
+         y = "Life Expectancy in years of age") + 
+  NULL
+```
+
+
+**Alternative 1:** Here, I used the same data as above but created the plot without the colour-coding to give an overview of the development of life expectancy in Europe.
+
+```{r lifeExp_one_continent_1}
+ggplot(continent_data, aes(x = year, y = lifeExp)) +
+   geom_point() + 
+   geom_smooth(se = FALSE) +
+  labs(title = "Life Expectancy in Europe (1957-2007)",
+         x = "Year",
+         y = "Life Expectancy in years of age") + 
+   NULL
+```
+
+
+**Alternative 2:** Alternatively, I split the plot created above into all countries - to show the differences within the countries in Europe.
+
+```{r lifeExp_one_continent_2}
+ggplot(continent_data, aes(x = year, y = lifeExp)) +
+   geom_point() + 
+   geom_smooth(se = FALSE) +
+   facet_wrap(~country) +
+labs(title = "Life Expectancy in Europe per country (1957-2007)",
+         x = "Year",
+         y = "Life Expectancy in years of age") + 
+   NULL
+```
+
+
+Here, I created a plot from the original `gapminder` data, showing the life expectancy over the years _per_ continent.
+
+```{r lifeExp_facet_by_continent}
+ggplot(data = gapminder , mapping = aes(x = year , y = lifeExp)) +
+   geom_point() + 
+   geom_smooth(se = FALSE) +
+   facet_wrap(~continent) +
+   theme(legend.position="none") +
+   NULL
+```
+
+
+## Analysis & Interpretation
+The life expectancy of humans overall increases over the years 1952 to 2007 on all continents. 
+This may be due to improved and more widely available healthcare and medicine all around the world. Additionally, globalisation 
+allows us to share advice on health and wellbeing world-wide which makes the planet overall more knowledgable on how to extend our
+lives. 
+
+Africa, the Americas and Asia all experienced a relatively steep increase in life expectancy over time which may result from an extreme improvement of healthcare in those continents in the regarded 55 years. Europe and Oceania seem to have already had a better health infrastracture during the mid-20th century as their life expectancies were already comparatively high at the beginning of the observations in 1952. Still, their healthcare also improved over the years - and so did these continents' life expectancy - but as the initial level was already relatively higher, the overall increase in life expextancy in Europe and Oceania was not as rapid as in Afria, the Americas and Asia.
+
+Lastly, the increase in life expectancy seems to slow down or even slightly stagnate on all continents but Oceania, possibly indicating that a certain limit to life expectancy will soon be reached. Furthermore, in Africa, average life expectancy seems to have already stagnated - if not will soon begin to decrease. This may indicate a deterioration of healthcare and wellbeing in some countries in Africa. This could also be explained by severe diseases or pandemics leading to earlier deaths in a few countries that decrease the overall continent life expectancy.
+
+It is, however, difficult to make clear analyses per continent as most continents show wide differences in life expectancy developments between the countries within one continent. This is not true for Oceania as it only consists of two countries with similar life expectancies. The graphs, however, show that there are large ranges of the highest and lowest life expectancies and their developments over time per country on all other continents.
+
+
+
+
+# Task 3: Brexit voting
+
+We will have a quick look at the results of the 2016 Brexit vote in the UK. First we read the data using `read_csv()` and have a quick glimpse at the data.
+
+```{r load_brexit_data, warning=FALSE, message=FALSE}
+brexit_results <- read_csv(here::here("Data","brexit_results.csv"))
+
+
+glimpse(brexit_results)
+```
+
+To get a sense of the spread of the data, we plot a histogram and a density plot of the leave share in all constituencies.
+
+```{r brexit_histogram, warning=FALSE, message=FALSE}
+ggplot(brexit_results, aes(x = leave_share)) +
+  geom_histogram(binwidth = 2.5) +
+  labs(title = "Spread of 'leave-votes' share",
+        subtitle = "Histogram showing the spread of the proportion of 'leave the EU-votes' over all constituencies",
+         x = "Share of leave-votes",
+         y = "Count of constituencies")
+
+ggplot(brexit_results, aes(x = leave_share)) +
+  geom_density() +
+ labs(title = "Density of 'leave-votes' share",
+        subtitle = "Density plot showing the spread/density of the proportion of 'leave the EU-votes' over all constituencies",
+         x = "Share of leave-votes",
+         y = "Density over all constituencies")
+
+
+```
+
+One common explanation for the Brexit outcome was fear of immigration and opposition to the EU's more open border policy. We can check the relationship (or correlation) between the proportion of native born residents (`born_in_uk`) in a constituency and its `leave_share` by calculating the correlation between the two variables.
+
+```{r brexit_immigration_correlation}
+brexit_results %>% 
+  select(leave_share, born_in_uk) %>% 
+  cor()
+```
+
+The correlation is almost **0.5**, which shows that the two variables are positively correlated. 
+
+We can also create a scatterplot between these two variables using `geom_point`. We also add the best fit line, using  `geom_smooth(method = "lm")`. 
+
+```{r brexit_immigration_plot}
+ggplot(brexit_results, aes(x = born_in_uk, y = leave_share)) +
+  geom_point(alpha=0.3) +
+  geom_smooth(method = "lm") +
+  theme_bw() +
+  labs(title = "Share of UK-born voters and share of leave-EU voters relationship",
+       subtitle = "Relationship between the share of voters born in the UK and the share of voters that voted to leave the EU over all constituencies",
+       x = "Share of UK-born voters",
+       y = "Share of leave-voters") +
+  NULL
+```
+
+## Analysis & Interpretation
+Looking at the above graph and the derived correlation of 0.49, a positive relationship between the share of UK-born voters and voters that voted to leave the EU becomes visible. This means that the higher the share of UK-born voters a constituency in the UK has, the more likely the constituency is to also have a higher share of pro-Brexit voters. On the other hand, the higher the share of voters that were born outside of the UK belong to/vote in a constitucency, the lower the share of voters in favour of staying in the EU. 
+
+This result is not surprising when we look at the pro and con arguments for Brexit. Brexit means leaving the EU and, thereby, returning the UK to its traditional values, seperated from the EU's values and regulations. It also means focusing on the UK first and the British being able to govern the country as they like - without major interferences or guidelines from the EU. This means a return to a more traditional and historic UK with less influence from the rest of the continent. Obviously, this is more ingrained into people that were born in the UK and are interested in keeping its culture and values alive. Voters that were not born in the UK may be more interested in well-established international relations as well as a country that is more adapted to the rest of the continent and supports globalized values.  
+
+Next to the topic of values and traditions, as mentioned above: _"One common explanation for the Brexit outcome was fear of immigration and opposition to the EU's more open border policy."_ Here, it becomes clear that non-UK-born voters are immigrants themselves and, therefore, most probably support more open-minded policies regarding immigrants as well as open border policies. These non-UK-born voters may be interested in the UK being on good terms with their own home country. Further, they may be interested to be able to easily and freely travel to their home countries and back as well as work in the UK. These arguments support the observation that the higher the share of non-UK-born voters live in a constituency, the lower the share of leave-voters.
+
+Lastly, the graph clearly shows that there are more constituencies in the UK with a higher share (approx. 80% and above) of UK-born voters. This is not a surprise since the majority of the population in the UK is also UK-born. Nevertheless, the plot shows some outliers to the overall trend as a few constituencies with a high share of UK-born voters (e.g. >90%) have a relatively low share of leave-voters (<30%). Most of the constituencies with <80% of UK-born voters are relatively widely-spread within a range of 20% to 60% share of leave-voters. There is a slight trend towards lower share of UK-born voters translating to lower share of leave-votes but overall, these observations are quite scattered and it's difficult to determine a definitive, clear trend.
+Generally, the points in the plot clearly cluster in the upper right corner, showing that most of the consitutencies consist of mainly UK-born voters and have a relatively high share of leave-voters. In the end, this was logically followed by the UK voters deciding to leave the EU.
+
+In a next step, it would be interesting to also analyse the relationship between the `leave-share` variable and the `age_18to24` variable. As most often the younger generations in the UK were more likely to be in favour of keeping an alliance with the EU in order to stay globally connected, I would expect this analysis to show that a higher share of 18 to 24 year-olds in a constituency means a relatively lower share of leave-voters.
+
+
+# Details
+
+- Who did you collaborate with: No one
+- Approximately how much time did you spend on this problem set: 4 hours
+- What, if anything, gave you the most trouble: small details in the code that I forgot about
