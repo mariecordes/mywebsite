@@ -67,14 +67,14 @@ disqusShortname = ""
     #    url = "UrlOfLink"
 
     # Button Style 1
-    [[params.navigation.button1]]
-      name = "Get Started"
-      url = "blogs"
+    #[[params.navigation.button1]]
+      #name = "Get Started"
+      #url = "blogs"
 
     # Button Style 2
-    [[params.navigation.button2]]
-      name = "Log In"
-      url = "#"
+    #[[params.navigation.button2]]
+      #name = "Log In"
+      #url = "#"
 
 
   # Banner section
@@ -140,7 +140,7 @@ disqusShortname = ""
   [params.two]
     enable = true
     title = "Learn more about who I am"
-    subtitle = "Curious, enthusiastic and open-minded. Business & Management undergrad in 2019. Analytics & Management masters in 2021. Born and raised in Germany. Lived in Germany, the UK, Hong Kong & the US. Enjoy practicing yoga, making banana bread and wearing striped clothes. Food lover, world traveler and London explorer. Alwas up for a challenge. Looking to inspire and to be inspired."
+    subtitle = "Curious, enthusiastic and open-minded. Business & Management undergrad in 2019. Analytics & Management masters in 2021. Born and raised in Germany. Lived in the UK, Hong Kong & the US. Enjoy practicing yoga, making banana bread and wearing striped clothes. Food lover, world traveler and London explorer. Alwas up for a challenge. Looking to inspire and to be inspired."
     buttonText = "Get Started"
     url = "blogs"
 
@@ -177,7 +177,7 @@ disqusShortname = ""
 
     [[params.contact.address]]
     title = "Address"
-    street = "London Business School,\n Regent's Park"
+    street = "London Business School, Regent's Park"
     city = "London, NW1 4SA"
     country = "United Kingdom"
 
