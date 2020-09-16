@@ -1,5 +1,5 @@
 # Site settings
-baseURL = "http://example.org/"
+baseURL = "https://mariecordes.netlify.app/"
 languageCode = "en-us"
 title = "Marie Cordes's Portfolio Website"
 theme = "forty"
@@ -99,28 +99,28 @@ disqusShortname = ""
       url = "blogs/aboutme"
 
     [[params.tiles.showcase]]
+      title = "CV"
+      subtitle = "Learn more about my career path"
+      image = "pic02.jpg"
+      url = "blogs/cv"
+
+    [[params.tiles.showcase]]
       title = "Portfolio"
       subtitle = "Learn more about my work"
-      image = "pic02.jpg"
+      image = "pic03.jpg"
       url = "blogs/portfolio"
 
     [[params.tiles.showcase]]
       title = "Blog"
       subtitle = "Learn more about my life"
-      image = "pic03.jpg"
+      image = "pic04.jpg"
       url = "blogs/blog"
 
-    [[params.tiles.showcase]]
-      title = "London"
-      subtitle = "Learn more about my favourite city"
-      image = "pic04.jpg"
-      url = "blogs/london"
-
-    [[params.tiles.showcase]]
-      title = "Contact"
-      subtitle = "Reach out to me"
-      image = "pic05.jpg"
-      url = "blogs/contact"
+    #[[params.tiles.showcase]]
+      #title = "Contact"
+      #subtitle = "Reach out to me"
+      #image = "pic05.jpg"
+      #url = "blogs/contact"
 
     #[[params.tiles.showcase]]
       #title = "Etiam"
@@ -140,7 +140,7 @@ disqusShortname = ""
   [params.two]
     enable = true
     title = "Learn more about me and what I do"
-    subtitle = """Marie Cordes. That mean\nCurious, enthusiastic and open-minded.\nBusiness & Management undergrad in 2019.\nAnalytics & Management masters in 2021.\nBorn and raised in Germany.\nLived in Germany, the UK, Hong Kong & the US.\nEnjoy practicing yoga, making banana bread and wearing striped clothes.\nFood lover, world traveler and London explorer.\nAlwas up for a challenge.\nLooking to inspire and to be inspired."
+    subtitle = """Marie Cordes. That means:\nCurious, enthusiastic and open-minded.\nBusiness & Management undergrad in 2019.\nAnalytics & Management masters in 2021.\nBorn and raised in Germany.\nLived in Germany, the UK, Hong Kong & the US.\nEnjoy practicing yoga, making banana bread and wearing striped clothes.\nFood lover, world traveler and London explorer.\nAlwas up for a challenge.\nLooking to inspire and to be inspired."
 
     buttonText = "Get Started"
     url = "blogs"
