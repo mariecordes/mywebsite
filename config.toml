@@ -140,8 +140,7 @@ disqusShortname = ""
   [params.two]
     enable = true
     title = "Learn more about me and what I do"
-    subtitle = """Marie Cordes. That means:\nCurious, enthusiastic and open-minded.\nBusiness & Management undergrad in 2019.\nAnalytics & Management masters in 2021.\nBorn and raised in Germany.\nLived in Germany, the UK, Hong Kong & the US.\nEnjoy practicing yoga, making banana bread and wearing striped clothes.\nFood lover, world traveler and London explorer.\nAlwas up for a challenge.\nLooking to inspire and to be inspired."
-
+    subtitle = "Marie Cordes. That means: Curious, enthusiastic and open-minded. Business & Management undergrad in 2019. Analytics & Management masters in 2021. Born and raised in Germany. Lived in Germany, the UK, Hong Kong & the US. Enjoy practicing yoga, making banana bread and wearing striped clothes. Food lover, world traveler and London explorer. Alwas up for a challenge. Looking to inspire and to be inspired."
     buttonText = "Get Started"
     url = "blogs"
 
