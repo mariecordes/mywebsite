@@ -119,7 +119,7 @@ Some conclusions we can, for example, draw is that those variables that have an 
 
 ## Visualizations
 
-In order to add a the `ggthemr` **fresh** theme to all the following ggplots, we run this command:
+In order to add the `ggthemr` **fresh** theme to all the following ggplots, we run this command:
 
 ```{r, add_fresh_theme}
 ggthemr('dust')
