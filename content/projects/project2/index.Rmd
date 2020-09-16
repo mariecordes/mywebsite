@@ -46,6 +46,7 @@ library(openintro)
 library(usethis)
 library(devtools)
 library(bbplot)
+library(ggthemr)
 ```
 
 # Exploratory Data Analysis
@@ -118,15 +119,22 @@ Some conclusions we can, for example, draw is that those variables that have an 
 
 ## Visualizations
 
+In order to add a the `ggthemr` **fresh** theme to all the following ggplots, we run this command:
+
+```{r, add_fresh_theme}
+ggthemr('dust')
+```
+
+
 ### Correlations
 
 To get a sense of the data and the relationships between the variables, we plot create a `ggpairs` plot which shows each respective correlation and scatterplot for all two variable pairs. 
 
 
-```{r}
+```{r, ggpairs}
 brexit_results %>% 
   select(-Seat, -degree) %>% 
-  GGally::ggpairs(alpha = 0.4) +
+  GGally::ggpairs(alpha = 0.2) +
       theme_minimal()
 ```
 
@@ -153,7 +161,6 @@ ggplot(brexit_results, aes(x = leave_share)) +
         subtitle = "Histogram showing the spread of the proportion of 'leave the EU-votes' over all constituencies",
          x = "Share of leave-votes",
          y = "Count of constituencies") +
-  #bbc_style()+
   NULL
 
 ggplot(brexit_results, aes(x = leave_share)) +
@@ -162,7 +169,6 @@ ggplot(brexit_results, aes(x = leave_share)) +
         subtitle = "Density plot showing the spread/density of the proportion of 'leave the EU-votes' over all constituencies",
          x = "Share of leave-votes",
          y = "Density over all constituencies") +
-  #bbc_style() +
   NULL
 
 
@@ -186,12 +192,11 @@ We can also create a scatterplot between these two variables using `geom_point`.
 ggplot(brexit_results, aes(x = born_in_uk, y = leave_share)) +
   geom_point(alpha=0.3) +
   geom_smooth(method = "lm") +
-  theme_bw() +
   labs(title = "Share of UK-born voters and share of leave-EU voters relationship",
-       subtitle = "Relationship between the share of voters born in the UK and the share of voters that voted to leave the EU over all constituencies",
+       subtitle = "Relationship between the share of voters born in the UK \n and the share of voters that voted to leave the EU over all constituencies",
        x = "Share of UK-born voters",
        y = "Share of leave-voters") +
-  
+   
   NULL
 ```
 
@@ -215,7 +220,6 @@ As we have found earlier, the `brexit_results.csv` data set involves 632 observa
 As the four party share variables are all on the x-axis in the final plot, we will summarize them by using `pivot_longer`.
 
 ```{r, pivot_longer}
-
 brexit <- brexit_results %>% 
             select(Seat, con_2015, lab_2015, ld_2015, ukip_2015, leave_share) %>%      #eliminate irrelevant variables
             pivot_longer(2:5, names_to = "party", values_to = "percent" )             #pivot longer to summarize party variables
@@ -224,6 +228,8 @@ brexit <- brexit_results %>%
 With the manipulated data set, we can now reproduce the plot as above.
 
 ```{r, plot}
+ggthemr_reset() #reset 'fresh' theme because we will add own aes to the next plot
+
 colours <- c("#0087dc", "#d50000", "#FDBB30", "#EFE600") #define vector with party-specific colours
 
 brexit_plot <- brexit %>% 
@@ -249,8 +255,12 @@ brexit_plot <- brexit %>%
                      y = "Leave % in the 2016 Brexit referendum") +
                 NULL
 
-ggsave("brexit_plot.png", plot = brexit_plot, width = 11, height = 7, path = here::here("data", "images"))
-knitr::include_graphics(here::here("data", "images", "brexit_plot.png"))
+#save and scale differently if needed
+#ggsave("brexit_plot.png", plot = brexit_plot, width = 11, height = 7, path = here::here("data", "images"))
+#knitr::include_graphics(here::here("data", "images", "brexit_plot.png"))
+
+#otherwise just print as it is
+brexit_plot
   
 ```
 

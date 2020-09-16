@@ -373,14 +373,16 @@ We also find that our only character variable <code>Seat</code> has 632 unique v
 </div>
 <div id="visualizations" class="section level2">
 <h2>Visualizations</h2>
+<p>In order to add a the <code>ggthemr</code> <strong>fresh</strong> theme to all the following ggplots, we run this command:</p>
+<pre class="r"><code>ggthemr(&#39;dust&#39;)</code></pre>
 <div id="correlations" class="section level3">
 <h3>Correlations</h3>
 <p>To get a sense of the data and the relationships between the variables, we plot create a <code>ggpairs</code> plot which shows each respective correlation and scatterplot for all two variable pairs.</p>
 <pre class="r"><code>brexit_results %&gt;% 
   select(-Seat, -degree) %&gt;% 
-  GGally::ggpairs(alpha = 0.4) +
+  GGally::ggpairs(alpha = 0.2) +
       theme_minimal()</code></pre>
-<p><img src="/projects/project2/index_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/project2/index_files/figure-html/ggpairs-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>In the following, we describe a few findings based on these plots - no definitive results!</p>
 <p>We find an extremely high positive correlation at 0.85 between <code>leave_share</code> and <code>ukip_2015</code> as well as another significant positive correlations between <code>born_in_uk</code> and <code>leave_share</code>.</p>
 <p>The first observation may show that the majority of UKIP voters was also pro-Brexit. The latter relationship will be further investigated later on.</p>
@@ -397,7 +399,6 @@ We also find that our only character variable <code>Seat</code> has 632 unique v
         subtitle = &quot;Histogram showing the spread of the proportion of &#39;leave the EU-votes&#39; over all constituencies&quot;,
          x = &quot;Share of leave-votes&quot;,
          y = &quot;Count of constituencies&quot;) +
-  #bbc_style()+
   NULL</code></pre>
 <p><img src="/projects/project2/index_files/figure-html/brexit_histogram-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggplot(brexit_results, aes(x = leave_share)) +
@@ -406,7 +407,6 @@ We also find that our only character variable <code>Seat</code> has 632 unique v
         subtitle = &quot;Density plot showing the spread/density of the proportion of &#39;leave the EU-votes&#39; over all constituencies&quot;,
          x = &quot;Share of leave-votes&quot;,
          y = &quot;Density over all constituencies&quot;) +
-  #bbc_style() +
   NULL</code></pre>
 <p><img src="/projects/project2/index_files/figure-html/brexit_histogram-2.png" width="648" style="display: block; margin: auto;" /></p>
 </div>
@@ -424,12 +424,11 @@ We also find that our only character variable <code>Seat</code> has 632 unique v
 <pre class="r"><code>ggplot(brexit_results, aes(x = born_in_uk, y = leave_share)) +
   geom_point(alpha=0.3) +
   geom_smooth(method = &quot;lm&quot;) +
-  theme_bw() +
   labs(title = &quot;Share of UK-born voters and share of leave-EU voters relationship&quot;,
-       subtitle = &quot;Relationship between the share of voters born in the UK and the share of voters that voted to leave the EU over all constituencies&quot;,
+       subtitle = &quot;Relationship between the share of voters born in the UK \n and the share of voters that voted to leave the EU over all constituencies&quot;,
        x = &quot;Share of UK-born voters&quot;,
        y = &quot;Share of leave-voters&quot;) +
-  
+   
   NULL</code></pre>
 <p><img src="/projects/project2/index_files/figure-html/brexit_immigration_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Looking at the above graph and the derived correlation of 0.49, a positive relationship between the share of UK-born voters and voters that voted to leave the EU becomes visible. This means that the higher the share of UK-born voters a constituency in the UK has, the more likely the constituency is to also have a higher share of pro-Brexit voters. On the other hand, the higher the share of voters that were born outside of the UK belong to/vote in a constitucency, the lower the share of voters in favour of staying in the EU.</p>
@@ -447,7 +446,9 @@ Generally, the points in the plot clearly cluster in the upper right corner, sho
             select(Seat, con_2015, lab_2015, ld_2015, ukip_2015, leave_share) %&gt;%      #eliminate irrelevant variables
             pivot_longer(2:5, names_to = &quot;party&quot;, values_to = &quot;percent&quot; )             #pivot longer to summarize party variables</code></pre>
 <p>With the manipulated data set, we can now reproduce the plot as above.</p>
-<pre class="r"><code>colours &lt;- c(&quot;#0087dc&quot;, &quot;#d50000&quot;, &quot;#FDBB30&quot;, &quot;#EFE600&quot;) #define vector with party-specific colours
+<pre class="r"><code>ggthemr_reset() #reset &#39;fresh&#39; theme because we will add own aes to the next plot
+
+colours &lt;- c(&quot;#0087dc&quot;, &quot;#d50000&quot;, &quot;#FDBB30&quot;, &quot;#EFE600&quot;) #define vector with party-specific colours
 
 brexit_plot &lt;- brexit %&gt;% 
                 ggplot(aes(x=percent, y=leave_share)) +
@@ -472,9 +473,13 @@ brexit_plot &lt;- brexit %&gt;%
                      y = &quot;Leave % in the 2016 Brexit referendum&quot;) +
                 NULL
 
-ggsave(&quot;brexit_plot.png&quot;, plot = brexit_plot, width = 11, height = 7, path = here::here(&quot;data&quot;, &quot;images&quot;))
-knitr::include_graphics(here::here(&quot;data&quot;, &quot;images&quot;, &quot;brexit_plot.png&quot;))</code></pre>
-<p><img src="/Users/MarieCordes1/myrepo/mywebsite/data/images/brexit_plot.png" width="1650" style="display: block; margin: auto;" /></p>
+#save and scale differently if needed
+#ggsave(&quot;brexit_plot.png&quot;, plot = brexit_plot, width = 11, height = 7, path = here::here(&quot;data&quot;, &quot;images&quot;))
+#knitr::include_graphics(here::here(&quot;data&quot;, &quot;images&quot;, &quot;brexit_plot.png&quot;))
+
+#otherwise just print as it is
+brexit_plot</code></pre>
+<p><img src="/projects/project2/index_files/figure-html/plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>In this final analysis we plot the respective share of voters for the Conservative Party, Labour Party, Liberal Democrats and UKIP per constituency in 2015 compared to the respective leave share in the Brexit referendum in 2016.</p>
 <p>We find that two positive relationships and two negative relationships. More precisely, we find a steep regression line between the UKIP share and leave-share and a slightly upward facing slope for the regression line between the Conservative Party share and the leave share. This would indicate that the higher the share of UKIP voters in a constituency, the higher the share of pro-Brexit voters.</p>
 <p>Despite the regression line being slightly positive, the scatterplot of the Conservative party does not allow for a clear interpretation. This is also true for the Labour Party, despite this regression line being slightly downward sloped.</p>
