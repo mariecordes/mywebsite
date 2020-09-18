@@ -4,8 +4,8 @@ author: "Marie Cordes"
 date: "September 2020"
 output:
   html_document:
-    theme: flatly
-    highlight: zenburn
+    theme: material
+    highlight: kate
     number_sections: yes
     toc: yes
     toc_float: yes
@@ -49,6 +49,7 @@ library(devtools)
 library(ggthemr)
 library(readr)
 library(kableExtra)
+library(rmdformats)
 ```
 
 
@@ -141,6 +142,9 @@ ggplot(gapminder,
    geom_smooth(se = FALSE) +
    facet_wrap(~continent) +
    theme(legend.position="none") +
+  labs(title = "Life Expectancy over all continents",
+         x = "Year",
+         y = "Life Expectancy in years of age") + 
    NULL
 ```
 

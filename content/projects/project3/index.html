@@ -4,8 +4,8 @@ author: "Marie Cordes"
 date: "September 2020"
 output:
   html_document:
-    theme: flatly
-    highlight: zenburn
+    theme: material
+    highlight: kate
     number_sections: yes
     toc: yes
     toc_float: yes
@@ -97,6 +97,9 @@ labs(title = &quot;Life Expectancy in Europe per country (1957-2007)&quot;,
    geom_smooth(se = FALSE) +
    facet_wrap(~continent) +
    theme(legend.position=&quot;none&quot;) +
+  labs(title = &quot;Life Expectancy over all continents&quot;,
+         x = &quot;Year&quot;,
+         y = &quot;Life Expectancy in years of age&quot;) + 
    NULL</code></pre>
 <p><img src="/projects/project3/index_files/figure-html/lifeExp_facet_by_continent-1.png" width="648" style="display: block; margin: auto;" /></p>
 <div id="analysis-interpretation" class="section level2">
