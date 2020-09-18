@@ -1,0 +1,1264 @@
+---
+title: "Gapminder Analysis"
+author: "Marie Cordes"
+date: "September 2020"
+output:
+  html_document:
+    theme: flatly
+    highlight: zenburn
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+    code_folding: show
+---
+
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+<link href="/rmarkdown-libs/lightable/lightable.css" rel="stylesheet" />
+
+
+<p><img src="https://www.gapminder.org/wp-content/themes/gapminder/images/logo.png" /></p>
+<div id="gapminder-data-set" class="section level1">
+<h1>Gapminder data set</h1>
+<p>The <code>gapminder</code> dataset has data on life expectancy, population, and GDP per capita for 142 countries from 1952 to 2007. To get an understanding of the dataframe, namely to see the variable names, variable types, etc., we use the <code>glimpse</code> function. We also have a look at the first 10 rows of data.</p>
+<pre class="r"><code>#load gapminder data
+library(gapminder)
+
+#glimpse at data
+glimpse(gapminder)</code></pre>
+<pre><code>## Rows: 1,704
+## Columns: 6
+## $ country   &lt;fct&gt; Afghanistan, Afghanistan, Afghanistan, Afghanistan, Afghani…
+## $ continent &lt;fct&gt; Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia,…
+## $ year      &lt;int&gt; 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997,…
+## $ lifeExp   &lt;dbl&gt; 28.8, 30.3, 32.0, 34.0, 36.1, 38.4, 39.9, 40.8, 41.7, 41.8,…
+## $ pop       &lt;int&gt; 8425333, 9240934, 10267083, 11537966, 13079460, 14880372, 1…
+## $ gdpPercap &lt;dbl&gt; 779, 821, 853, 836, 740, 786, 978, 852, 649, 635, 727, 975,…</code></pre>
+<pre class="r"><code>#look at the first 10 rows of the data set
+head(gapminder, 10)</code></pre>
+<pre><code>## # A tibble: 10 x 6
+##    country     continent  year lifeExp      pop gdpPercap
+##    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+##  1 Afghanistan Asia       1952    28.8  8425333      779.
+##  2 Afghanistan Asia       1957    30.3  9240934      821.
+##  3 Afghanistan Asia       1962    32.0 10267083      853.
+##  4 Afghanistan Asia       1967    34.0 11537966      836.
+##  5 Afghanistan Asia       1972    36.1 13079460      740.
+##  6 Afghanistan Asia       1977    38.4 14880372      786.
+##  7 Afghanistan Asia       1982    39.9 12881816      978.
+##  8 Afghanistan Asia       1987    40.8 13867957      852.
+##  9 Afghanistan Asia       1992    41.7 16317921      649.
+## 10 Afghanistan Asia       1997    41.8 22227415      635.</code></pre>
+<p><strong>WHAT DO WE FIND?? SKIM?</strong></p>
+</div>
+<div id="country-comparison" class="section level1">
+<h1>Country Comparison</h1>
+<p>We start by creating two new data sets, <code>country_data</code> and <code>continent_data</code>, filtering the gapminder data for one country (here, my home country Germany) and for one continent (Europe).</p>
+<pre class="r"><code>country_data &lt;- gapminder %&gt;% 
+            filter(country == &quot;Germany&quot;) #Choosing Germany because I am from Germany
+
+continent_data &lt;- gapminder %&gt;% 
+            filter(continent == &quot;Europe&quot;)</code></pre>
+<p>In the following, we create a plot of life expectancy over time for Germany from 1952 to 2007 to see how life expectancy has changed over the years in my home country.</p>
+<pre class="r"><code>ggplot(country_data,
+       aes(x = year, y = lifeExp)) +
+     geom_point() +
+     geom_smooth(se = FALSE) +
+     labs(title = &quot;Life Expectancy in Germany (1957-2007)&quot;,
+          x = &quot;Year&quot;,
+          y = &quot;Life Expectancy in years of age&quot;) +
+     NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/lifeExp_one_country-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Next, we want to produce a graph to see how the life expectancy has changed over the years in Europe - the continent which Germany belongs to.</p>
+<p>We creat a plot with the continent data to give an overview of the development of life expectancy in Europe.</p>
+<pre class="r"><code>ggplot(continent_data, 
+       aes(x = year, y = lifeExp)) +
+   geom_point() + 
+   geom_smooth(se = FALSE) +
+  labs(title = &quot;Life Expectancy in Europe (1957-2007)&quot;,
+         x = &quot;Year&quot;,
+         y = &quot;Life Expectancy in years of age&quot;) + 
+   NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/lifeExp_one_continent_1-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>The plot above includes all countries in one graph. Alternatively, we can facet the plot per country to show the differences within the countries in Europe.</p>
+<pre class="r"><code>ggplot(continent_data, 
+       aes(x = year, y = lifeExp)) +
+   geom_point() + 
+   geom_smooth(se = FALSE) +
+   facet_wrap(~country) +
+labs(title = &quot;Life Expectancy in Europe per country (1957-2007)&quot;,
+         x = &quot;Year&quot;,
+         y = &quot;Life Expectancy in years of age&quot;) + 
+   NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/lifeExp_one_continent_2-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Despite there being differences within a continent, we can also look at the differences between continents. Here, we create a plot from the original <code>gapminder</code> data (not the filtered datasets created before), showing the life expectancy over the years <em>per</em> continent.</p>
+<pre class="r"><code>ggplot(gapminder, 
+       aes(x = year , y = lifeExp)) +
+   geom_point() + 
+   geom_smooth(se = FALSE) +
+   facet_wrap(~continent) +
+   theme(legend.position=&quot;none&quot;) +
+   NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/lifeExp_facet_by_continent-1.png" width="648" style="display: block; margin: auto;" /></p>
+<div id="analysis-interpretation" class="section level2">
+<h2>Analysis &amp; Interpretation</h2>
+<p>The life expectancy of humans overall increases over the years 1952 to 2007 on all continents.
+This may be due to improved and more widely available healthcare and medicine all around the world. Additionally, globalisation
+allows us to share advice on health and wellbeing world-wide which makes the planet overall more knowledgable on how to extend our
+lives.</p>
+<p>Africa, the Americas and Asia all experienced a relatively steep increase in life expectancy over time which may result from an extreme improvement of healthcare in those continents in the regarded 55 years. Europe and Oceania seem to have already had a better health infrastracture during the mid-20th century as their life expectancies were already comparatively high at the beginning of the observations in 1952. Still, their healthcare also improved over the years - and so did these continents’ life expectancy - but as the initial level was already relatively higher, the overall increase in life expextancy in Europe and Oceania was not as rapid as in Afria, the Americas and Asia.</p>
+<p>Lastly, the increase in life expectancy seems to slow down or even slightly stagnate on all continents but Oceania, possibly indicating that a certain limit to life expectancy will soon be reached. Furthermore, in Africa, average life expectancy seems to have already stagnated - if not will soon begin to decrease. This may indicate a deterioration of healthcare and wellbeing in some countries in Africa. This could also be explained by severe diseases or pandemics leading to earlier deaths in a few countries that decrease the overall continent life expectancy.</p>
+<p>It is, however, difficult to make clear analyses per continent as most continents show wide differences in life expectancy developments between the countries within one continent. This is not true for Oceania as it only consists of two countries with similar life expectancies. The graphs, however, show that there are large ranges of the highest and lowest life expectancies and their developments over time per country on all other continents.</p>
+</div>
+</div>
+<div id="gapminder-2.0" class="section level1">
+<h1>Gapminder 2.0</h1>
+<div id="tidy-and-clean-data" class="section level2">
+<h2>Tidy and clean data</h2>
+<p>Again recalling the original <code>gapminder</code> data frame from the gapminder package, we find that that data frame contains just six columns from the larger <a href="https://www.gapminder.org/data/">data in Gapminder World</a>.</p>
+<p>In this part, we join a few dataframes with more data than the ‘gapminder’ package. Specifically, we look at data on</p>
+<ul>
+<li>Life expectancy at birth (life_expectancy_years.csv)</li>
+<li>GDP per capita in constant 2010 US$ (<a href="https://data.worldbank.org/indicator/NY.GDP.PCAP.KD" class="uri">https://data.worldbank.org/indicator/NY.GDP.PCAP.KD</a>)</li>
+<li>Female fertility: The number of babies per woman (<a href="https://data.worldbank.org/indicator/SP.DYN.TFRT.IN" class="uri">https://data.worldbank.org/indicator/SP.DYN.TFRT.IN</a>)</li>
+<li>Primary school enrollment as % of children attending primary school (<a href="https://data.worldbank.org/indicator/SE.PRM.NENR" class="uri">https://data.worldbank.org/indicator/SE.PRM.NENR</a>)</li>
+<li>Mortality rate, for under 5, per 1000 live births (<a href="https://data.worldbank.org/indicator/SH.DYN.MORT" class="uri">https://data.worldbank.org/indicator/SH.DYN.MORT</a>)</li>
+<li>HIV prevalence (adults_with_hiv_percent_age_15_49.csv): The estimated number of people living with HIV per 100 population of age group 15-49.</li>
+</ul>
+<p>We use the <code>wbstats</code> package to download data from the World Bank. The relevant World Bank indicators are <code>SP.DYN.TFRT.IN</code>, <code>SE.PRM.NENR</code>, <code>NY.GDP.PCAP.KD</code>, and <code>SH.DYN.MORT</code></p>
+<pre class="r"><code># load data
+hiv &lt;- vroom(here::here(&quot;data&quot;, &quot;adults_with_hiv_percent_age_15_49.csv&quot;))
+life_expectancy &lt;- vroom(here::here(&quot;data&quot;, &quot;life_expectancy_years.csv&quot;))
+
+# get World bank data using wbstats
+library(wbstats)
+indicators &lt;- c(&quot;SP.DYN.TFRT.IN&quot;,&quot;SE.PRM.NENR&quot;, &quot;SH.DYN.MORT&quot;, &quot;NY.GDP.PCAP.KD&quot;)
+
+
+worldbank_data &lt;- wb_data(country=&quot;countries_only&quot;, #countries only- no aggregates like Latin America, Europe, etc.
+                          indicator = indicators, 
+                          start_date = 1960, #1952?
+                          end_date = 2016) #2007?
+
+# get a dataframe of information regarding countries, indicators, sources, regions, indicator topics, lending types, income levels,  from the World Bank API 
+countries &lt;-  wbstats::wb_cachelist$countries</code></pre>
+<p>In the following, we join the 3 dataframes (life_expectancy, worldbank_data, and HIV) into one. We tidy the data first and then perform <a href="http://r4ds.had.co.nz/relational-data.html">join operations</a>.</p>
+<p>We begin by tidying the <code>hiv</code> and the <code>life_expectancy</code> dataframes through <code>pivot_longer</code> so that we can summarize several coloumns which will help us with our analysis and, primarly, will help us to join the dataframes. We both use the <code>merge</code> and the <code>left_join</code> operations to try out what works and what doesn’t and see which one is preferable.</p>
+<p><em>(Disclaimer: We prefer <code>left_join</code> as join operation over <code>merge</code> as it’s faster but we keep both operations in our code to show that both are possible to use)</em></p>
+<pre class="r"><code>#tidy hiv through pivot longer
+hiv_tidy &lt;- hiv %&gt;% 
+  pivot_longer(cols = c(&quot;1979&quot;:&quot;2011&quot;),
+               names_to = &quot;date&quot;, 
+               values_to = &quot;cases&quot;)
+
+#tidy life_expectancy through pivot longer
+life_expectancy_tidy &lt;- life_expectancy %&gt;% 
+  pivot_longer(cols = c(&quot;1800&quot;:&quot;2100&quot;),
+               names_to = &quot;date&quot;, 
+               values_to = &quot;cases&quot;)
+
+#join dataframes
+hiv_life &lt;-merge(hiv_tidy, life_expectancy_tidy, 
+                 by = c( &quot;date&quot;,&quot;country&quot;))
+
+#select relevant variables
+world_clean &lt;- worldbank_data %&gt;% 
+  select(&quot;date&quot;,&quot;country&quot;,&quot;SP.DYN.TFRT.IN&quot;,&quot;SE.PRM.NENR&quot;, &quot;SH.DYN.MORT&quot;, &quot;NY.GDP.PCAP.KD&quot;)
+
+#join again
+world_hiv_life &lt;- merge(hiv_life,world_clean, 
+                        by = c(&quot;date&quot;,&quot;country&quot;))</code></pre>
+</div>
+<div id="data-gaps" class="section level2">
+<h2>Data gaps</h2>
+<p>Next, we investigate which regions have the most observations with missing HIV data by plotting a bar chart. We used colours to indicate the regions as putting the regions on the x-axis only looks messy.</p>
+<pre class="r"><code>#load data
+countries &lt;- vroom(here::here(&quot;data&quot;, &quot;countries.csv&quot;))
+
+#join data frames
+regions_countries_HIV &lt;- countries %&gt;% 
+  left_join(hiv_tidy, by=&quot;country&quot;) 
+
+missinghiv &lt;- regions_countries_HIV %&gt;% 
+  select(admin_region, cases) %&gt;% 
+  group_by(admin_region) %&gt;% 
+  summarize(na_count = sum(is.na(cases))) %&gt;% 
+  arrange(desc(na_count)) %&gt;% 
+  na.omit() #some countries are not placed in administrative regions, so we removed them
+
+ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = admin_region)) + 
+  geom_col()+
+  scale_x_discrete(label= &quot;&quot;)+
+  labs(title = &quot;Most data gaps for Sub-Saharan Africa&quot;,
+       subtitle = &quot;Number of missing values for HIV Data per region&quot;,
+       y=&quot;missing values for HIV Data&quot;,
+       x=&quot;&quot;) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.title = element_blank()) +
+  NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/get_data5-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>We find that, by far, the most values are missing within the Sub-Saharan Africa data observations. We will take these findings into consideration when regarding further analysis and their applicabilaty.</p>
+</div>
+<div id="hiv-vs.-life-expectancy" class="section level2">
+<h2>HIV vs. life expectancy</h2>
+<p>As a first analysis, we generate a scatterplot with a smoothing line to investigate the the relationship between HIV prevalence and life expectancy.</p>
+<pre class="r"><code>ggplot(data = world_hiv_life, aes(x= cases.x, y = cases.y)) + 
+        geom_point()+ 
+        geom_smooth() +
+        labs(title = &quot;Does HIV decrease a country&#39;s life expectancy?&quot; ,
+             subtitle = &quot;Relationship between HIV prevalence and life expectancy&quot;,
+             x = &quot;HIV Prevalence (%)&quot;, 
+             y = &quot;Life Expectancy (years of age)&quot;) + 
+        NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/get_data3-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>The graph shows a somewhat inverse relationships between HIV prevalence and life expectancy - however, this is only true for a lower percentage of HIV prevelance (below around 5%). We can further notice, that there are many more data points with a relatively low HIV prevalence. We can see that for an extremely low HIV prevelance (below around 3%), life expectancy is overall highest at up to more than 80. HIV prevalence of around 5%-30% corresponds to a somewhat lower life expectancy between 40 and 60.</p>
+<p>As the graph does not separate the time variable and plots several years for a country, we want to look at two graphs from 1990 (beginning of most data points) and 2011 (last data points) to understand if/how this relationship has developed over time.</p>
+<pre class="r"><code>world_hiv_life %&gt;% 
+  filter(date == &quot;1990&quot;) %&gt;% 
+    ggplot(aes(x= cases.x, y = cases.y)) + 
+        geom_point()+
+        geom_smooth()+ 
+        facet_wrap(~date)+
+        labs(title = &quot;Does HIV decrease a country&#39;s life expectancy?&quot; ,
+             subtitle = &quot;Relationship between HIV prevalence and life expectancy in 1990&quot;,
+             x = &quot;HIV Prevalence (%)&quot;, 
+             y = &quot;Life Expectancy (years of age)&quot;) + 
+        NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>world_hiv_life %&gt;% 
+  filter(date == &quot;2011&quot;) %&gt;% 
+    ggplot(aes(x= cases.x, y = cases.y)) + 
+        geom_point()+
+        geom_smooth()+ 
+        facet_wrap(~date)+
+        labs(title = &quot;Does HIV decrease a country&#39;s life expectancy?&quot; ,
+             subtitle = &quot;Relationship between HIV prevalence and life expectancy in 2011&quot;,
+             x = &quot;HIV Prevalence (%)&quot;, 
+             y = &quot;Life Expectancy (years of age)&quot;) + 
+        NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/unnamed-chunk-4-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>We find that the nature of the relationship (negative relationship) has stayed the same over time - it seems as if it even intensified over the years.</p>
+<p>Finally, we cannot tell from this analysis if the higher life expectancy is <strong>because of</strong> fewer relative HIV cases or if countries with generally higher life expectancy due to higher economic wealth and better health infrastructures are, thus, also less likely to experience HIV cases or earlier deaths caused by HIV.</p>
+<p>As the picture is not really clear, in a further analysis, we would use <code>facet_wrap</code> on this plot to investigate if there are any regional differences.</p>
+</div>
+<div id="gdp-vs.-fertility-rate" class="section level2">
+<h2>GDP vs. fertility rate</h2>
+<p>Next, we want to analyse the relationship between fertility rate and GDP per capita. As the general analysis gives us a rather odd picture, we facet by region to understand geographical trends better. In order to show the trends better, the scales are free and different per region.</p>
+<pre class="r"><code>#create new data set that includes regions
+worldbank_data_regions &lt;- wb_data(country = &quot;regions_only&quot; , #use aggregate regions
+                                  indicator = indicators, 
+                                  start_date = 1960, 
+                                  end_date = 2016)
+
+#select relevant variables
+world_clean_regions &lt;- worldbank_data_regions %&gt;% 
+  select(&quot;date&quot;,&quot;country&quot;,&quot;SP.DYN.TFRT.IN&quot;,&quot;SE.PRM.NENR&quot;, &quot;SH.DYN.MORT&quot;, &quot;NY.GDP.PCAP.KD&quot;)
+
+
+ggplot(data = world_clean_regions, 
+       aes(x= SP.DYN.TFRT.IN, y = NY.GDP.PCAP.KD)) + 
+          geom_point() +
+          geom_smooth()+
+          facet_wrap( ~ country, scale = &quot;free&quot;) +
+          labs (title = &quot;More babies, more money?&quot;, 
+                subtitle = &quot;Relationship between fertility rate and GDP per capita per region&quot;,
+                x = &quot;Fertility Rate (Number of babies per woman)&quot;, 
+                y = &quot;GDP per capita ($)&quot;) + 
+          NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/get_data4-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Again, the analyses are not 100% clear but there seem to be somewhat inverse relationships between fertility rate and a country’s GDP per capita in all regions - apart from some bumps inbetween. This effect is clearer in some areas (e.g. South Asia) than others (e.g. North America). However, we must not disregard the fact that some regions have a wide variety of countries and individual economic dynamics while other regions, such as North America, have fewer countries (here, only USA &amp; Canada), which could lead to difficulties in comparing everything one on one.</p>
+<p>Generally, one can observe a general trend of more a higher fertility rate translating to a lower GDP per capita and vice versa. This is a common difference between advanced and developing countries, where in developing countries, families often have multiple children while for families in advanced countries (with higher GDP per capita) it is more common to have around 2 children.</p>
+<p>Again, it is difficult to observe time as an important variable here. For further investigation, we add the colour graphics in the graph below and delete the geom_smooth trend line.</p>
+<pre class="r"><code>ggplot(data = world_clean_regions, 
+       aes(x= SP.DYN.TFRT.IN, y = NY.GDP.PCAP.KD, 
+           colour = date)) + 
+          geom_point() +
+          facet_wrap( ~ country, 
+                      scale = &quot;free&quot;) +
+          labs (title = &quot;More babies, more money?&quot;, 
+                subtitle = &quot;Relationship between fertility rate and GDP per capita per region&quot;,
+                x = &quot;Fertility Rate (Number of babies per woman)&quot;, 
+                y = &quot;GDP per capita ($)&quot;) + 
+          NULL</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/unnamed-chunk-5-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Consequently, we find that time is actually a highly influencing factor that we cannot disregard. Every graph (every region) clearly shows that there was a generally higher fertility rate and lower GDP per capita in the past which developed into a respectively higher (still on relative terms as there are still vast differences between countries’ GDP per capita) GDP per capita along with a lower fertility rate.</p>
+<p>This trend may have many influencing factors, one being women starting to work in full-time jobs over the past decades, increasing a countries GDP through added work while at the same time, potentially, leaving less time to have (many) children.</p>
+</div>
+<div id="child-mortality" class="section level2">
+<h2>Child mortality</h2>
+<p>Now, we investigate how the mortality rate for under 5 changed has changed by region. In each region, we find the top 5 countries that have seen the greatest improvement, as well as those 5 countries where mortality rates have had the least improvement or even deterioration. The ‘Aggregates’ panel serves the purpose of comparing regions to the general trend of all regions put together.</p>
+<pre class="r"><code>under5mortality &lt;- vroom(here::here(&quot;data&quot;, &quot;under5mortality.csv&quot;))
+
+#tidy data
+tidyunder5mortality &lt;- under5mortality %&gt;% 
+  pivot_longer(cols = c(&quot;1960&quot;:&quot;2019&quot;),
+               names_to = &quot;year&quot;, 
+               values_to = &quot;Mortality&quot;)  
+
+  names(tidyunder5mortality)[1]=&quot;country&quot;
+  
+#join datasets
+mortality_region &lt;- tidyunder5mortality %&gt;% 
+  left_join(regions_countries_HIV, by=&quot;country&quot;) 
+
+#select/calculate relevant data
+trend_under5 &lt;- mortality_region %&gt;% 
+  select(year, region, Mortality) %&gt;% 
+    group_by(year,region) %&gt;% 
+      na.omit() %&gt;% 
+        summarize(mean_mortality=mean(Mortality))
+
+#plot data
+ggplot(data = trend_under5, 
+       aes(x=year, 
+           y=mean_mortality, 
+           group = region)) +
+    geom_point() +
+    facet_wrap(~region, scale = &quot;free&quot;)+ #facet by region, set scale free to make it better understandable &amp; trends more visible
+  labs(title = &quot;Lower mortality rate for under 5 over the last decades globally&quot;,
+       subtitle = &quot;Change of mortality rate for under 5 over time per region&quot;,
+        y=&quot;Deaths per 1000 children&quot;,
+        x = &quot;Year&quot;)+
+        scale_x_discrete(name=&quot;&quot;,
+                         breaks  = c(&quot;1960&quot;,&quot;1970&quot;,&quot;1980&quot;,&quot;1990&quot;,&quot;2000&quot;,&quot;2010&quot;,&quot;2020&quot;) 
+        )</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/get_data6-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>As we can see, mortality rates for children under 5 have decreased in all regions over the past decades. This trend is most probably because of better health infrastructures and wealthier economies all around the world. More peace and less war will be an influencing factor too.</p>
+<p>Moving on, the following tables represent the percent changes in mortality rate for under 5 from 1970 to 2018. WHY 1970</p>
+<p>We will look at a number of tables that show the top 5 countries with both the greatest and worst improvement in mortality rates under 5. You will find the specific title commented in the code and then a table with the name of the 5 countries and their respective percent change (<code>pct_change</code> in percentage points).</p>
+<p>We will not discuss every single finding as several different regions and many different dynamics are in place here.</p>
+<pre class="r"><code>library(kableExtra)
+mortality_improvements &lt;- mortality_region %&gt;% 
+                              select(year,region,country, Mortality) %&gt;%
+                                group_by(year,country,region) %&gt;% 
+                                  filter(year == &quot;1970&quot; | year == &quot;2018&quot;) %&gt;% #selecting 1970 rather than 1960 as there were too many missing values in the latter 
+                                     unique() %&gt;% 
+                                      na.omit() 
+  
+
+mortality_improvements_new &lt;- mortality_improvements %&gt;% 
+                                  group_by(country) %&gt;% 
+                                    arrange(country) %&gt;% 
+                                      mutate(pct_change = (Mortality/lag(Mortality) - 1) * 100) %&gt;% 
+                                        na.omit()</code></pre>
+<div id="east-asia-pacific" class="section level3">
+<h3>East Asia &amp; Pacific</h3>
+<p>Here, we find the countries with the greatest improvement in child mortality (under 5) to be nations such as China, Singapore and Japan which have also economically boomed over the past decades, most probably leading to significant improvements in health infrastructures as well. All countries in this region with the least improvement are island nations, which potentially indicate less/more difficult accessibility to medical supplies.</p>
+<pre class="r"><code>#East Asia &amp; Pacific greatest improvement S
+east_asia_top &lt;- mortality_improvements_new %&gt;%
+                    filter(region == &quot;East Asia &amp; Pacific&quot;) %&gt;%
+                    select(country,pct_change) %&gt;% 
+                    arrange(pct_change) %&gt;% 
+                    head(5) 
+ 
+kbl(east_asia_top,
+    caption=&quot;Top 5 most improved in East Asia &amp; Pacific&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-6">Table 1: </span>Top 5 most improved in East Asia &amp; Pacific
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Korea, Rep. 
+</td>
+<td style="text-align:right;">
+-94.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+China
+</td>
+<td style="text-align:right;">
+-92.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Thailand
+</td>
+<td style="text-align:right;">
+-90.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Singapore
+</td>
+<td style="text-align:right;">
+-89.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Japan
+</td>
+<td style="text-align:right;">
+-85.6
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#East Asia &amp; Pacific smallest improvement INSELSTAATEN &gt; MEDICAL ANBINDUNG
+
+east_asia_bottom &lt;- mortality_improvements_new %&gt;%
+                        filter(region == &quot;East Asia &amp; Pacific&quot;) %&gt;%
+                        select(country,pct_change) %&gt;% 
+                        arrange(desc(pct_change)) %&gt;% 
+                        head(5) 
+                       
+kbl(east_asia_bottom,
+    caption=&quot;Top 5 least improved in East Asia &amp; Pacific&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-6">Table 1: </span>Top 5 least improved in East Asia &amp; Pacific
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Fiji
+</td>
+<td style="text-align:right;">
+-55.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Marshall Islands
+</td>
+<td style="text-align:right;">
+-58.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Kiribati
+</td>
+<td style="text-align:right;">
+-62.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Philippines
+</td>
+<td style="text-align:right;">
+-66.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Papua New Guinea
+</td>
+<td style="text-align:right;">
+-66.7
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="south-asia" class="section level3">
+<h3>South Asia</h3>
+<p>As there are only 8 countries observable, we decrease the smallest improvement to a top 3. Apart from Pakistan and Afghanistan, all countries in this region experienced a relatively high improvement in child mortality, possibly because overall improvements in health infrastructures and medical progress. Considerably lower percent changes in Pakistan and Afghanistan may result from war zones.</p>
+<pre class="r"><code>#South Asia greatest improvement
+sa_top &lt;- mortality_improvements_new %&gt;%
+            filter(region == &quot;South Asia&quot;) %&gt;%
+            select(country,pct_change) %&gt;% 
+            arrange(pct_change) %&gt;% 
+            head(5) 
+ 
+kbl(sa_top,
+    caption=&quot;Top 5 most improved South Asia&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-7">Table 2: </span>Top 5 most improved South Asia
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Maldives
+</td>
+<td style="text-align:right;">
+-96.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sri Lanka
+</td>
+<td style="text-align:right;">
+-89.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bhutan
+</td>
+<td style="text-align:right;">
+-89.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nepal
+</td>
+<td style="text-align:right;">
+-87.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bangladesh
+</td>
+<td style="text-align:right;">
+-86.5
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#South Asia smallest improvement 
+
+sa_bottom &lt;- mortality_improvements_new %&gt;%
+              filter(region == &quot;South Asia&quot;) %&gt;%
+              select(country,pct_change) %&gt;% 
+              arrange(desc(pct_change)) %&gt;% 
+              head(3) 
+ 
+kbl(sa_bottom,
+    caption=&quot;Top 3 least improved in South Asia&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-7">Table 2: </span>Top 3 least improved in South Asia
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Pakistan
+</td>
+<td style="text-align:right;">
+-63.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Afghanistan
+</td>
+<td style="text-align:right;">
+-79.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+India
+</td>
+<td style="text-align:right;">
+-82.9
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="europe-central-asia" class="section level3">
+<h3>Europe &amp; Central Asia</h3>
+<p>Here, we find already very privileged countries to have experienced the smallest improvements in child mortality as they already had/have well developed (health) infrastructures (e.g. Denmark, Netherlands, Switzerland). Less developed (for European terms) countries such as Turkey and Portugal have experienced comparatively high progress and, thus, also highest percentage imrpovements in child mortality rates.</p>
+<pre class="r"><code>#Europe &amp; Central Asia greatest improvement
+europe_asia_top &lt;- mortality_improvements_new %&gt;%
+                      filter(region == &quot;Europe &amp; Central Asia&quot;) %&gt;%
+                      select(country,pct_change) %&gt;% 
+                      arrange(pct_change) %&gt;% 
+                      head(5) 
+ 
+kbl(europe_asia_top,
+    caption=&quot;Top 5 most improved in Europe &amp; Central Asia&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-8">Table 3: </span>Top 5 most improved in Europe &amp; Central Asia
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Portugal
+</td>
+<td style="text-align:right;">
+-94.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Turkey
+</td>
+<td style="text-align:right;">
+-94.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Italy
+</td>
+<td style="text-align:right;">
+-91.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Finland
+</td>
+<td style="text-align:right;">
+-89.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Luxembourg
+</td>
+<td style="text-align:right;">
+-89.2
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Europe &amp; Central Asia smallest improvement
+europe_asia_bottom &lt;- mortality_improvements_new %&gt;%
+                        filter(region == &quot;Europe &amp; Central Asia&quot;) %&gt;%
+                        select(country,pct_change) %&gt;% 
+                        arrange(desc(pct_change)) %&gt;% 
+                        head(5) 
+ 
+kbl(europe_asia_bottom,
+    caption=&quot;Top 5 least improved in Europe &amp; Central Asia&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-8">Table 3: </span>Top 5 least improved in Europe &amp; Central Asia
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Denmark
+</td>
+<td style="text-align:right;">
+-74.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Netherlands
+</td>
+<td style="text-align:right;">
+-75.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Switzerland
+</td>
+<td style="text-align:right;">
+-77.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+France
+</td>
+<td style="text-align:right;">
+-78.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bulgaria
+</td>
+<td style="text-align:right;">
+-78.2
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="latin-america" class="section level3">
+<h3>Latin America</h3>
+<p>We can observe the variety of economical progress within Latin America by observing the large range of up to 91pp (Peru) improvement in child mortality rate over the time period as the best improvement and 40pp improvement as smallest change (Dominica). Again, we find island nations to have smaller improvements in child mortality rate, potentially indicating worse medical supply.</p>
+<pre class="r"><code>#Latin America greatest improvement
+latam_top &lt;- mortality_improvements_new %&gt;%
+                  filter(region == &quot;Latin America &amp; Caribbean&quot;) %&gt;%
+                  select(country,pct_change) %&gt;% 
+                  arrange(pct_change) %&gt;% 
+                  head(5) 
+ 
+kbl(latam_top,
+    caption=&quot;Top 5 most improved in Latin America &amp; Caribbean&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-9">Table 4: </span>Top 5 most improved in Latin America &amp; Caribbean
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Peru
+</td>
+<td style="text-align:right;">
+-91.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Chile
+</td>
+<td style="text-align:right;">
+-91.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+El Salvador
+</td>
+<td style="text-align:right;">
+-90.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ecuador
+</td>
+<td style="text-align:right;">
+-89.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nicaragua
+</td>
+<td style="text-align:right;">
+-89.4
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Latin America smallest improvement
+latam_bottom &lt;- mortality_improvements_new %&gt;%
+                  filter(region == &quot;Latin America &amp; Caribbean&quot;) %&gt;%
+                  select(country,pct_change) %&gt;% 
+                  arrange(desc(pct_change)) %&gt;% 
+                  head(5) 
+ 
+kbl(latam_bottom,
+    caption=&quot;Top 5 least improved in Latin America &amp; Caribbean&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-9">Table 4: </span>Top 5 least improved in Latin America &amp; Caribbean
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Dominica
+</td>
+<td style="text-align:right;">
+-40.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Guyana
+</td>
+<td style="text-align:right;">
+-59.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Venezuela, RB
+</td>
+<td style="text-align:right;">
+-60.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Trinidad and Tobago
+</td>
+<td style="text-align:right;">
+-64.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bahamas, The
+</td>
+<td style="text-align:right;">
+-66.4
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="middle-east-north-africa" class="section level3">
+<h3>Middle East &amp; North Africa</h3>
+<p>Here, we find countries such as the UAE, Oman and Bahrain that have developed into more privileged countries over the past decades to also show the best improvement in child mortality rates. Again, the countries with the smallest improvement include war zones and countries with less developed infrastructures.</p>
+<pre class="r"><code>#Middle East &amp; North Africa greatest improvement
+mena_top &lt;- mortality_improvements_new %&gt;%
+              filter(region == &quot;Middle East &amp; North Africa&quot;) %&gt;%
+              select(country,pct_change) %&gt;% 
+              arrange(pct_change) %&gt;% 
+              head(5) 
+ 
+kbl(mena_top,caption=&quot;Top 5 most improved in Middle East &amp; North Africa&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-10">Table 5: </span>Top 5 most improved in Middle East &amp; North Africa
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Oman
+</td>
+<td style="text-align:right;">
+-95.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+United Arab Emirates
+</td>
+<td style="text-align:right;">
+-92.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Egypt, Arab Rep. 
+</td>
+<td style="text-align:right;">
+-91.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Libya
+</td>
+<td style="text-align:right;">
+-91.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bahrain
+</td>
+<td style="text-align:right;">
+-90.6
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Middle East &amp; North Africa smallest improvement
+
+mena_bottom &lt;- mortality_improvements_new %&gt;%
+  filter(region == &quot;Middle East &amp; North Africa&quot;) %&gt;%
+  select(country,pct_change) %&gt;% 
+  arrange(desc(pct_change)) %&gt;% 
+  head(5) 
+ 
+kbl(mena_bottom,caption=&quot;Top 5 least improved in Middle East &amp; North Africa&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-10">Table 5: </span>Top 5 least improved in Middle East &amp; North Africa
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Malta
+</td>
+<td style="text-align:right;">
+-74.8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Iraq
+</td>
+<td style="text-align:right;">
+-76.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Jordan
+</td>
+<td style="text-align:right;">
+-81.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yemen, Rep. 
+</td>
+<td style="text-align:right;">
+-83.2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Syrian Arab Republic
+</td>
+<td style="text-align:right;">
+-83.8
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="north-america" class="section level3">
+<h3>North America</h3>
+<p>As we only have two countries with the USA and Canada, it’s difficult to draw conclusions and compare nations.</p>
+<pre class="r"><code>#North America greatest improvement
+na_top &lt;- mortality_improvements_new %&gt;%
+              filter(region == &quot;North America&quot;) %&gt;%
+              select(country,pct_change) %&gt;% 
+              arrange(pct_change) %&gt;% 
+              head(5) 
+ 
+kbl(na_top,
+    caption=&quot;USA &amp; Canada&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-11">Table 6: </span>USA &amp; Canada
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Canada
+</td>
+<td style="text-align:right;">
+-77.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+United States
+</td>
+<td style="text-align:right;">
+-72.0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sub-saharan-africa" class="section level3">
+<h3>Sub-Saharan Africa</h3>
+<p>We again find a large difference between the best improvement in percentage points at -88.6pp and the smallest improvement at -47.9pp. This shows the different dynamics in the many African countries and no clear trend or development that concerns the entire continent.</p>
+<p>We generally have to be careful with this interpretation as, as we found earlier, the data set includes many gaps for the Sub-Saharan Africa observations.</p>
+<pre class="r"><code>#Sub-Saharan Africa greatest improvement
+ssa_top &lt;- mortality_improvements_new %&gt;%
+              filter(region == &quot;Sub-Saharan Africa&quot;) %&gt;%
+              select(country,pct_change) %&gt;% 
+              arrange(pct_change) %&gt;% 
+              head(5) 
+
+kbl(ssa_top,
+    caption=&quot;Top 5 most improved in Sub-Saharan Africa&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-12">Table 7: </span>Top 5 most improved in Sub-Saharan Africa
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cabo Verde
+</td>
+<td style="text-align:right;">
+-88.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Malawi
+</td>
+<td style="text-align:right;">
+-85.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Senegal
+</td>
+<td style="text-align:right;">
+-84.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rwanda
+</td>
+<td style="text-align:right;">
+-84.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mauritius
+</td>
+<td style="text-align:right;">
+-81.4
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#Sub-Saharan Africa smallest improvement
+ssa_bottom &lt;- mortality_improvements_new %&gt;%
+                filter(region == &quot;Sub-Saharan Africa&quot;) %&gt;%
+                select(country,pct_change) %&gt;% 
+                arrange(desc(pct_change)) %&gt;% 
+                head(5) 
+ 
+kbl(ssa_bottom,
+    caption=&quot;Top 5 least improved in Sub-Saharan Africa&quot;) %&gt;% 
+  kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-12">Table 7: </span>Top 5 least improved in Sub-Saharan Africa
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+country
+</th>
+<th style="text-align:right;">
+pct_change
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Central African Republic
+</td>
+<td style="text-align:right;">
+-47.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lesotho
+</td>
+<td style="text-align:right;">
+-54.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nigeria
+</td>
+<td style="text-align:right;">
+-57.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Namibia
+</td>
+<td style="text-align:right;">
+-59.6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Zimbabwe
+</td>
+<td style="text-align:right;">
+-60.0
+</td>
+</tr>
+</tbody>
+</table>
+<p>Overall, it is noticeable that there was (luckily) no observation of an increase in child mortality rate between 1970 and 2018 in the observed countries.</p>
+<p>However, investigating a relative percent change will always only tell half the story. Knowing the actual beginning and ending rates of child mortality for each country would make this analysis more meaningful. More precisely, our percent change analysis does not show if, for example, a country already had a really low mortality rate and then only a small improvement or if it actually had a really high mortality rate but only a small improvement over time. This variable must not be disregarded when drawing meaningful conclusions.</p>
+<p>Furthermore, there are vast differences between what is considered a small (the smallest) change in the mortality rate as for some regions the smallest change was at -70pp and for some at -40pp.</p>
+</div>
+</div>
+<div id="primary-school-enrollment-vs.-fertility-rate" class="section level2">
+<h2>Primary school enrollment vs. fertility rate</h2>
+<p>Lastly, we investigate if there is a relationship between primary school enrollment and fertility rate. Again, as we disregard the time variable in the first plot, we facet different time periods to get a better understanding of the data.</p>
+<pre class="r"><code>#create new data set witout NAs
+no_na &lt;- worldbank_data %&gt;% 
+  na.omit()
+
+#create overall plot
+ggplot(data = no_na, 
+       aes(x = SP.DYN.TFRT.IN, y = SE.PRM.NENR))+ 
+    geom_point()+
+    labs(title = &quot;More children, less school?&quot;,
+         subtitle = &quot;Relationship between primary school enrollment and fertility rate&quot;,
+         x=&quot;Fertility rate (babies per woman)&quot;,
+         y=&quot;Primary School enrollment(%)&quot;)</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/get_data8-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#create  new data set with time periods
+ay_no_na &lt;- no_na %&gt;% 
+  filter(date == &quot;1970&quot;| 
+            date == &quot;1980&quot;| 
+            date == &quot;1990&quot;| 
+            date == &quot;2000&quot;| 
+            date == &quot;2010&quot;| 
+            date == &quot;2016&quot;) 
+
+ay_no_na</code></pre>
+<pre><code>## # A tibble: 480 x 8
+##    iso2c iso3c country  date NY.GDP.PCAP.KD SE.PRM.NENR SH.DYN.MORT
+##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;          &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+##  1 AO    AGO   Angola   2010          3588.        75.8       120. 
+##  2 AL    ALB   Albania  2000          2245.        95.4        27.2
+##  3 AL    ALB   Albania  2010          4094.        86.0        13.2
+##  4 AL    ALB   Albania  2016          4682.        94.1         9.4
+##  5 AE    ARE   United…  1980        116233.        76.2        35  
+##  6 AE    ARE   United…  1990         68781.        96.9        16.6
+##  7 AE    ARE   United…  2016         41045.        94.6         7.8
+##  8 AR    ARG   Argent…  1970          7084.        95.1        71.8
+##  9 AR    ARG   Argent…  2000          8224.        98.9        19.6
+## 10 AR    ARG   Argent…  2010         10386.        98.7        14.4
+## # … with 470 more rows, and 1 more variable: SP.DYN.TFRT.IN &lt;dbl&gt;</code></pre>
+<pre class="r"><code>#create plot and facet by time period
+ggplot(data = ay_no_na, 
+       aes(x = SP.DYN.TFRT.IN, y = SE.PRM.NENR))+ 
+  geom_point() +
+  labs(title = &quot;More children, less school?&quot;,
+       subtitle = &quot;Relationship between primary school enrollment and fertility rate over time&quot;,
+       x=&quot;Fertility rate (babies per woman)&quot;,
+       y=&quot;Primary School enrollment(%)&quot;)+
+  facet_wrap(~ date) +
+  geom_smooth()</code></pre>
+<p><img src="/projects/project3/index_files/figure-html/get_data8-2.png" width="648" style="display: block; margin: auto;" /></p>
+<p>As fertility rate increases primary school enrollment seems to be decreasing, highlighting an inverse relationship. The same can be inferred both by looking at the first scatterplot with the aggregates of all observations over time and the latter scatterplots, separating the time variable and showing the relationship at different points in time.</p>
+<p>This trend is most likely due to the fact that it is common for less developed countries to have large families with a great number of children - however, these poorer countries can often not send all of their children to school. On the other hand, in advanced countries, it is common to only have, on average, 2 children. The education system being more advanced and the families wealthier, these fewer children per family can, however, all attend primary school. This trend solidified over time. Nevertheless, with recent data from 2010 and 2016, it seems as also developing countries are more and more able to also provide primary education to their children as the data points do show a tendency to move to the upper part of the graph (higher primary school enrollment) over the years.</p>
+<p>To support this analysis, we would, as a next step, look at the data per region.</p>
+</div>
+</div>

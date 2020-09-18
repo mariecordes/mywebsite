@@ -1,0 +1,598 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="Curious, enthusiastic and open-minded. Business &amp; Management undergrad. Analytics &amp; Management masters in 2021. Born and raised in Germany. Lived in Germany, the UK, Hong Kong &amp; the US. Enjoy practicing yoga, making banana bread and wearing striped clothes. Food lover, world traveler and London explorer.">
+	<meta name="author" content="Marie Cordes">
+	<meta name="generator" content="Hugo 0.74.3" />
+	<title>Session 4: Homework 2 &middot; Marie Cordes&#39;s Portfolio Website</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Marie Cordes&#39;s Portfolio Website</strong> <span></span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/projects/project1">About me</a></li>
+            
+                <li><a href="/blogs/portfolio">Portfolio</a></li>
+            
+                <li><a href="/blogs/blog">Blog</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>Session 4: Homework 2</h1>
+                            </header>
+                            
+                            
+
+
+<div id="climate-change-and-temperature-anomalies" class="section level1">
+<h1>Climate change and temperature anomalies</h1>
+<p>We want to study climate change and find data for that on the <em>Combined Land-Surface Air and Sea-Surface Water Temperature Anomalies</em> in the Northern Hemisphere at <a href="https://data.giss.nasa.gov/gistemp">NASA’s Goddard Institute for Space Studies</a>. The <a href="https://data.giss.nasa.gov/gistemp/tabledata_v3/NH.Ts+dSST.txt">tabular data of temperature anomalies can be found here</a></p>
+<p>To define temperature anomalies you need to have a reference, or base, period which NASA clearly states that it is the period between 1951-1980.</p>
+<p>First, we load the file:</p>
+<pre class="r"><code>weather &lt;- 
+  read_csv(&quot;https://data.giss.nasa.gov/gistemp/tabledata_v3/NH.Ts+dSST.csv&quot;, 
+           skip = 1, 
+           na = &quot;***&quot;)</code></pre>
+<p>Here, we use two additional options: <code>skip</code> and <code>na</code>.</p>
+<ol style="list-style-type: decimal">
+<li>The <code>skip=1</code> option is there as the real data table only starts in Row 2, so we need to skip one row.</li>
+<li><code>na = "***"</code> option informs R how missing observations in the spreadsheet are coded. When looking at the spreadsheet, you can see that missing data is coded as "***". It is best to specify this here, as otherwise some of the data is not recognized as numeric data.</li>
+</ol>
+<p>Once the data is loaded, we notice that there is a object titled <code>weather</code> in the <code>Environment</code> panel. We inspect the dataframe by clicking on the <code>weather</code> object and looking at the dataframe that pops up on a seperate tab.</p>
+<p>For each month and year, the dataframe shows the deviation of temperature from the normal (expected). Further, the dataframe is in wide format.</p>
+<p>Before we dive into the data, we want to transform it to a more helpful format.</p>
+<p>The <code>weather</code> dataframe has a column for <code>Year</code> and then one column per month of the year (12 more in total). However, there are six further columns that we will not need. In the code below, we use the <code>select()</code> function to select the 13 columns (year and the 12 months) of interest to get rid of the others (J-D, D-N, DJF, etc.).</p>
+<p>We also convert the dataframe from wide to ‘long’ format by using the <code>pivot_longer()</code> function. We name the new dataframe <code>tidyweather</code>, the variable containing the name of the month <code>month</code>, and the temperature deviation values <code>delta</code>.</p>
+<pre class="r"><code>tidyweather &lt;- weather %&gt;% 
+                  select(Year:Dec) %&gt;% 
+                  pivot_longer(cols = 2:13, names_to = &quot;Month&quot;, values_to = &quot;delta&quot;)
+
+glimpse(tidyweather)</code></pre>
+<pre><code>## Rows: 1,680
+## Columns: 3
+## $ Year  &lt;dbl&gt; 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880, 1880, 188…
+## $ Month &lt;chr&gt; &quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, …
+## $ delta &lt;dbl&gt; -0.54, -0.38, -0.26, -0.37, -0.11, -0.22, -0.23, -0.24, -0.26, …</code></pre>
+<p>When inspecting the dataframe with the <code>glimpse()</code> function or by opening the separate <code>tidyweather</code> dataframe tab, we find that our dataset has been reduced to the following three variables now:</p>
+<ol style="list-style-type: decimal">
+<li><code>Year</code>,</li>
+<li><code>Month</code>, and</li>
+<li><code>delta</code>, or temperature deviation.</li>
+</ol>
+<div id="plotting-information" class="section level2">
+<h2>Plotting Information</h2>
+<p>Let us plot the data using a time-series scatter plot, and add a trendline. To do that, we first create a new variable called <code>date</code> in order to ensure that the <code>delta</code> values are plotted chronologically.</p>
+<p>We now have a <code>Month</code> variable that includes the months “Jan”, “Feb”, etc. as <em>characters</em> and a <code>month</code> variable that includes those months as ordered factors, i.e. “Jan”&lt;“Feb”&lt; etc.</p>
+<pre class="r"><code>#create new variable `date` to ensure chronological order
+tidyweather &lt;- tidyweather %&gt;%
+  mutate(date = ymd(paste(as.character(Year), Month, &quot;1&quot;)),
+         month = month(date, label=TRUE),
+         year = year(date))
+
+#plot time-series scatter plot with time variable on x-axis and temp deviation on y-axis
+ggplot(tidyweather, aes(x=date, y = delta))+
+  geom_point()+
+  geom_smooth(color=&quot;red&quot;) + #add red trend line
+  theme_bw() +
+  labs (
+    title = &quot;Increasing weather anomalies in the past few decades&quot;,
+    subtitle = &quot;Temperature deviations per month over time&quot;,
+    x = &quot;Year&quot;,
+    y = &quot;Temp deviation from expectation&quot;
+    
+  )</code></pre>
+<p><img src="/projects/project5/index_files/figure-html/scatter_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Next, we want to find out if the effect of increasing temperature deviations is more pronounced in some months. We use <code>facet_wrap()</code> to produce a separate scatter plot for each month, again with a smoothing line.</p>
+<p><img src="/projects/project5/index_files/figure-html/facet_wrap-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Looking at the produced plots, we find that the increase in temperature deviations from the normal (expected) temperature has increased over the years in <strong>every</strong> month of the year. Although the trend line has similar shapes in all months, the curve is flatter in some months and steeper in others. We find that the delta has increased more significantly in the winter months (e.g. Nov, Dec, Jan) than the summer months (e.g. Jun, Jul, Aug). This may mean that winters have become significantly hotter or colder but summers have only become slightly hotter or colder over the past decades.</p>
+<p>To investigate the historical data further, it may be useful to group it into different time periods.</p>
+<p>NASA calculates a temperature anomaly, as difference form the base period of 1951-1980. The code below creates a new data frame called <code>comparison</code> that groups data in five time periods: 1881-1920, 1921-1950, 1951-1980, 1981-2010 and 2011-present.</p>
+<p>We remove data before 1800 and before using <code>filter</code>. Then, we use the <code>mutate</code> function to create a new variable <code>interval</code> which contains information on which period each observation belongs to. We assign the different periods using <code>case_when()</code>.</p>
+<pre class="r"><code>comparison &lt;- tidyweather %&gt;% 
+  filter(Year&gt;= 1881) %&gt;%     #remove years prior to 1881
+  #create new variable &#39;interval&#39;, and assign values based on criteria below:
+  mutate(interval = case_when(
+    Year %in% c(1881:1920) ~ &quot;1881-1920&quot;,
+    Year %in% c(1921:1950) ~ &quot;1921-1950&quot;,
+    Year %in% c(1951:1980) ~ &quot;1951-1980&quot;,
+    Year %in% c(1981:2010) ~ &quot;1981-2010&quot;,
+    TRUE ~ &quot;2011-present&quot;
+  ))</code></pre>
+<p>Inspecting the <code>comparison</code> dataframe in the <code>Environment</code> pane, we find that the new column <code>interval</code> has been added and shows which period each observation belongs to.</p>
+<p>Now that we have the <code>interval</code> variable, we can create a density plot to study the distribution of monthly deviations (<code>delta</code>), grouped by the different time periods we are interested in. We set <code>fill</code> to <code>interval</code> in order to group and colour the data by different time periods.</p>
+<pre class="r"><code>ggplot(comparison, aes(x=delta, fill=interval))+
+  geom_density(alpha=0.2) +   #density plot with transparency set to 20%
+  theme_bw() +                #theme
+  labs (
+    title = &quot;Temperatures increasing over the last century&quot;,
+      subtitle = &quot;Density plot for monthly temperature anomalies with 1951-1980 as base period&quot;,
+    y     = &quot;Density&quot;,         #changing y-axis label to sentence case
+    x = &quot;Temp deviation from expectation&quot;
+  )</code></pre>
+<p><img src="/projects/project5/index_files/figure-html/density_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>So far, we have been working with monthly anomalies. However, we are also interested in average annual anomalies. We do this by using <code>group_by()</code> and <code>summarise()</code>, followed by a scatter plot to display the result.</p>
+<pre class="r"><code>#creating yearly average delta
+average_annual_anomaly &lt;- tidyweather %&gt;% 
+  group_by(Year) %&gt;%   #grouping data by Year
+  
+  # creating summaries for mean delta 
+  # use `na.rm=TRUE` to eliminate NA (not available) values 
+  summarise(annual_average_delta = mean(delta, na.rm=TRUE)) 
+
+#plotting the data:
+ggplot(average_annual_anomaly, aes(x=Year, y= annual_average_delta))+
+  geom_point()+
+  
+  #Fit the best fit line, using LOESS method
+  geom_smooth(method = &quot;loess&quot;) +
+  
+  #change to theme_bw() to have white background + black frame around plot
+  theme_bw() +
+  labs (
+    title = &quot;Significant temperature anomalies since 1970s&quot;,
+      subtitle = &quot;Average yearly temperature deviation from the normal&quot;,
+    y     = &quot;Average annual temp anomaly&quot;,
+    x = &quot;Year&quot;
+  )                         </code></pre>
+<p><img src="/projects/project5/index_files/figure-html/averaging-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>The analyses of monthly and annual temperature anomalies show very similar results. Over time, i.e. over both months and years, temperature overall increases. As the base period for the “normal” is 1951-1980, it is obvious that the deviations from the expected temperature in these years are relatively small (close to zero). This results in the small stagnating part of the curve around these years. The deviations before that time period are negative with the greatest negative deviation at the beginning of the observation years in 1880, decreasing the negative with every year after. After the base period, the deviations become positive and increasingly higher. The positive deviations are especially steep after around 1980.</p>
+<p>This graph clearly shows an average temperature increase over the past century since 1880 with especially significant increases in the past few decades since 1980. This clearly depicts what is commonly known as climate change and how rising temperatures have been fueled by technologies and lifestyle of the 20th and 21st century.</p>
+<p>In a next step, it would be interesting to split the data into geographical sections instead of periodical sections to investigate which specific regions of the world are more or less affected by climate change.</p>
+</div>
+<div id="confidence-interval-for-delta" class="section level2">
+<h2>Confidence Interval for <code>delta</code></h2>
+<p><a href="https://earthobservatory.nasa.gov/world-of-change/decadaltemp.php">NASA points out on their website</a> that</p>
+<blockquote>
+<p>A one-degree global change is significant because it takes a vast amount of heat to warm all the oceans, atmosphere, and land by that much. In the past, a one- to two-degree drop was all it took to plunge the Earth into the Little Ice Age.</p>
+</blockquote>
+<p>Here, we will construct a confidence interval (CI) for the average annual delta since 2011. We use the dataframe <code>comparison</code> as it has already grouped temperature anomalies according to time intervals and we are only interested in what is happening between 2011-present.</p>
+<p>First, we construct the CI by using a formula.</p>
+<pre class="r"><code>formula_ci &lt;- comparison %&gt;% 
+                filter(interval == &quot;2011-present&quot;) %&gt;%  #choose the interval 2011-present
+  
+  # calculate summary statistics for temperature deviation (delta) 
+  # calculate mean, SD, count, SE, lower/upper 95% CI
+                summarise(mean = mean(delta, na.rm = TRUE), SD = sd(delta, na.rm = TRUE), count = n(), SE = SD/sqrt(count), ci_lower = mean - 1.96*SE, ci_upper = mean + 1.96*SE)
+
+#print out formula_CI
+formula_ci</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##    mean    SD count     SE ci_lower ci_upper
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1 0.966 0.262   108 0.0252    0.916     1.02</code></pre>
+<pre class="r"><code>#CI = [0.916, 1.02]</code></pre>
+<p>Second, we construct the CI by using a bootstrap simulation with the <code>infer</code> package.</p>
+<pre class="r"><code>library(infer)
+#set seed number
+set.seed(1234)
+
+boot_temp &lt;- comparison %&gt;%
+  # Select 2011-present
+  filter(interval == &quot;2011-present&quot;) %&gt;%
+  
+  # Specify the variable of interest
+  specify(response = delta) %&gt;%
+  
+  # Generate a bunch of bootstrap samples
+  generate(reps = 1000, type = &quot;bootstrap&quot;) %&gt;%
+  
+  # Find the mean of each sample
+  calculate(stat = &quot;mean&quot;)
+
+#calculate 95% confidence interval
+percentile_ci &lt;- boot_temp %&gt;%
+  get_ci(level = 0.95, type = &quot;percentile&quot;)
+
+percentile_ci #print 95% CI</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1    0.917     1.02</code></pre>
+<p>Using formulas and individually calculating the mean, standard deviation, count and standard error gives us the results of the last but one code chunk above. We construct a 95% CI by both adding and subtracting the standard error times 1.96 (z score for 95% confidence) to/from the mean. We find the CI to be <strong>[0.916, 1.02]</strong>.</p>
+<p>Using the bootstrap simulation in the last code chunk, we generate multiple bootstrap samples and find the mean of each of these samples to then find that the 95% CI is <strong>[0.917, 1.02]</strong>.</p>
+<p>When using the summary statistics, we are 95% confident that the average yearly temperature anomaly is between [0.916, 1.02]. When using bootstrap, we found this interval to be [0.917, 1.02].</p>
+<p>These results support our earlier analysis. The confidence intervals show us that a positive temperature deviation of around 1 degree Celcius is highly likely to occur, proving the overall hypothesis that our temperatures are increasing every year (by around 1 degree Celcius). As define by the NASA earlier, these seemingly small temperature increases can have significant implications for the Earth, our climate and our nature.</p>
+</div>
+</div>
+<div id="general-social-survey-gss" class="section level1">
+<h1>General Social Survey (GSS)</h1>
+<p>The <a href="http://www.gss.norc.org/">General Social Survey (GSS)</a> gathers data on American society in order to monitor and explain trends in attitudes, behaviours, and attributes. Many trends have been tracked for decades, so one can see the evolution of attitudes, etc in American Society.</p>
+<p>In this assignment, we analyze data from the <strong>2016 GSS sample data</strong>, using it to estimate values of <em>population parameters</em> of interest about US adults. The GSS sample data file has 2867 observations of 935 variables, but we are only interested in very few of these variables and, therefore, use a smaller file with 2867 observations of 7 variables.</p>
+<p>We won’t take responses like “No Answer”, “Don’t Know”, “Not applicable”, “Refused to Answer” into consideration.</p>
+<pre class="r"><code>gss &lt;- read_csv(here::here(&quot;data&quot;, &quot;smallgss2016.csv&quot;), 
+                na = c(&quot;&quot;, &quot;Don&#39;t know&quot;,
+                       &quot;No answer&quot;, &quot;Not applicable&quot;))</code></pre>
+<p>We will be creating 95% confidence intervals for population parameters. The variables we have are the following:</p>
+<ul>
+<li>hours and minutes spent on email weekly. The responses to these questions are recorded in the <code>emailhr</code> and <code>emailmin</code> variables. For example, if the response is 2.50 hours, this would be recorded as emailhr = 2 and emailmin = 30.</li>
+<li><code>snapchat</code>, <code>instagrm</code>, <code>twitter</code>: whether respondents used these social media in 2016</li>
+<li><code>sex</code>: Female - Male</li>
+<li><code>degree</code>: highest education level attained</li>
+</ul>
+<div id="instagram-and-snapchat-by-sex" class="section level2">
+<h2>Instagram and Snapchat, by sex</h2>
+<p>First, we estimate the <em>population</em> proportion of Snapchat or Instagram users in 2016.</p>
+<p>We begin by creating a new variable, <code>snap_insta</code> that is <em>Yes</em> if the respondent reported using any of Snapchat (<code>snapchat</code>) or Instagram (<code>instagrm</code>), and <em>No</em> if not. If the recorded value was NA for both of these questions, the value in the new variable should also be NA.</p>
+<pre class="r"><code>gss_new &lt;- gss %&gt;% 
+             mutate(snap_insta = case_when(snapchat == &quot;Yes&quot;~&quot;Yes&quot;, 
+                                           instagrm == &quot;Yes&quot;~&quot;Yes&quot;,
+                                           snapchat == &quot;NA&quot;~&quot;NA&quot;,
+                                           instagrm == &quot;NA&quot;~&quot;NA&quot;,
+                                            TRUE ~ &quot;No&quot;
+                                          ))
+
+gss_new</code></pre>
+<pre><code>## # A tibble: 2,867 x 8
+##    emailmin emailhr snapchat instagrm twitter sex    degree         snap_insta
+##    &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;          &lt;chr&gt;     
+##  1 0        12      NA       NA       NA      Male   Bachelor       NA        
+##  2 30       0       No       No       No      Male   High school    No        
+##  3 NA       NA      No       No       No      Male   Bachelor       No        
+##  4 10       0       NA       NA       NA      Female High school    NA        
+##  5 NA       NA      Yes      Yes      No      Female Graduate       Yes       
+##  6 0        2       No       Yes      No      Female Junior college Yes       
+##  7 0        40      NA       NA       NA      Male   High school    NA        
+##  8 NA       NA      Yes      Yes      No      Female High school    Yes       
+##  9 0        0       NA       NA       NA      Male   High school    NA        
+## 10 NA       NA      No       No       No      Male   Junior college No        
+## # … with 2,857 more rows</code></pre>
+<p>Next, we calculate the proportion of Yes’s for <code>snap_insta</code> among those who answered the question, i.e. excluding NAs.</p>
+<pre class="r"><code>gss_new %&gt;% 
+  filter(snap_insta != &quot;NA&quot;) %&gt;%  #eliminate NAs
+  group_by(snap_insta) %&gt;% 
+  summarise(count = n()) %&gt;% 
+  mutate(frequency = count/sum(count)) #add frequency column</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   snap_insta count frequency
+##   &lt;chr&gt;      &lt;int&gt;     &lt;dbl&gt;
+## 1 No           858     0.625
+## 2 Yes          514     0.375</code></pre>
+<p>We find that 37.5% of respondents (excluding NAs) used either Snapchat or Instagram or both.</p>
+<p>Using the CI formula for proportions, we construct 95% CIs for men and women who used either Snapchat or Instagram.</p>
+<pre class="r"><code>#define count of respondents who use snapchat and/or instagram
+snap_insta_all &lt;- gss_new %&gt;% 
+                            filter(snap_insta == &quot;Yes&quot;) %&gt;% 
+                            summarise(count = n())
+
+#define count of female respondents who use snapchat and/or instagram
+snap_insta_f &lt;- gss_new %&gt;% 
+                            filter(snap_insta == &quot;Yes&quot;, sex == &quot;Female&quot;) %&gt;%
+                            summarise(count = n())
+
+#define count of male respondents who use snapchat and/or instagram
+snap_insta_m &lt;- gss_new %&gt;% 
+                            filter(snap_insta == &quot;Yes&quot;, sex == &quot;Male&quot;) %&gt;%
+                            summarise(count = n())
+
+#Create CI for twitter &quot;Female&quot;
+prop.test(sum(snap_insta_f), sum(snap_insta_all))</code></pre>
+<pre><code>## 
+##  1-sample proportions test with continuity correction
+## 
+## data:  sum out of sumsnap_insta_f out of snap_insta_all
+## X-squared = 32, df = 1, p-value = 1e-08
+## alternative hypothesis: true p is not equal to 0.5
+## 95 percent confidence interval:
+##  0.583 0.668
+## sample estimates:
+##     p 
+## 0.626</code></pre>
+<pre class="r"><code>#find CI = [0.583, 0.668]
+#find sample estimate p = 0.626
+
+#Create CI for twitter &quot;Male&quot;
+prop.test(sum(snap_insta_m), sum(snap_insta_all))</code></pre>
+<pre><code>## 
+##  1-sample proportions test with continuity correction
+## 
+## data:  sum out of sumsnap_insta_m out of snap_insta_all
+## X-squared = 32, df = 1, p-value = 1e-08
+## alternative hypothesis: true p is not equal to 0.5
+## 95 percent confidence interval:
+##  0.332 0.417
+## sample estimates:
+##     p 
+## 0.374</code></pre>
+<pre class="r"><code>#find CI = [0.332, 0.417]
+#find sample estimate p = 0.374</code></pre>
+<p>Following this calculation, we are 95% confident that the true population proportion of people that use either Snapchat or Instagram or both is female is between 58.3% and 66.8%. Similarly, we are 95% confident the proportion that use either Snapchat or Instagram or both is male is between 33.2% and 41.7%.</p>
+<p>The <code>prop.test</code> command also shows us that the sample values for the regarded data is 62.6% female Snapchat/Instagram users and 37.4% male users.</p>
+</div>
+<div id="twitter-by-education-level" class="section level2">
+<h2>Twitter, by education level</h2>
+<p>Here, we estimate the <em>population</em> proportion of Twitter users by education level in 2016.</p>
+<p>There are 5 education levels in variable <code>degree</code> which, in ascending order of years of education, are Lt high school, High School, Junior college, Bachelor, Graduate.</p>
+<p>First, we turn <code>degree</code> from a character variable into a factor variable. We also make sure the order is the correct one and that levels are not sorted alphabetically which is what R by default does.</p>
+<pre class="r"><code>#find out which class `degree` is
+class(gss_new$degree)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>#convert `degree` to factor
+degree_f &lt;- as.factor(gss_new$degree)
+
+#check again
+class(degree_f)</code></pre>
+<pre><code>## [1] &quot;factor&quot;</code></pre>
+<pre class="r"><code>#order education levels
+degree_fo &lt;-  c(&quot;Lt high school&quot;, &quot;High school&quot;, &quot;Junior college&quot;, &quot;Bachelor&quot;, &quot;Graduate&quot;)</code></pre>
+<p>Next, we create a new variable, <code>bachelor_graduate</code> that is <em>Yes</em> if the respondent has either a <code>Bachelor</code> or <code>Graduate</code> degree. As before, if the recorded value for either was NA, the value in the new variable should also be NA. For all other degree levels, the new variable is <em>No</em>.</p>
+<pre class="r"><code>gss_new2 &lt;- gss %&gt;% 
+             mutate(bachelor_graduate = case_when(degree == &quot;Bachelor&quot;~&quot;Yes&quot;, 
+                                                  degree == &quot;Graduate&quot;~&quot;Yes&quot;,
+                                                  degree == &quot;NA&quot;~&quot;NA&quot;,
+                                                  TRUE ~ &quot;No&quot;
+                                          ))
+
+gss_new2</code></pre>
+<pre><code>## # A tibble: 2,867 x 8
+##    emailmin emailhr snapchat instagrm twitter sex    degree     bachelor_gradua…
+##    &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;      &lt;chr&gt;           
+##  1 0        12      NA       NA       NA      Male   Bachelor   Yes             
+##  2 30       0       No       No       No      Male   High scho… No              
+##  3 NA       NA      No       No       No      Male   Bachelor   Yes             
+##  4 10       0       NA       NA       NA      Female High scho… No              
+##  5 NA       NA      Yes      Yes      No      Female Graduate   Yes             
+##  6 0        2       No       Yes      No      Female Junior co… No              
+##  7 0        40      NA       NA       NA      Male   High scho… No              
+##  8 NA       NA      Yes      Yes      No      Female High scho… No              
+##  9 0        0       NA       NA       NA      Male   High scho… No              
+## 10 NA       NA      No       No       No      Male   Junior co… No              
+## # … with 2,857 more rows</code></pre>
+<p>Here, we calculate the proportion of <code>bachelor_graduate</code> who do (Yes) and who don’t (No) use twitter.</p>
+<pre class="r"><code>gss_new2 %&gt;% 
+  filter(twitter != &quot;NA&quot;, bachelor_graduate == &quot;Yes&quot;) %&gt;% #filter out NAs in twitter responses and only bachelor_graduate 
+  group_by(twitter) %&gt;%   #only considering respondents with a Bachelor or Graduate degree
+  summarise(count = n()) %&gt;% 
+  mutate(frequency = count/sum(count))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   twitter count frequency
+##   &lt;chr&gt;   &lt;int&gt;     &lt;dbl&gt;
+## 1 No        375     0.767
+## 2 Yes       114     0.233</code></pre>
+<p>We find that a majority of 76.7% of respondents with a Bachelor or Graduate degree do not use Twitter while the rest, 23.3% do use Twitter.</p>
+<p>Using the CI formula for proportions, we construct two 95% CIs for the true <code>bachelor_graduate</code> population proportion - whether they use (Yes) and don’t (No) use twitter. We exclude NAs for Twitter again.</p>
+<pre class="r"><code>#define count of respondents with Bachelor or Graduate degree
+bg_all &lt;- gss_new2 %&gt;% 
+                            filter(bachelor_graduate == &quot;Yes&quot;, twitter != &quot;NA&quot;) %&gt;% 
+                            summarise(count = n())
+
+#define count of respondents with Bachelor or Graduate degre that USE twitter
+bg_all_t &lt;- gss_new2 %&gt;% 
+                            filter(bachelor_graduate == &quot;Yes&quot;, twitter == &quot;Yes&quot;) %&gt;% 
+                            summarise(count = n())
+
+#define count of respondents with Bachelor or Graduate degre that DO NOT USE twitter
+bg_all_nt &lt;- gss_new2 %&gt;% 
+                            filter(bachelor_graduate == &quot;Yes&quot;, twitter == &quot;No&quot;) %&gt;% 
+                            summarise(count = n())
+
+#Create CI for twitter &quot;Yes&quot;
+prop.test(sum(bg_all_t), sum(bg_all))</code></pre>
+<pre><code>## 
+##  1-sample proportions test with continuity correction
+## 
+## data:  sum out of sumbg_all_t out of bg_all
+## X-squared = 138, df = 1, p-value &lt;2e-16
+## alternative hypothesis: true p is not equal to 0.5
+## 95 percent confidence interval:
+##  0.197 0.274
+## sample estimates:
+##     p 
+## 0.233</code></pre>
+<pre class="r"><code>#find CI = [0.197, 0.274]
+#find sample estimate p = 0.233
+
+#Create CI for twitter &quot;No&quot;
+prop.test(sum(bg_all_nt), sum(bg_all))</code></pre>
+<pre><code>## 
+##  1-sample proportions test with continuity correction
+## 
+## data:  sum out of sumbg_all_nt out of bg_all
+## X-squared = 138, df = 1, p-value &lt;2e-16
+## alternative hypothesis: true p is not equal to 0.5
+## 95 percent confidence interval:
+##  0.726 0.803
+## sample estimates:
+##     p 
+## 0.767</code></pre>
+<pre class="r"><code>#find CI = [0.726, 0.803]
+#find sample estimate p = 0.767</code></pre>
+<p>Following this calculation, we are 95% confident that the population proportion with a Bachelor or Graduate degree that use Twitter is between 19.7% and 27.4%. Similarly, we are 95% confident that the population proportion with a Bachelor or Graduate degree that does not use Twitter is between 72.6% and 80.3%.</p>
+<p>These two confidence intervals do not overlap. This is most likely the case as the two proportions are rather extreme. Considering the available data, were the two proportions more centred to the middle (e.g. both proportions around 50%), they would be more likely to overlap.</p>
+</div>
+<div id="email-usage" class="section level2">
+<h2>Email usage</h2>
+<p>Lastly, we estimate the <em>population</em> parameter on time spent on email weekly.</p>
+<p>We start by creating a new variable called <code>email</code> that combines <code>emailhr</code> and <code>emailmin</code> to reports the number of minutes the respondents spend on email weekly. We start by transforming the existing two variables to a numeric format as they are currently characters.</p>
+<pre class="r"><code>gss_new3 &lt;- gss %&gt;% 
+              filter(emailhr != &quot;NA&quot;, emailmin != &quot;NA&quot;) %&gt;%  #eliminate NAs
+                #change variable format from character to numeric for both email hr and min
+                mutate(emailhr_n = as.numeric(emailhr)) %&gt;% 
+                mutate(emailmin_n = as.numeric(emailmin)) %&gt;% 
+                #create email variable that combines previous variables as total number of minutes
+                mutate(email = emailhr_n*60+emailmin_n)</code></pre>
+<p>Next, we want to visualise the distribution of this new variable.</p>
+<p>First, we find the mean and the median number of minutes respondents spend on email weekly.</p>
+<pre class="r"><code>#calculate and define email mean
+mean_email &lt;- gss_new3 %&gt;% 
+                filter(email != &quot;NA&quot;) %&gt;% 
+                pull(email) %&gt;%
+                mean() %&gt;% 
+                signif(5)
+mean_email</code></pre>
+<pre><code>## [1] 417</code></pre>
+<pre class="r"><code>#mean_email is 417
+                
+#calculate and define email median
+median_email &lt;- gss_new3 %&gt;% 
+                filter(email != &quot;NA&quot;) %&gt;% 
+                pull(email) %&gt;%
+                median()
+median_email</code></pre>
+<pre><code>## [1] 120</code></pre>
+<pre class="r"><code>#median_email is 120</code></pre>
+<p>We find that the average (mean) amount of time Americans spend on emails per week is 417 minutes (6 hrs 57 minutes). We find the median at 120 minutes (2 hours).</p>
+<p>In order to find out if the mean or the median is a better measure of the typical time Americans spend on emails weekly, we look at the distribution by plotting the density function below.</p>
+<p>Consequently, we plot the distribution of the <code>email</code> variable with a density function. We disregard the NAs of the <code>emailhr</code> and <code>emailmin</code> variables and, therefore, also the NAs of the new <code>email</code> variable. We also add a red line that indicates the mean (as calculted above) and a green line that indicates the median.</p>
+<pre class="r"><code>#create density plot
+gss_new3 %&gt;% 
+    filter(email != &quot;NA&quot;) %&gt;% #filter out NAs
+    ggplot(aes(x = email)) +
+    geom_density(fill = &quot;dodgerblue&quot;, alpha = 0.2) +
+    geom_vline(xintercept = mean_email, size = 0.5, colour = &quot;red&quot;) +     #add mean line in red
+    geom_vline(xintercept = median_email, size = 0.5, colour = &quot;green&quot;)+  #add median line in green
+    geom_text(aes(x=mean_email+270, label=paste0(&quot;Mean\n&quot;, mean_email), y=0.0025)) + #add label to mean
+    geom_text(aes(x=median_email-270, label=paste0(&quot;Median\n&quot;, median_email), y=0.0005)) + #add label to median
+    theme_bw() +
+    labs(title = &quot;Most emails answered within 8 hours&quot;,
+         subtitle = &quot;Distribution of minutes spend on emails among Americans&quot;,
+         x = &quot;Minutes&quot;,
+         y = &quot;Density&quot;) +
+    NULL</code></pre>
+<p><img src="/projects/project5/index_files/figure-html/unnamed-chunk-10-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Interpreting the graph, we find the median at 120 minutes to be a better measure of the typical time Americans spend on emails per week. The time an American spends on emails per week generally highly depends on other variables such as age and job. Therefore, there will be a large spread of observation points within a population as some people spend their entire week on emails for their job, while others may not even own an email account. In the graph, we can see that the majority of observation points records a relatively low amount of time spend on emails at around 100 minutes. However, there are several outliers that record more than 1000 minutes (some even more than 4000 minutes) per week. This makes clear that the mean of 417 minutes is skewed by these outliers and, therefore, not a representative measure for the typical American. Thus, we consider the median to be more representative.</p>
+<p>Lastly, we calculate a 95% bootstrap confidence interval for the mean amount of time Americans spend on email weekly.</p>
+<pre class="r"><code>library(infer)
+set.seed(1234)  #set seed number
+
+boot_email &lt;- gss_new3 %&gt;%
+    filter(email != &quot;NA&quot;) %&gt;%         #eliminate NAs
+    specify(response = email) %&gt;%       #specify variable of interest
+    generate(reps = 1000, type = &quot;bootstrap&quot;) %&gt;%   #generate bunch of bootstrap samples
+    calculate(stat = &quot;mean&quot;)          #find mean of each sample
+
+email_ci &lt;- boot_email %&gt;%      #calculate 95% confidence interval
+  get_ci(level = 0.95, type = &quot;percentile&quot;)
+
+email_ci #print 95% CI</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1     385.     453.</code></pre>
+<pre class="r"><code>#find CI = [385, 453] minutes</code></pre>
+<p>Following this, we are 95% confident that the true average amount of time Americans spend on email weekly is between 6 hrs and 25 minutes and 7 hrs and 33 minutes.</p>
+<p>This shows the CI for the true population average. Again, the average may, however, not be very representative of the typical American. Considering this CI, a typical American would spend around 1 hr per day on emails. This may be true for people who work in an office job that requires a lot of email communication. However, there is a large chunk of the population that does not require emails for work and an hour a day on emails may seem a little odd to them. Again, this average is biased by some people spending an incredible amount of time on emails per week and, therefore, the median is a better representation of the typical American than the mean.</p>
+<p>Alternatively, we could create a 99% confidence interval instead of a 95% one. As the confidence is higher, meaning we are even more confident that the population parameter is within this interval, the range of values becomes less specific. The larger the interval, the greater the Standard Error and the more certain one is that that confidence interval includes the true parameter.</p>
+<p>Therefore, a 99% CI would be wider than a 95% interval as it shows a larger range of values.</p>
+<p>When actually using the bootstrap simulation for a 99% CI, we find the following results:</p>
+<pre class="r"><code>email_ci99 &lt;- boot_email %&gt;%      #calculate 95% confidence interval
+  get_ci(level = 0.99, type = &quot;percentile&quot;)
+
+email_ci99 #print 99% CI</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##   lower_ci upper_ci
+##      &lt;dbl&gt;    &lt;dbl&gt;
+## 1     375.     465.</code></pre>
+<pre class="r"><code>#find CI = [375, 465] minutes</code></pre>
+<p>Consequently, we can be 99% confident that the true average amount of time Americans spend on email weekly is between 6 hrs and 15 minutes and 7 hrs and 45 minutes. While the range of the 95% CI between the lower and the upper limit was 1 hr and 8 minutes, the range of the 99% CI is 1 hr and 30 minutes and, thereby, 22 minutes larger. Including more possible true values (i.e. 22 more minutes in total) increases our confidence as there is a larger pool of values that may be true.</p>
+</div>
+</div>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://www.linkedin.com/in/mariecordes/" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+                    <li><a href="https://github.com/mariecordes" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+                    <li><a href="https://www.facebook.com/mariecordes6/" class="icon alt fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+                
+                    <li><a href="https://www.instagram.com/schokomarie/" class="icon alt fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; by Marie Cordes</li>
+                
+                <li>Design:  <a href="https://www.html5up.net">HTML5 UP</a></li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>

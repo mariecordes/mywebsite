@@ -49,6 +49,8 @@ library(bbplot)
 library(ggthemr)
 ```
 
+![Brexit](https://www.bundesregierung.de/resource/image/1712628/hero_desktop/1170/585/8459b4440eaf8440a5f47fe94ee0aebc/nV/2020-01-15-fahnen-von-grossbritannien-und-europa.jpg)
+
 # Exploratory Data Analysis
 
 In the following we will look at a dataset concerning the results of the 2016 Brexit vote in the UK.
