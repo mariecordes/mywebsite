@@ -6,20 +6,9 @@
     <description>Recent content in Projects on Marie Cordes&#39;s Portfolio Website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 18 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/projects/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Session 4: Homework 2</title>
-      <link>/projects/project5/</link>
-      <pubDate>Fri, 18 Sep 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/projects/project5/</guid>
-      <description>Climate change and temperature anomalies We want to study climate change and find data for that on the Combined Land-Surface Air and Sea-Surface Water Temperature Anomalies in the Northern Hemisphere at NASA’s Goddard Institute for Space Studies. The tabular data of temperature anomalies can be found here
-To define temperature anomalies you need to have a reference, or base, period which NASA clearly states that it is the period between 1951-1980.</description>
-    </item>
     
     <item>
       <title>About Me</title>
@@ -51,6 +40,16 @@ brexit_results &amp;lt;- vroom::vroom(here::here(&amp;quot;data&amp;quot;,&amp;q
       <guid>/projects/project3/</guid>
       <description>Gapminder data set The gapminder dataset has data on life expectancy, population, and GDP per capita for 142 countries from 1952 to 2007. To get an understanding of the dataframe, namely to see the variable names, variable types, etc., we use the glimpse function. We also have a look at the first 10 rows of data.
 #load gapminder data library(gapminder) #glimpse at data glimpse(gapminder) ## Rows: 1,704 ## Columns: 6 ## $ country &amp;lt;fct&amp;gt; Afghanistan, Afghanistan, Afghanistan, Afghanistan, Afghani… ## $ continent &amp;lt;fct&amp;gt; Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia, Asia,… ## $ year &amp;lt;int&amp;gt; 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997,… ## $ lifeExp &amp;lt;dbl&amp;gt; 28.</description>
+    </item>
+    
+    <item>
+      <title>Ongoing projects</title>
+      <link>/projects/project5/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/project5/</guid>
+      <description>Climate change and temperature anomalies We want to study climate change and find data for that on the Combined Land-Surface Air and Sea-Surface Water Temperature Anomalies in the Northern Hemisphere at NASA’s Goddard Institute for Space Studies. The tabular data of temperature anomalies can be found here
+To define temperature anomalies you need to have a reference, or base, period which NASA clearly states that it is the period between 1951-1980.</description>
     </item>
     
   </channel>

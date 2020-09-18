@@ -4,8 +4,8 @@ author: "Marie Cordes"
 date: "September 2020"
 output:
   html_document:
-    theme: material
-    highlight: kate
+    theme: flatly
+    highlight: zenburn
     number_sections: yes
     toc: yes
     toc_float: yes

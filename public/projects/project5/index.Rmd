@@ -1,7 +1,7 @@
 ---
-title: "Session 4: Homework 2"
-author: "Study Group 14"
-date: "`r Sys.Date()`"
+title: "Ongoing projects"
+author: "Marie Cordes"
+date: "September 2020`"
 output:
   html_document:
     theme: flatly
@@ -32,6 +32,7 @@ knitr::opts_chunk$set(
 
 ```{r load-libraries, include=FALSE}
 library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(ggplot2)
 library(mosaic)
 library(ggthemes)
 library(lubridate)
@@ -43,12 +44,24 @@ library(readxl)
 library(vroom)
 library(wbstats)
 library(tidyr)
+library(gapminder)
+library(devtools)
+library(ggthemr)
+library(readr)
+library(kableExtra)
+library(rmdformats)
+```
+
+```{r, add_ggthemr_theme, include=FALSE}
+#In order to add the `ggthemr` theme to all the following ggplots, we run this command:
+ggthemr('solarized')
 ```
 
 
 
 # Climate change and temperature anomalies 
 
+![](https://wallpapercave.com/wp/wp2354251.jpg)
 
 We want to study climate change and find data for that on the *Combined Land-Surface Air and Sea-Surface Water Temperature Anomalies* in the Northern Hemisphere at [NASA's Goddard Institute for Space Studies](https://data.giss.nasa.gov/gistemp). The [tabular data of temperature anomalies can be found here](https://data.giss.nasa.gov/gistemp/tabledata_v3/NH.Ts+dSST.txt)
 
@@ -285,6 +298,8 @@ These results support our earlier analysis. The confidence intervals show us tha
 
 
 # General Social Survey (GSS)
+
+![](https://www.seo-kueche.de/wp-content/uploads/2020/03/social-media-news-apps-scaled.jpg)
 
 The [General Social Survey (GSS)](http://www.gss.norc.org/) gathers data on American society in order to monitor and explain trends in attitudes, behaviours, and attributes. Many trends have been tracked for decades, so one can see the evolution of attitudes, etc in American Society.
 
