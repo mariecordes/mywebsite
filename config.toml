@@ -105,6 +105,12 @@ disqusShortname = ""
       url = "blogs/cv"
 
     [[params.tiles.showcase]]
+      title = "IBM HR Analysis"
+      subtitle = "Learn more about my analysis of the IBM HR dataset"
+      image = "pic05.jpg"
+      url = "projects/project4"
+
+    [[params.tiles.showcase]]
       title = "Brexit Voting Analysis"
       subtitle = "Learn more about my analysis of the 2016 Brexit referendum"
       image = "pic02.jpg"
@@ -115,12 +121,6 @@ disqusShortname = ""
       subtitle = "Learn more about my analysis of the gapminder dataset"
       image = "pic03.jpg"
       url = "projects/project3"
-
-    [[params.tiles.showcase]]
-      title = "IBM HR Analysis"
-      subtitle = "Learn more about my analysis of the IBM HR dataset"
-      image = "pic05.jpg"
-      url = "projects/project4"
 
     [[params.tiles.showcase]]
       title = "Further Analysis"
@@ -185,7 +185,7 @@ disqusShortname = ""
   # Footer section
   [params.footer]
     enable = true
-    copyright = "by Marie Cordes"
+    copyright = "Content and pictures by Marie Cordes "
 
     # Uses font awesome icons
     #[[params.footer.social]]
