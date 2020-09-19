@@ -52,12 +52,20 @@ disqusShortname = ""
       url = "projects/project1"
 
     [[params.navigation.links]]
-      name = "Portfolio"
-      url = "blogs/portfolio"
+      name = "Analysis - Brexit Voting"
+      url = "projects/project2"
 
-    [[params.navigation.links]]
-      name = "Blog"
-      url = "blogs/blog"
+     [[params.navigation.links]]
+      name = "Analysis - IBM HR"
+      url = "projects/project4"
+      
+      [[params.navigation.links]]
+      name = "Analysis - Gapminder"
+      url = "projects/project3"
+      
+      [[params.navigation.links]]
+      name = "Further Analyses"
+      url = "projects/project5"
 
     # Add custom links here by uncommenting code below. To remove links just delete
     # the [[params.navigation.links]] map associated with that link. Copy and paste
@@ -105,16 +113,16 @@ disqusShortname = ""
       url = "blogs/cv"
 
     [[params.tiles.showcase]]
-      title = "IBM HR Analysis"
-      subtitle = "Learn more about my analysis of the IBM HR dataset"
-      image = "pic05.jpg"
-      url = "projects/project4"
-
-    [[params.tiles.showcase]]
       title = "Brexit Voting Analysis"
       subtitle = "Learn more about my analysis of the 2016 Brexit referendum"
       image = "pic02.jpg"
       url = "projects/project2"
+      
+    [[params.tiles.showcase]]
+      title = "IBM HR Analysis"
+      subtitle = "Learn more about my analysis of the IBM HR dataset"
+      image = "pic05.jpg"
+      url = "projects/project4"
 
     [[params.tiles.showcase]]
       title = "Gapminder Analysis"
@@ -123,7 +131,7 @@ disqusShortname = ""
       url = "projects/project3"
 
     [[params.tiles.showcase]]
-      title = "Further Analysis"
+      title = "Further Analyses"
       subtitle = "Get a preview of some analyses I am currently working on"
       image = "pic06.jpg"
       url = "projects/project5"
