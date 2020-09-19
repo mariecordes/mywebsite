@@ -49,23 +49,23 @@ disqusShortname = ""
 
     [[params.navigation.links]]
       name = "About me"
-      url = "projects/project1"
+      url = "aboutme"
 
     [[params.navigation.links]]
       name = "Analysis - Brexit Voting"
-      url = "projects/project2"
+      url = "projects/brexitvoting"
 
      [[params.navigation.links]]
       name = "Analysis - IBM HR"
-      url = "projects/project4"
+      url = "projects/ibmhr"
       
       [[params.navigation.links]]
       name = "Analysis - Gapminder"
-      url = "projects/project3"
+      url = "projects/gapminder"
       
       [[params.navigation.links]]
       name = "Further Analyses"
-      url = "projects/project5"
+      url = "projects/furtherprojects"
 
     # Add custom links here by uncommenting code below. To remove links just delete
     # the [[params.navigation.links]] map associated with that link. Copy and paste
@@ -103,8 +103,8 @@ disqusShortname = ""
     [[params.tiles.showcase]]
       title = "About me"
       subtitle = "Learn more about me"
-      image = "projects/project1.jpg"
-      url = "projects/project1"
+      image = "projects/aboutme.jpg"
+      url = "aboutme"
 
     [[params.tiles.showcase]]
       title = "CV"
@@ -116,25 +116,25 @@ disqusShortname = ""
       title = "Brexit Voting Analysis"
       subtitle = "Learn more about my analysis of the 2016 Brexit referendum"
       image = "pic02.jpg"
-      url = "projects/project2"
+      url = "projects/brexitvoting"
       
     [[params.tiles.showcase]]
       title = "IBM HR Analysis"
       subtitle = "Learn more about my analysis of the IBM HR dataset"
       image = "pic05.jpg"
-      url = "projects/project4"
+      url = "projects/ibmhr"
 
     [[params.tiles.showcase]]
       title = "Gapminder Analysis"
       subtitle = "Learn more about my analysis of the gapminder dataset"
       image = "pic03.jpg"
-      url = "projects/project3"
+      url = "projects/gapminder"
 
     [[params.tiles.showcase]]
-      title = "Further Analyses"
+      title = "Further Projects"
       subtitle = "Get a preview of some analyses I am currently working on"
       image = "pic06.jpg"
-      url = "projects/project5"
+      url = "projects/furtherprojects"
       
     # You can make more showcases by copy and pasting the code above
 

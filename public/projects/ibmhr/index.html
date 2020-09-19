@@ -1,0 +1,1982 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="Curious, enthusiastic and open-minded. Business &amp; Management undergrad. Analytics &amp; Management masters in 2021. Born and raised in Germany. Lived in Germany, the UK, Hong Kong &amp; the US. Enjoy practicing yoga, making banana bread and wearing striped clothes. Food lover, world traveler and London explorer.">
+	<meta name="author" content="Marie Cordes">
+	<meta name="generator" content="Hugo 0.74.3" />
+	<title>IBM HR Analysis &middot; Marie Cordes&#39;s Portfolio Website</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Marie Cordes&#39;s Portfolio Website</strong> <span></span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/aboutme">About me</a></li>
+            
+                <li><a href="/projects/brexitvoting">Analysis - Brexit Voting</a></li>
+            
+                <li><a href="/projects/ibmhr">Analysis - IBM HR</a></li>
+            
+                <li><a href="/projects/gapminder">Analysis - Gapminder</a></li>
+            
+                <li><a href="/projects/furtherprojects">Further Analyses</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>IBM HR Analysis</h1>
+                            </header>
+                            
+                            
+
+
+<p><img src="https://www.ibm.com/innovate/branding/logoartwork/logoartwork.nsf/IBM_logo_blue60_CMYK.jpg" /></p>
+<div id="data-set" class="section level1">
+<h1>Data set</h1>
+<p>In this project, we analyse a data set on Human Resoruce Analytics. The <a href="https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset">IBM HR Analytics Employee Attrition &amp; Performance data set</a> is a fictional data set created by IBM data scientists.</p>
+<p>First, we load the data and have a first look at it.</p>
+<pre class="r"><code>#load data
+hr_dataset &lt;- vroom(here::here(&quot;data&quot;, &quot;datasets_1067_1925_WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;))
+
+#glimpse at data
+glimpse(hr_dataset)</code></pre>
+<pre><code>## Rows: 1,470
+## Columns: 35
+## $ Age                      &lt;dbl&gt; 41, 49, 37, 33, 27, 32, 59, 30, 38, 36, 35, …
+## $ Attrition                &lt;chr&gt; &quot;Yes&quot;, &quot;No&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, …
+## $ BusinessTravel           &lt;chr&gt; &quot;Travel_Rarely&quot;, &quot;Travel_Frequently&quot;, &quot;Trave…
+## $ DailyRate                &lt;dbl&gt; 1102, 279, 1373, 1392, 591, 1005, 1324, 1358…
+## $ Department               &lt;chr&gt; &quot;Sales&quot;, &quot;Research &amp; Development&quot;, &quot;Research…
+## $ DistanceFromHome         &lt;dbl&gt; 1, 8, 2, 3, 2, 2, 3, 24, 23, 27, 16, 15, 26,…
+## $ Education                &lt;dbl&gt; 2, 1, 2, 4, 1, 2, 3, 1, 3, 3, 3, 2, 1, 2, 3,…
+## $ EducationField           &lt;chr&gt; &quot;Life Sciences&quot;, &quot;Life Sciences&quot;, &quot;Other&quot;, &quot;…
+## $ EmployeeCount            &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+## $ EmployeeNumber           &lt;dbl&gt; 1, 2, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16…
+## $ EnvironmentSatisfaction  &lt;dbl&gt; 2, 3, 4, 4, 1, 4, 3, 4, 4, 3, 1, 4, 1, 2, 3,…
+## $ Gender                   &lt;chr&gt; &quot;Female&quot;, &quot;Male&quot;, &quot;Male&quot;, &quot;Female&quot;, &quot;Male&quot;, …
+## $ HourlyRate               &lt;dbl&gt; 94, 61, 92, 56, 40, 79, 81, 67, 44, 94, 84, …
+## $ JobInvolvement           &lt;dbl&gt; 3, 2, 2, 3, 3, 3, 4, 3, 2, 3, 4, 2, 3, 3, 2,…
+## $ JobLevel                 &lt;dbl&gt; 2, 2, 1, 1, 1, 1, 1, 1, 3, 2, 1, 2, 1, 1, 1,…
+## $ JobRole                  &lt;chr&gt; &quot;Sales Executive&quot;, &quot;Research Scientist&quot;, &quot;La…
+## $ JobSatisfaction          &lt;dbl&gt; 4, 2, 3, 3, 2, 4, 1, 3, 3, 3, 2, 3, 3, 4, 3,…
+## $ MaritalStatus            &lt;chr&gt; &quot;Single&quot;, &quot;Married&quot;, &quot;Single&quot;, &quot;Married&quot;, &quot;M…
+## $ MonthlyIncome            &lt;dbl&gt; 5993, 5130, 2090, 2909, 3468, 3068, 2670, 26…
+## $ MonthlyRate              &lt;dbl&gt; 19479, 24907, 2396, 23159, 16632, 11864, 996…
+## $ NumCompaniesWorked       &lt;dbl&gt; 8, 1, 6, 1, 9, 0, 4, 1, 0, 6, 0, 0, 1, 0, 5,…
+## $ Over18                   &lt;chr&gt; &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;, &quot;Y&quot;,…
+## $ OverTime                 &lt;chr&gt; &quot;Yes&quot;, &quot;No&quot;, &quot;Yes&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;No&quot;, &quot;Yes&quot;…
+## $ PercentSalaryHike        &lt;dbl&gt; 11, 23, 15, 11, 12, 13, 20, 22, 21, 13, 13, …
+## $ PerformanceRating        &lt;dbl&gt; 3, 4, 3, 3, 3, 3, 4, 4, 4, 3, 3, 3, 3, 3, 3,…
+## $ RelationshipSatisfaction &lt;dbl&gt; 1, 4, 2, 3, 4, 3, 1, 2, 2, 2, 3, 4, 4, 3, 2,…
+## $ StandardHours            &lt;dbl&gt; 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, …
+## $ StockOptionLevel         &lt;dbl&gt; 0, 1, 0, 0, 1, 0, 3, 1, 0, 2, 1, 0, 1, 1, 0,…
+## $ TotalWorkingYears        &lt;dbl&gt; 8, 10, 7, 8, 6, 8, 12, 1, 10, 17, 6, 10, 5, …
+## $ TrainingTimesLastYear    &lt;dbl&gt; 0, 3, 3, 3, 3, 2, 3, 2, 2, 3, 5, 3, 1, 2, 4,…
+## $ WorkLifeBalance          &lt;dbl&gt; 1, 3, 3, 3, 3, 2, 2, 3, 3, 2, 3, 3, 2, 3, 3,…
+## $ YearsAtCompany           &lt;dbl&gt; 6, 10, 0, 8, 2, 7, 1, 1, 9, 7, 5, 9, 5, 2, 4…
+## $ YearsInCurrentRole       &lt;dbl&gt; 4, 7, 0, 7, 2, 7, 0, 0, 7, 7, 4, 5, 2, 2, 2,…
+## $ YearsSinceLastPromotion  &lt;dbl&gt; 0, 1, 0, 3, 2, 3, 0, 0, 1, 7, 0, 0, 4, 1, 0,…
+## $ YearsWithCurrManager     &lt;dbl&gt; 5, 7, 0, 0, 2, 6, 0, 0, 8, 7, 3, 8, 3, 2, 3,…</code></pre>
+<p>We find that the data set has 1,470 observations on 35 variables including employees’ income, their distance from work, their position in the company, their level of education, etc. A full description of the variables can be found on the <a href="https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset">website</a>.</p>
+<p>We further investigate the data with the <code>skim()</code> function.</p>
+<pre class="r"><code>skim(hr_dataset)</code></pre>
+<table style='width: auto;'
+        class='table table-condensed'>
+<caption>
+<span id="tab:skim">Table 1: </span>Data summary
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Name
+</td>
+<td style="text-align:left;">
+hr_dataset
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of rows
+</td>
+<td style="text-align:left;">
+1470
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of columns
+</td>
+<td style="text-align:left;">
+35
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+_______________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Column type frequency:
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+character
+</td>
+<td style="text-align:left;">
+9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+26
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+________________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Group variables
+</td>
+<td style="text-align:left;">
+None
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+min
+</th>
+<th style="text-align:right;">
+max
+</th>
+<th style="text-align:right;">
+empty
+</th>
+<th style="text-align:right;">
+n_unique
+</th>
+<th style="text-align:right;">
+whitespace
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Attrition
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BusinessTravel
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Department
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+EducationField
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Gender
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JobRole
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MaritalStatus
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Over18
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+OverTime
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+p0
+</th>
+<th style="text-align:right;">
+p25
+</th>
+<th style="text-align:right;">
+p50
+</th>
+<th style="text-align:right;">
+p75
+</th>
+<th style="text-align:right;">
+p100
+</th>
+<th style="text-align:left;">
+hist
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+36.92
+</td>
+<td style="text-align:right;">
+9.14
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+36
+</td>
+<td style="text-align:right;">
+43.0
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:left;">
+▂▇▇▃▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DailyRate
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+802.49
+</td>
+<td style="text-align:right;">
+403.51
+</td>
+<td style="text-align:right;">
+102
+</td>
+<td style="text-align:right;">
+465
+</td>
+<td style="text-align:right;">
+802
+</td>
+<td style="text-align:right;">
+1157.0
+</td>
+<td style="text-align:right;">
+1499
+</td>
+<td style="text-align:left;">
+▇▇▇▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DistanceFromHome
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+9.19
+</td>
+<td style="text-align:right;">
+8.11
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+14.0
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:left;">
+▇▅▂▂▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Education
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.91
+</td>
+<td style="text-align:right;">
+1.02
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4.0
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+▂▃▇▆▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+EmployeeCount
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+▁▁▇▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+EmployeeNumber
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1024.87
+</td>
+<td style="text-align:right;">
+602.02
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+491
+</td>
+<td style="text-align:right;">
+1020
+</td>
+<td style="text-align:right;">
+1555.8
+</td>
+<td style="text-align:right;">
+2068
+</td>
+<td style="text-align:left;">
+▇▇▇▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+EnvironmentSatisfaction
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.72
+</td>
+<td style="text-align:right;">
+1.09
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4.0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+▅▅▁▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HourlyRate
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+65.89
+</td>
+<td style="text-align:right;">
+20.33
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+48
+</td>
+<td style="text-align:right;">
+66
+</td>
+<td style="text-align:right;">
+83.8
+</td>
+<td style="text-align:right;">
+100
+</td>
+<td style="text-align:left;">
+▇▇▇▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JobInvolvement
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.73
+</td>
+<td style="text-align:right;">
+0.71
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+▁▃▁▇▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JobLevel
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.06
+</td>
+<td style="text-align:right;">
+1.11
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+▇▇▃▂▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JobSatisfaction
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.73
+</td>
+<td style="text-align:right;">
+1.10
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4.0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+▅▅▁▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MonthlyIncome
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+6502.93
+</td>
+<td style="text-align:right;">
+4707.96
+</td>
+<td style="text-align:right;">
+1009
+</td>
+<td style="text-align:right;">
+2911
+</td>
+<td style="text-align:right;">
+4919
+</td>
+<td style="text-align:right;">
+8379.0
+</td>
+<td style="text-align:right;">
+19999
+</td>
+<td style="text-align:left;">
+▇▅▂▁▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MonthlyRate
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+14313.10
+</td>
+<td style="text-align:right;">
+7117.79
+</td>
+<td style="text-align:right;">
+2094
+</td>
+<td style="text-align:right;">
+8047
+</td>
+<td style="text-align:right;">
+14236
+</td>
+<td style="text-align:right;">
+20461.5
+</td>
+<td style="text-align:right;">
+26999
+</td>
+<td style="text-align:left;">
+▇▇▇▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NumCompaniesWorked
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.69
+</td>
+<td style="text-align:right;">
+2.50
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4.0
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+▇▃▂▂▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PercentSalaryHike
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+15.21
+</td>
+<td style="text-align:right;">
+3.66
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+18.0
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:left;">
+▇▅▃▂▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PerformanceRating
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3.15
+</td>
+<td style="text-align:right;">
+0.36
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+▇▁▁▁▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RelationshipSatisfaction
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.71
+</td>
+<td style="text-align:right;">
+1.08
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4.0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+▅▅▁▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+StandardHours
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+80.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+80
+</td>
+<td style="text-align:right;">
+80
+</td>
+<td style="text-align:right;">
+80
+</td>
+<td style="text-align:right;">
+80.0
+</td>
+<td style="text-align:right;">
+80
+</td>
+<td style="text-align:left;">
+▁▁▇▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+StockOptionLevel
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.79
+</td>
+<td style="text-align:right;">
+0.85
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;">
+▇▇▁▂▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TotalWorkingYears
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+11.28
+</td>
+<td style="text-align:right;">
+7.78
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+15.0
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:left;">
+▇▇▂▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TrainingTimesLastYear
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.80
+</td>
+<td style="text-align:right;">
+1.29
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;">
+▂▇▇▂▃
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WorkLifeBalance
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.76
+</td>
+<td style="text-align:right;">
+0.71
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;">
+▁▃▁▇▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+YearsAtCompany
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+7.01
+</td>
+<td style="text-align:right;">
+6.13
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+9.0
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:left;">
+▇▂▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+YearsInCurrentRole
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4.23
+</td>
+<td style="text-align:right;">
+3.62
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+7.0
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:left;">
+▇▃▂▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+YearsSinceLastPromotion
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.19
+</td>
+<td style="text-align:right;">
+3.22
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+YearsWithCurrManager
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4.12
+</td>
+<td style="text-align:right;">
+3.57
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+7.0
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:left;">
+▇▂▅▁▁
+</td>
+</tr>
+</tbody>
+</table>
+<p>We find that the data set is made up of 9 <em>character</em> and 26 <em>numeric</em> variables. Here, we can also see that there are no missing values in any of the variables and all observations are complete. We will not go into more detail but the data skimming also shows the mean, standard deviation, quartiles and a small histogram for each variable for anyone interested in having a closer look.</p>
+</div>
+<div id="data-cleaning" class="section level1">
+<h1>Data cleaning</h1>
+<p>We will clean the data set as some variables, e.g., <code>education</code> are given as a number rather than a more useful description, some variable names unclude capital letters and some variables are not necessary to our analysis. We will create a new data set called <code>hr_cleaned</code> which will include the cleaned data.</p>
+<pre class="r"><code>hr_cleaned &lt;- hr_dataset %&gt;% 
+  
+# get rid of capital letters in variable names  
+  clean_names() %&gt;%  
+
+# change numeric value for education to a descriptive word of level of education
+  mutate(
+    education = case_when(
+      education == 1 ~ &quot;Below College&quot;,
+      education == 2 ~ &quot;College&quot;,
+      education == 3 ~ &quot;Bachelor&quot;,
+      education == 4 ~ &quot;Master&quot;,
+      education == 5 ~ &quot;Doctor&quot;
+    ),
+    
+# change numeric value for environment satisfaction to a descriptive word of degree of satisfaction
+    environment_satisfaction = case_when(
+      environment_satisfaction == 1 ~ &quot;Low&quot;,
+      environment_satisfaction == 2 ~ &quot;Medium&quot;,
+      environment_satisfaction == 3 ~ &quot;High&quot;,
+      environment_satisfaction == 4 ~ &quot;Very High&quot;
+    ),
+
+# change numeric value for job satisfaction to a descriptive word of degree of satisfaction
+    job_satisfaction = case_when(
+      job_satisfaction == 1 ~ &quot;Low&quot;,
+      job_satisfaction == 2 ~ &quot;Medium&quot;,
+      job_satisfaction == 3 ~ &quot;High&quot;,
+      job_satisfaction == 4 ~ &quot;Very High&quot;
+    ),
+
+# change numeric value for performance rating to a descriptive word of rating
+    performance_rating = case_when(
+      performance_rating == 1 ~ &quot;Low&quot;,
+      performance_rating == 2 ~ &quot;Good&quot;,
+      performance_rating == 3 ~ &quot;Excellent&quot;,
+      performance_rating == 4 ~ &quot;Outstanding&quot;
+    ),
+
+# change numeric value for work life balance to a descriptive word of opinion on work life balance
+    work_life_balance = case_when(
+      work_life_balance == 1 ~ &quot;Bad&quot;,
+      work_life_balance == 2 ~ &quot;Good&quot;,
+      work_life_balance == 3 ~ &quot;Better&quot;,
+      work_life_balance == 4 ~ &quot;Best&quot;
+    )
+  ) %&gt;% 
+  
+# select only relevant variables
+  select(age, attrition, daily_rate, department,
+         distance_from_home, education,
+         gender, job_role,environment_satisfaction,
+         job_satisfaction, marital_status,
+         monthly_income, num_companies_worked, percent_salary_hike,
+         performance_rating, total_working_years,
+         work_life_balance, years_at_company,
+         years_since_last_promotion)</code></pre>
+<p>Now, let’s have a look at the cleaned data set.</p>
+<pre class="r"><code># glimpse at cleaned data set
+glimpse(hr_cleaned)</code></pre>
+<pre><code>## Rows: 1,470
+## Columns: 19
+## $ age                        &lt;dbl&gt; 41, 49, 37, 33, 27, 32, 59, 30, 38, 36, 35…
+## $ attrition                  &lt;chr&gt; &quot;Yes&quot;, &quot;No&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;…
+## $ daily_rate                 &lt;dbl&gt; 1102, 279, 1373, 1392, 591, 1005, 1324, 13…
+## $ department                 &lt;chr&gt; &quot;Sales&quot;, &quot;Research &amp; Development&quot;, &quot;Resear…
+## $ distance_from_home         &lt;dbl&gt; 1, 8, 2, 3, 2, 2, 3, 24, 23, 27, 16, 15, 2…
+## $ education                  &lt;chr&gt; &quot;College&quot;, &quot;Below College&quot;, &quot;College&quot;, &quot;Ma…
+## $ gender                     &lt;chr&gt; &quot;Female&quot;, &quot;Male&quot;, &quot;Male&quot;, &quot;Female&quot;, &quot;Male&quot;…
+## $ job_role                   &lt;chr&gt; &quot;Sales Executive&quot;, &quot;Research Scientist&quot;, &quot;…
+## $ environment_satisfaction   &lt;chr&gt; &quot;Medium&quot;, &quot;High&quot;, &quot;Very High&quot;, &quot;Very High&quot;…
+## $ job_satisfaction           &lt;chr&gt; &quot;Very High&quot;, &quot;Medium&quot;, &quot;High&quot;, &quot;High&quot;, &quot;Me…
+## $ marital_status             &lt;chr&gt; &quot;Single&quot;, &quot;Married&quot;, &quot;Single&quot;, &quot;Married&quot;, …
+## $ monthly_income             &lt;dbl&gt; 5993, 5130, 2090, 2909, 3468, 3068, 2670, …
+## $ num_companies_worked       &lt;dbl&gt; 8, 1, 6, 1, 9, 0, 4, 1, 0, 6, 0, 0, 1, 0, …
+## $ percent_salary_hike        &lt;dbl&gt; 11, 23, 15, 11, 12, 13, 20, 22, 21, 13, 13…
+## $ performance_rating         &lt;chr&gt; &quot;Excellent&quot;, &quot;Outstanding&quot;, &quot;Excellent&quot;, &quot;…
+## $ total_working_years        &lt;dbl&gt; 8, 10, 7, 8, 6, 8, 12, 1, 10, 17, 6, 10, 5…
+## $ work_life_balance          &lt;chr&gt; &quot;Bad&quot;, &quot;Better&quot;, &quot;Better&quot;, &quot;Better&quot;, &quot;Bett…
+## $ years_at_company           &lt;dbl&gt; 6, 10, 0, 8, 2, 7, 1, 1, 9, 7, 5, 9, 5, 2,…
+## $ years_since_last_promotion &lt;dbl&gt; 0, 1, 0, 3, 2, 3, 0, 0, 1, 7, 0, 0, 4, 1, …</code></pre>
+<pre class="r"><code># look at first 5 rows of data set
+head(hr_cleaned, 5)</code></pre>
+<pre><code>## # A tibble: 5 x 19
+##     age attrition daily_rate department distance_from_h… education gender
+##   &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;                 &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt; 
+## 1    41 Yes             1102 Sales                     1 College   Female
+## 2    49 No               279 Research …                8 Below Co… Male  
+## 3    37 Yes             1373 Research …                2 College   Male  
+## 4    33 No              1392 Research …                3 Master    Female
+## 5    27 No               591 Research …                2 Below Co… Male  
+## # … with 12 more variables: job_role &lt;chr&gt;, environment_satisfaction &lt;chr&gt;,
+## #   job_satisfaction &lt;chr&gt;, marital_status &lt;chr&gt;, monthly_income &lt;dbl&gt;,
+## #   num_companies_worked &lt;dbl&gt;, percent_salary_hike &lt;dbl&gt;,
+## #   performance_rating &lt;chr&gt;, total_working_years &lt;dbl&gt;,
+## #   work_life_balance &lt;chr&gt;, years_at_company &lt;dbl&gt;,
+## #   years_since_last_promotion &lt;dbl&gt;</code></pre>
+<p>After cleaning the data, the columns have been reduced to 19 (from 35) for a better overview. In the following, we will explore this cleaned data set trough several analyses.</p>
+</div>
+<div id="analysis" class="section level1">
+<h1>Analysis</h1>
+<div id="correlations-overview" class="section level2">
+<h2>Correlations overview</h2>
+<p>In order to better understand the variables, we will, first, have a look at the relationships between some of the most relevant variables by considering their correlations and scatterplots. We will use the <code>ggpairs()</code> function which, in addition, will show us each individual variable’s density plot.</p>
+<pre class="r"><code>hr_cleaned %&gt;% 
+  
+  #select relevant variables
+  select(age, monthly_income, num_companies_worked, total_working_years, years_at_company, years_since_last_promotion, gender) %&gt;%
+  
+  #create ggpairs plots
+  GGally::ggpairs(aes(colour = gender), alpha = 0.4)</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/ggpairs-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Although this plot is full of a vast amount of information, we can still see some relevant trends that we will investigate further in the next sections. For example, we see that there are relatively high correlations between age and all of the other selected variables. This shows a very common dynamic that the older you are, the longer you have worked and the more money you make. This trend can also be seen between the positive (and in this selection highest) correlation between monthly income and total working years of 0.773. Most people that have worked for several years are in senior positions where they also work more.</p>
+<p>Another interesting find is the high, positive correlation of 0.628 between total working years and years at the company. This indicates that most people that have worked many years in their lives have worked at this regarded company (IBM) for a long time as well. As we also find a similar high correlation between years at the company and years since the last promotion, we can assume that the longer an employee works at IBM, the less frequently he/she will be promoted - a typical trend for more senior roles.</p>
+<p>We don’t find any sigfinicant differences between women and men, apart from the fact that men have, on average, worked in less companies so far than women.</p>
+<p>Now that we have a broad overview of the variables and their interactions, we will look at some of them in more detail.</p>
+</div>
+<div id="attrition-employee-happiness" class="section level2">
+<h2>Attrition &amp; Employee Happiness</h2>
+<div id="attrition" class="section level3">
+<h3>Attrition</h3>
+<p>We begin by looking at the <code>attrition variable</code> and want to find out how many employees, of the 1,470 recorded observations, have left the company (i.e. where <code>attrition</code> equals “Yes”).</p>
+<pre class="r"><code># sum number of &quot;Yes&quot; for attrition
+sum(hr_cleaned$attrition == &quot;Yes&quot;)</code></pre>
+<pre><code>## [1] 237</code></pre>
+<pre class="r"><code>#create bar plot for attrition
+ggplot(hr_cleaned, 
+       aes(attrition)) +
+        geom_bar() +
+        labs(title = &quot;Only few employees leave&quot;, 
+             subtitle = &quot;Count of employees that have left and have not left the company&quot;,
+             x = &quot;Attrition?&quot;,
+             y = &quot;Number of employees&quot;) +
+                    NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/attrition_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Summing all the observations that were “Yes” for attrition and looking at the bar plot below, we find that 237 employees left the company, whereas X of the observed employees still work for IBM.</p>
+<p>This means that on average …</p>
+<pre class="r"><code># divide the people that have left the company by all 
+sum(hr_cleaned$attrition == &quot;Yes&quot;) / count(hr_cleaned$attrition)</code></pre>
+<pre><code>##  n_No 
+## 0.192</code></pre>
+<p>… around 19 out of 100 people leave the company.</p>
+<p>It is relatively difficult to judge an attrition rate of 19% with no further information about the industry of the company and what would be a normal attrition in that industry.</p>
+<p>Oftentimes, employees leave a company because they are not satisfied with their job or their work-life balance. In order to make further conclusions about the attrition rate, we will evaluate employees’ happiness.</p>
+</div>
+<div id="employee-happiness" class="section level3">
+<h3>Employee Happiness</h3>
+<p>In the following, we will look at the distributions of <code>job_satisfaction</code> and <code>work_life_balance</code>.</p>
+<pre class="r"><code>#put job satisfaction levels in order
+hr_cleaned$job_satisfaction &lt;- factor(hr_cleaned$job_satisfaction, levels = c(&quot;Low&quot;, &quot;Medium&quot;, &quot;High&quot;, &quot;Very High&quot;))
+
+#create job satisfaction plot
+ggplot(hr_cleaned, 
+       aes(job_satisfaction, 
+
+#calculate percentage values per bar
+           label = scales::percent(prop.table(stat(count))))) +
+  
+#create bar plot
+            geom_bar() +
+  
+#add percentage values
+            geom_text(stat = &#39;count&#39;,
+            vjust = -0.5, # put labels above bars
+            size = 5) + # size of label font
+
+#add plot labels
+            labs(title = &quot;Most employees are happy with their jobs&quot;, 
+                 subtitle = &quot;Distribution of employees&#39; satisfaction with their jobs&quot;,
+                 x = &quot;Job satisfaction&quot;,
+                 y = &quot;Number of employees&quot;) +
+                    NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/job_satisfaction_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>As can be seen, a majority of <strong>61.29%</strong> of employees are highly or very highly satisfied with their job.</p>
+<pre class="r"><code>#put work-life balance levels in order
+hr_cleaned$work_life_balance &lt;- factor(hr_cleaned$work_life_balance, levels = c(&quot;Bad&quot;, &quot;Good&quot;, &quot;Better&quot;, &quot;Best&quot;))
+
+#create work life balance satisfaction plot
+ggplot(hr_cleaned, 
+       aes(work_life_balance, 
+
+#calculate percentage values per bar
+           label = scales::percent(prop.table(stat(count))))) +
+  
+#create bar plot
+            geom_bar() +
+  
+#add percentage values
+            geom_text(stat = &#39;count&#39;,
+            vjust = -0.5, #put labels above bars
+            size = 5) + #size of label font
+
+#add plot labels
+            labs(title = &quot;Most employees thing their work-life-balance is great - but not perfect&quot;, 
+                 subtitle = &quot;Distribution of employees&#39; satisfaction with their work-life-balance&quot;,
+                 x = &quot;Work-life-balance&quot;,
+                 y = &quot;Number of employees&quot;) +
+                    NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/work_life_balance_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>As can be seen in this plot, a small minority of <strong>5.4%</strong> of employees is not satisfied with their work-life balance. A majority of <strong>60.7%</strong> of employees rates their work-life balance 3 out of 4, namely “better”. Nevertheless, the scale could be improved by introducing a “medium” option or balancing the positive and negative attributes as of now, there is one bad and three good options to describe one’s work-life balance.</p>
+<p>Altogether, most employees seem to be satisfied with their job and work-life balance, indicating that the 19% attrition rate is either rather low compared to industry standards or there are other reasons than employees’ happiness causing attrition.</p>
+</div>
+</div>
+<div id="distributions" class="section level2">
+<h2>Distributions</h2>
+<p>As a next step, we will explore the distributions of <code>age</code>, <code>years_at_company</code>, <code>monthly_income</code> and <code>years_since_last_promotion</code> in more detail.</p>
+<p>First, we will have a rough look at the summary statistics for the four variables:</p>
+<pre class="r"><code>#select relevant variables
+hr_cleaned_selected &lt;- hr_cleaned %&gt;% 
+                          select(age, years_at_company, monthly_income, years_since_last_promotion)
+
+#summarize
+summary(hr_cleaned_selected)</code></pre>
+<pre><code>##       age       years_at_company monthly_income  years_since_last_promotion
+##  Min.   :18.0   Min.   : 0       Min.   : 1009   Min.   : 0.00             
+##  1st Qu.:30.0   1st Qu.: 3       1st Qu.: 2911   1st Qu.: 0.00             
+##  Median :36.0   Median : 5       Median : 4919   Median : 1.00             
+##  Mean   :36.9   Mean   : 7       Mean   : 6503   Mean   : 2.19             
+##  3rd Qu.:43.0   3rd Qu.: 9       3rd Qu.: 8379   3rd Qu.: 3.00             
+##  Max.   :60.0   Max.   :40       Max.   :19999   Max.   :15.00</code></pre>
+<p>For a Normal distribution, the mean equals the median. Looking at the summary statistics, in no instance the mean is precisely equal to the respective median. However, the <code>age</code> variable’s mean of 36.9 is relatively close to its median of 36.0 compared to larger differences for the other three variables. Therefore, it is likely that the <code>age</code> distribution is roughly normal.</p>
+<p>Let’s have a closer look.</p>
+<pre class="r"><code>#plot age distribution
+ggplot(hr_cleaned_selected, aes(age)) +
+          geom_density()+
+          labs(title = &quot;Age is Normal&quot;,
+                subtitle = &quot;Density function for employees&#39; age&quot;,
+                x = &quot;Age&quot;,
+                y = &quot;Density&quot;) +
+          NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/density_plots-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#plot years_at_company distribution
+ggplot(hr_cleaned_selected, aes(years_at_company)) +
+          geom_density()+
+          labs(title = &quot;Mostly newbies&quot;,
+                subtitle = &quot;Density function for how many years employees are working at the company&quot;,
+                x = &quot;Years&quot;,
+                y = &quot;Density&quot;) +
+          NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/density_plots-2.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#plot years_since_last_promotion distribution
+ggplot(hr_cleaned_selected, aes(years_since_last_promotion)) +
+          geom_density()+
+          labs(title = &quot;Please promote me again&quot;,
+                subtitle = &quot;Density function for how many years have passed since an employee was last promoted&quot;,
+                x = &quot;Years&quot;,
+                y = &quot;Density&quot;) +
+          NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/density_plots-3.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#plot monthly_income distribution
+ggplot(hr_cleaned_selected, aes(monthly_income)) +
+          geom_density()+
+          labs(title = &quot;Little for many, much for few&quot;,
+                subtitle = &quot;Density function for employees&#39; monthly income&quot;,
+                x = &quot;Monthly income ($)&quot;,
+                y = &quot;Density&quot;) +
+          NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/density_plots-4.png" width="648" style="display: block; margin: auto;" /></p>
+<p>As expected, we can observe a roughly Normal distribution for the employees’ age. We find that the majority of employees has been at the company less then 10 years. There are, however, a few people that have worked at the company for 20 or even over 30 years. We, further find that for most employees, the last promotion is fewer than approx. 3 years ago while for only a small minority of employees the last promotion is over 10 years ago.</p>
+<p>As there are a few people earning more than 10,000USD per month, the majority of employees earn a lower monthly income, indicating a common company structure with many low-salary jobs and only few high-salary jobs. In the next section, we will investigate <strong>monthly income</strong> further.</p>
+</div>
+<div id="monthly-income" class="section level2">
+<h2>Monthly Income</h2>
+<p>In the following, we analyse potential influencing factors on the employees’ monthly income.</p>
+<div id="education" class="section level3">
+<h3>Education</h3>
+<p>Firstly, we will have a look at the relationship between employees’ monthly income and their respective highest level of education.</p>
+<pre class="r"><code>#put education levels in order
+hr_cleaned$education &lt;- factor(hr_cleaned$education, levels = c(&quot;Below College&quot;, &quot;College&quot;, &quot;Bachelor&quot;, &quot;Master&quot;, &quot;Doctor&quot;))
+
+#plot education vs monthly income boxplot
+ggplot(hr_cleaned, 
+       aes(x = education, y = monthly_income)) +
+          geom_boxplot() +
+          labs(title = &quot;The higher the education, the higher the pay?&quot;,
+               subtitle = &quot;Relationship between monthly income and education&quot;,
+               x = &quot;Education level&quot;,
+               y = &quot;Monthly income ($)&quot;) +
+     NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/education_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Generally, we can see that a higher level of education means a higher median monthly income. However, all education levels apart from Doctor show several outliers that earn between 15,000-20,000USD in contrast to relatively low medians around/below 5,000USD and 3rd quartile values of significantly lower than 10,000USD. No significant relationship can be observed.</p>
+<p>For further investigation, we calculate and plot a bar chart of the mean (also called average) and median income by education level.</p>
+<pre class="r"><code>#defining the mean per education level
+mean_ed &lt;- hr_cleaned %&gt;%
+  
+  #group observations by their level of education
+            group_by(education) %&gt;%
+  
+  #create mean variable
+            summarize(mean_inc = mean(monthly_income)) %&gt;% 
+  
+  #arrange mean variable from highest to lowest
+            arrange(desc(mean_inc))
+
+#check mean per education level 
+mean_ed</code></pre>
+<pre><code>## # A tibble: 5 x 2
+##   education     mean_inc
+##   &lt;fct&gt;            &lt;dbl&gt;
+## 1 Doctor           8278.
+## 2 Master           6832.
+## 3 Bachelor         6517.
+## 4 College          6227.
+## 5 Below College    5641.</code></pre>
+<pre class="r"><code>#create plot for mean income by education level
+ggplot(mean_ed,
+       aes(x=education,
+           y=mean_inc)) +
+        geom_col() +
+        theme(axis.text.x = element_text(angle = 90)) + #turn x axis label text 90 degrees
+        labs(title = &quot;The higher the education, the higher the (average!) pay&quot;,
+             subtitle = &quot;Average income by education Level&quot;,
+             x=&quot;Education level&quot;,
+             y=&quot;Average monthly income ($)&quot;)</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/income_mean-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#defining the median per education level
+median_ed &lt;- hr_cleaned %&gt;%
+  
+  #group observations by their level of education
+            group_by(education) %&gt;%
+  
+  #create median variable
+            summarize(median_inc = median(monthly_income)) %&gt;% 
+  
+  #arrange median variable from highest to lowest
+            arrange(desc(median_inc))
+
+#check median per education level 
+median_ed</code></pre>
+<pre><code>## # A tibble: 5 x 2
+##   education     median_inc
+##   &lt;fct&gt;              &lt;dbl&gt;
+## 1 Doctor             6203 
+## 2 Master             5342.
+## 3 College            4892.
+## 4 Bachelor           4762 
+## 5 Below College      3849</code></pre>
+<pre class="r"><code>#create plot for median income by education level
+ggplot(median_ed,
+       aes(x=education,
+           y=median_inc)) +
+          geom_col() +
+          theme(axis.text.x = element_text(angle = 90)) + #turn x axis label text 90 degrees
+          labs(title = &quot;The higher the education, the higher the median pay? - Not necessarily!&quot;,
+               subtitle= &quot;Median income by education level&quot;,
+               x=&quot;Education level&quot;,
+               y=&quot;Median monthly income ($)&quot;)</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/income_median-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>The median monthly income shows no direct positive relationship with the level of education as the median monthly income of employees with a bachelor is lower than that of people with a college degree. Nevertheless, the average (mean) monthly income shows a positive relationship with the education level as people with the lowest education level (Below College) earn the lowest monthly income on average, employees with the second lowest education level (College) earn the second lowest monthly income and so on.</p>
+<p>Finally, we plot the distribution of monthly income by education level. The colouring also indicates the gender of the respective monthly income.</p>
+<pre class="r"><code>#plot distribution of monthly income
+ggplot(hr_cleaned, 
+       aes(x = monthly_income )) + 
+            geom_histogram(bins = 50) + #set size of histogram bins
+  
+  #facet by education level
+            facet_wrap(~education) + 
+  
+            labs(title = &quot;Little for many, much for few - regardless of education&quot;,
+                 subtitle = &quot;Distribution of monthly income by education level&quot;,
+                 x = &quot;Monthly income ($)&quot;,
+                 y = &quot;Number of employees&quot;) +
+     NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/income_education_distribution-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Here, again, we can only observe that there are a generally more low-salary jobs than high-salary jobs. The majority of all education levels except Doctor earn below 10,000USD but there is no clear indication as to which level of education earns the least. While there are only a few employees with a Doctor, their level of monthly income varies and shows no directly connected level of income.</p>
+<p>Altogether, these plots may show that while it is generally possible for some people to earn a comparatively higher salary with a higher level of education, there is no strict rule and, thus, also no significant positive relationship between employees’ monthly income and highest level of education. We may find other factors such as gender or job role to be a more significant influence.</p>
+</div>
+<div id="gender" class="section level3">
+<h3>Gender</h3>
+<p>Next, we will investigate if there is a relationship between monthly income and gender.</p>
+<pre class="r"><code>#create boxplot of monthly income vs gender
+ggplot(hr_cleaned, 
+       aes(x = gender, y = monthly_income)) +
+        geom_boxplot(alpha=.2) +
+        labs(title = &quot;No gender pay gap&quot;,
+             subtitle = &quot;Relationship between monthly income and gender&quot;,
+             x = &quot;Gender&quot;,
+             y = &quot;Monthly income ($)&quot;) +
+     NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/income_gender-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>We see, again, that most employees generally are in the lower monthly income range (i.e., &lt; 10,000USD) and the median employee salary is around 5,000USD - this is true for both men and women. We don’t see significant differences between male and female employees. In fact, the median salary of women is actually slightly higher than men’s within this group of employees.</p>
+<p>While most women are in this lower range, there are a few women earning up to 20,000USD. Even though there are also fewer men earning within the higher income range than within the lower, there are overall more men earning such relatively high monthly incomes (more outliers visible).</p>
+<p>Nonetheless, this graph does not take into consideration the number of female/male employees. Let’s have a look at that.</p>
+<pre class="r"><code>#Number of female employees
+sum(hr_cleaned$gender == &quot;Female&quot;)</code></pre>
+<pre><code>## [1] 588</code></pre>
+<pre class="r"><code>#Number of male employees
+sum(hr_cleaned$gender == &quot;Male&quot;)</code></pre>
+<pre><code>## [1] 882</code></pre>
+<pre class="r"><code>#Female in % of total
+sum(hr_cleaned$gender == &quot;Female&quot;)/(sum(hr_cleaned$gender == &quot;Female&quot;) + sum(hr_cleaned$gender == &quot;Male&quot;))</code></pre>
+<pre><code>## [1] 0.4</code></pre>
+<p>We find that there are fewer women in the company, namely <strong>40%</strong> of the employees are female.</p>
+<p>Let’s take a closer look at the average income per gender.</p>
+<pre class="r"><code>#Separate female and male datasets
+hr_cleaned_f &lt;- hr_cleaned %&gt;% 
+                  filter(hr_cleaned$gender == &quot;Female&quot;)
+
+hr_cleaned_m &lt;- hr_cleaned %&gt;% 
+                  filter(hr_cleaned$gender == &quot;Male&quot;)
+
+#total monthly income over all female / male employees
+#sum(hr_cleaned_f$monthly_income)
+#sum(hr_cleaned_m$monthly_income)
+
+#average incomes for females
+sum(hr_cleaned_f$monthly_income)/sum(hr_cleaned$gender == &quot;Female&quot;)</code></pre>
+<pre><code>## [1] 6687</code></pre>
+<pre class="r"><code>#average income for males
+sum(hr_cleaned_m$monthly_income)/sum(hr_cleaned$gender == &quot;Male&quot;)</code></pre>
+<pre><code>## [1] 6381</code></pre>
+<p>As we can see from the plot and the calculations, the average monthly income over all females in the company is 6,686USD whereas men earn 301USD less on average, namely 6,381USD. Even though there is a greater number of men that earn a relative high monthly income (than women), there is also a significantly higher amount of men that earn a lower-range monthly income than women. Since monthly income of men and women varies largely between all income classes and there are more men employed in the company, their amounts of monthly income are also wider spread than those of the fewer female employees. As there are more male employees and generally more low-salary employees, men’s average income is lower than that of the female employees.</p>
+<p>While the mean follows the same trend as the median in terms here, the median salary is lower for both men and women, indicating that the mean is subject to outliers (employees with very, very high income).</p>
+<p>Again, we find no significant relationship between an employee’s gender and their monthly income.</p>
+</div>
+<div id="job-role" class="section level3">
+<h3>Job Role</h3>
+<p>Since we found that neither education nor gender is a definitive indicator for monthly income, we will look at the relationship between an employee’s job role and their monthly income next.</p>
+<pre class="r"><code>#put job role levels in order according to highest median monthly income
+hr_cleaned$job_role &lt;- factor(hr_cleaned$job_role, levels = c(&quot;Sales Representative&quot;, &quot;Laboratory Technician&quot;, &quot;Research Scientist&quot;,&quot;Human Resources&quot;, &quot;Sales Executive&quot;, &quot;Manufacturing Director&quot;, &quot;Healthcare Representative&quot;,  &quot;Research Director&quot;, &quot;Manager&quot;))
+
+#create boxplot of monthly income vs job role
+ggplot(hr_cleaned, 
+       aes(x = monthly_income, y = job_role)) +
+        geom_boxplot() +
+        labs(title = &quot;Little for many, much for managers and directors&quot;,
+             subtitle = &quot;Relationship between monthly income and job role&quot;,
+             x = &quot;Job role&quot;,
+             y = &quot;Monthly income ($)&quot;) +
+      NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/jobrole_income-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>With this plot, we can clearly see that job roles can be a meaningful indicator of monthly income. When sorting the job roles by highest to lowest average monthly income, it becomes clear that high-seniority positions such as managers, directors and executives earn a higher level income than low-seniority jobs as a laboratory technician or sales representative.</p>
+<p>This result is is not surprising as a commonly approved approach to determining an employee’s salary is to take their job role rather than their level of education or gender into consideration. These influencing factors, of course, also play a role but are nowhere near as decisive as what kind of role an employee takes on and how much responsibility he/she carries.</p>
+</div>
+<div id="age" class="section level3">
+<h3>Age</h3>
+<p>As we have already seen some indications for a relationship between <code>age</code> and <code>job_role</code> in the beginning, we will, lastly, investigate the relationship between age and monthly income.</p>
+<pre class="r"><code>#create scatterplot of monthly income vs age
+ggplot(hr_cleaned, 
+       aes(x = age, y = monthly_income)) +
+        geom_point() +
+  
+  #add trend/regression line
+        geom_smooth(method = lm) + 
+  
+        labs(title = &quot;Little for young, much for elder&quot;,
+             subtitle = &quot;Relationship between monthly income and age&quot;,
+             x = &quot;Age&quot;,
+             y = &quot;Monthly income ($)&quot;) +
+     NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/age_income-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Although we can see that there are people of all ages earning a monthly income of below 5,000USD, it is clear that there are almost no people (just one person) younger than 30 that earn more than 10,000USD and only few (namely five) people between 30 and 40 that earn more than 15,000USD. Only employees above 40 years of age earn within the higher monthly income range of 15,000-20,000USD. This analysis clearly shows a positive relationship between age and monthly income, meaning the older an employee, the more likely he/she earns relatively more money.</p>
+<p>As a higher age is commonly associated with a higher (more senior) job role and consequently also a higher salary, we facet the prior plot per job role for further analysis.</p>
+<pre class="r"><code>#put job role levels in order according to highest median monthly income
+hr_cleaned$job_role &lt;- factor(hr_cleaned$job_role, levels = c(&quot;Manager&quot;, &quot;Research Director&quot;, &quot;Healthcare Representative&quot;, &quot;Manufacturing Director&quot;, &quot;Sales Executive&quot;, &quot;Human Resources&quot;,&quot;Research Scientist&quot;, &quot;Laboratory Technician&quot;, &quot;Sales Representative&quot;))
+
+#create scatterplot of monthly income vs age
+ggplot(hr_cleaned, 
+       aes(x = age, y = monthly_income)) +
+        geom_point() +
+  
+  #add trend/regression line
+        geom_smooth(method = lm) + 
+  
+  #facet by job role
+        facet_wrap(~job_role) + 
+  
+        labs(title = &quot;Little for the young many, much for the elder managers and directors&quot;,
+             subtitle = &quot;Relationship between monthly income and age by job role&quot;,
+             x = &quot;Age&quot;,
+             y = &quot;Monthly income ($)&quot;) +
+     NULL</code></pre>
+<p><img src="/projects/project4/index_files/figure-html/age_income_jobrole-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>This analysis prints a cohesive picture with our previous analysis. There are no to only a few employees below 30 in high-seniority positions such as Manager and Reseach Director which both record the highest levels of monthly income. There are people of almost all ages in the other job roles. While people in HR are relatively middle-aged with a few employees at the lower and upper age range, most people working as Sales Representatives are relatively young with a few older people and only two employees above 50.</p>
+</div>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>To conclude, the <strong>IBM HR Analytics Employee Attrition &amp; Performance data set</strong> gives a broad overview of the dynamics of a group of employees in a fictional company. While we can observe an attrition rate of 19%, we cannot judge whether this is high or low as we have no indication of the industry in which this company works in and what is considered a high/low attrition rate there. We do, however, find that both job satisfaction and opinion on work-life balance are high/good. This indicates that most employees are satisfied and there is no high attrition due to an unpleasant work environment or stressful jobs.</p>
+<p>While we can observe an almost Normal distribution for the employees’ age, we find that the majority of employees has been at the company less then approx. 10 years. There are, however, a few people that have worked at the company for 20 or even over 30 years. We, further find that employees are relatively quickly promoted as for most employees, the last promotion is fewer than approx. 3 years ago while for almost no employee the last promotion is over 10 years ago. While there are a few people earning more than 10,000USD per month, the majority of employees earn below, indicating a common company structure with many low-salary jobs and only few high-salary jobs.</p>
+<p>When investigating the monthly income in detail, we neither find a distinct relationship between monthly income and education level nor between monthly income and gender. We do however find positive relationships between monthly income and age as well as monthly income and job role, indicating that an older employee is more likely to be in a senior job position and the more senior a job position is, the higher the salary.</p>
+</div>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://www.linkedin.com/in/mariecordes/" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+                    <li><a href="https://github.com/mariecordes" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+                    <li><a href="https://www.facebook.com/mariecordes6/" class="icon alt fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+                
+                    <li><a href="https://www.instagram.com/schokomarie/" class="icon alt fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Content and pictures by Marie Cordes </li>
+                
+                <li>Design:  <a href="https://www.html5up.net">HTML5 UP</a></li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>

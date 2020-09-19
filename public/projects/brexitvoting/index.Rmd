@@ -1,0 +1,281 @@
+---
+title: "Brexit Voting Analysis"
+author: "Marie Cordes"
+date: "16.09.2020"
+output:
+  html_document:
+    theme: flatly
+    highlight: zenburn
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+    code_folding: show
+---
+
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+options(digits = 3)
+
+# default figure size
+knitr::opts_chunk$set(
+  fig.width=6.75, 
+  fig.height=6.75,
+  fig.align = "center"
+)
+```
+
+
+```{r load-libraries, echo=FALSE}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(mosaic)
+library(ggthemes)
+library(GGally)
+library(readxl)
+library(here)
+library(skimr)
+library(janitor)
+library(broom)
+library(tidyquant)
+library(infer)
+library(openintro)
+library(usethis)
+library(devtools)
+library(bbplot)
+library(ggthemr)
+```
+
+![Brexit](https://www.bundesregierung.de/resource/image/1712628/hero_desktop/1170/585/8459b4440eaf8440a5f47fe94ee0aebc/nV/2020-01-15-fahnen-von-grossbritannien-und-europa.jpg)
+
+# Exploratory Data Analysis
+
+In the following we will look at a dataset concerning the results of the 2016 Brexit vote in the UK.
+
+## Raw Data
+
+We will have a quick look at the results of the 2016 Brexit vote in the UK. First we read the data using `vroom` and have a quick glimpse at the data.
+
+```{r load_brexit_data, warning=FALSE, message=FALSE}
+brexit_results <- vroom::vroom(here::here("data","brexit_results.csv"))
+
+
+glimpse(brexit_results)
+```
+
+We find that the data set has 632 observations (rows) and 11 variables (coloumns). 
+
+The variables are the following:
+- `Seat`: character; the respective name of the constituencies
+- `con_2015`: double; the share of the Conservative Party voters per constituency in 2015
+- `lab_2015`: double; the share of the Labour Party voters per constituency in 2015
+- `ld_2015`: double; the share of the Liberal Democrats party voters per constituency in 2015
+- `ukip_2015`: double; the share of the UK Independence Party voters per constituency in 2015
+- `leave_share`: double; the share of voters that voted for Brexit
+- `born_in_uk`: double; the share of people born in the UK in the respective constituency 
+- `male`: double; the share of males in the respective constituency
+- `unemployed`: double; the share of people unemployed in the respective constituency
+- `degree`: _unsure of meaning_
+- `age_18to24`: double; the share of people aged 18 to 24 in the respective constituency
+
+## Summary Analysis 
+
+Next, we will skim the data.
+
+```{r}
+skim(brexit_results)
+```
+
+We find that that none of the variables have missing values except for `degree`. This variable has 59 missing values. However, we will not go further into this as this variable is not relevant to us. 
+We also find that our only character variable `Seat` has 632 unique values which lets us know that there are no duplicates in the list of constituencies. 
+
+We will have a more detailed look at the statistics of our numeric variables using `favstats()` next. 
+
+```{r}
+favstats(brexit_results$con_2015)
+
+favstats(brexit_results$lab_2015)
+
+favstats(brexit_results$ld_2015)
+
+favstats(brexit_results$ukip_2015)
+
+favstats(brexit_results$leave_share)
+
+favstats(brexit_results$born_in_uk)
+
+favstats(brexit_results$male)
+
+favstats(brexit_results$unemployed)
+
+favstats(brexit_results$age_18to24)
+
+```
+
+We will not go into too much detail but feel free to have a look at the minimum and maximum values, the mean and median or the standard deviation for each variable. 
+
+Some conclusions we can, for example, draw is that those variables that have an equal (or similar) mean and median are roughly normally distributed. This is true for `lab_2015`, `ukip_2015`, `leave_share`, `male` and `unemployed`. 
+
+## Visualizations
+
+In order to add the `ggthemr` **fresh** theme to all the following ggplots, we run this command:
+
+```{r, add_fresh_theme}
+ggthemr('dust')
+```
+
+
+### Correlations
+
+To get a sense of the data and the relationships between the variables, we plot create a `ggpairs` plot which shows each respective correlation and scatterplot for all two variable pairs. 
+
+
+```{r, ggpairs}
+brexit_results %>% 
+  select(-Seat, -degree) %>% 
+  GGally::ggpairs(alpha = 0.2) +
+      theme_minimal()
+```
+
+In the following, we describe a few findings based on these plots - no definitive results!
+
+We find an extremely high positive correlation at 0.85 between `leave_share` and `ukip_2015` as well as another significant positive correlations between `born_in_uk` and `leave_share`. 
+
+The first observation may show that the majority of UKIP voters was also pro-Brexit. The latter relationship will be further investigated later on.
+
+We also find significant negative relationships, e.g. between `lab_2015` and `con_2015`, clearly indicating that the more Labour Party voters there are in a constituency, the less Conservative Party voters there are and vice versa (quite obvious as those are the two biggest parties in the UK). Further negative relationships include those between `unemployed` and `con_2015` as well as `age_18to24` and `con_2015` indicating that the Conservative Party does not necessarily have many unemployed voters or voters below 24 years of age. 
+
+Another interesting dynamic stems from the negative correlations between `age_18to24` and `leave_share` as well as `born_in_uk`. This may indicate that the more younger voters are in a district, the fewer people are pro-Brexit. A common dynamic during the Brexit referendum was actually that older generations were generally pro Brexit while younger generations were against it. Further, the more voters are between the age of 18 to 24, the less voters were born in the UK. This may stem from many young immigrants settling in the UK. 
+
+There are further similar relationships that can be seen in the graph but we will not go into all of them in detail.
+
+### Distribution
+
+To understand the data further, we plot a histogram and a density plot of the leave share in all constituencies.
+
+```{r brexit_histogram, warning=FALSE, message=FALSE}
+ggplot(brexit_results, aes(x = leave_share)) +
+  geom_histogram(binwidth = 2.5) +
+  labs(title = "Spread of 'leave-votes' share",
+        subtitle = "Histogram showing the spread of the proportion of 'leave the EU-votes' over all constituencies",
+         x = "Share of leave-votes",
+         y = "Count of constituencies") +
+  NULL
+
+ggplot(brexit_results, aes(x = leave_share)) +
+  geom_density() +
+ labs(title = "Density of 'leave-votes' share",
+        subtitle = "Density plot showing the spread/density of the proportion of 'leave the EU-votes' over all constituencies",
+         x = "Share of leave-votes",
+         y = "Density over all constituencies") +
+  NULL
+
+
+```
+
+### Born in the UK vs. Leave-share
+
+One common explanation for the Brexit outcome was fear of immigration and opposition to the EU's more open border policy. We can check the relationship (or correlation) between the proportion of native born residents (`born_in_uk`) in a constituency and its `leave_share` by calculating the correlation between the two variables.
+
+```{r brexit_immigration_correlation}
+brexit_results %>% 
+  select(leave_share, born_in_uk) %>% 
+  cor()
+```
+
+The correlation is almost **0.5**, which shows that the two variables are positively correlated. 
+
+We can also create a scatterplot between these two variables using `geom_point`. We also add the best fit line, using  `geom_smooth(method = "lm")`. 
+
+```{r brexit_immigration_plot}
+ggplot(brexit_results, aes(x = born_in_uk, y = leave_share)) +
+  geom_point(alpha=0.3) +
+  geom_smooth(method = "lm") +
+  labs(title = "Share of UK-born voters and share of leave-EU voters relationship",
+       subtitle = "Relationship between the share of voters born in the UK \n and the share of voters that voted to leave the EU over all constituencies",
+       x = "Share of UK-born voters",
+       y = "Share of leave-voters") +
+   
+  NULL
+```
+
+
+Looking at the above graph and the derived correlation of 0.49, a positive relationship between the share of UK-born voters and voters that voted to leave the EU becomes visible. This means that the higher the share of UK-born voters a constituency in the UK has, the more likely the constituency is to also have a higher share of pro-Brexit voters. On the other hand, the higher the share of voters that were born outside of the UK belong to/vote in a constitucency, the lower the share of voters in favour of staying in the EU. 
+
+This result is not surprising when we look at the pro and con arguments for Brexit. Brexit means leaving the EU and, thereby, returning the UK to its traditional values, seperated from the EU's values and regulations. It also means focusing on the UK first and the British being able to govern the country as they like - without major interferences or guidelines from the EU. This means a return to a more traditional and historic UK with less influence from the rest of the continent. Obviously, this is more ingrained into people that were born in the UK and are interested in keeping its culture and values alive. Voters that were not born in the UK may be more interested in well-established international relations as well as a country that is more adapted to the rest of the continent and supports globalized values.  
+
+Next to the topic of values and traditions, as mentioned above: _"One common explanation for the Brexit outcome was fear of immigration and opposition to the EU's more open border policy."_ Here, it becomes clear that non-UK-born voters are immigrants themselves and, therefore, most probably support more open-minded policies regarding immigrants as well as open border policies. These non-UK-born voters may be interested in the UK being on good terms with their own home country. Further, they may be interested to be able to easily and freely travel to their home countries and back as well as work in the UK. These arguments support the observation that the higher the share of non-UK-born voters live in a constituency, the lower the share of leave-voters.
+
+Lastly, the graph clearly shows that there are more constituencies in the UK with a higher share (approx. 80% and above) of UK-born voters. This is not a surprise since the majority of the population in the UK is also UK-born. Nevertheless, the plot shows some outliers to the overall trend as a few constituencies with a high share of UK-born voters (e.g. >90%) have a relatively low share of leave-voters (<30%). Most of the constituencies with <80% of UK-born voters are relatively widely-spread within a range of 20% to 60% share of leave-voters. There is a slight trend towards lower share of UK-born voters translating to lower share of leave-votes but overall, these observations are quite scattered and it's difficult to determine a definitive, clear trend.
+Generally, the points in the plot clearly cluster in the upper right corner, showing that most of the consitutencies consist of mainly UK-born voters and have a relatively high share of leave-voters. In the end, this was logically followed by the UK voters deciding to leave the EU.
+
+In a next step, it would be interesting to also analyse the relationship between the `leave-share` variable and the `age_18to24` variable. As most often the younger generations in the UK were more likely to be in favour of keeping an alliance with the EU in order to stay globally connected, I would expect this analysis to show that a higher share of 18 to 24 year-olds in a constituency means a relatively lower share of leave-voters.
+
+
+### Political affiliation vs. Leave-share
+
+As we have found earlier, the `brexit_results.csv` data set involves 632 observations with 11 variables, including each constituency in the UK (`Seat`), the share of the four parties Conservative Party, Labour Party, Liberal Democrats, UK Independence Party (UKIP) in 2015 as well as the share of pro-brexit voters per constituency. There are further variables which are not necessary for this analysis; we will, therefore, eliminate them. 
+
+As the four party share variables are all on the x-axis in the final plot, we will summarize them by using `pivot_longer`.
+
+```{r, pivot_longer}
+brexit <- brexit_results %>% 
+            select(Seat, con_2015, lab_2015, ld_2015, ukip_2015, leave_share) %>%      #eliminate irrelevant variables
+            pivot_longer(2:5, names_to = "party", values_to = "percent" )             #pivot longer to summarize party variables
+```
+
+With the manipulated data set, we can now reproduce the plot as above.
+
+```{r, plot}
+ggthemr_reset() #reset 'fresh' theme because we will add own aes to the next plot
+
+colours <- c("#0087dc", "#d50000", "#FDBB30", "#EFE600") #define vector with party-specific colours
+
+brexit_plot <- brexit %>% 
+                ggplot(aes(x=percent, y=leave_share)) +
+                geom_point(shape = 21, stroke = 0, alpha = 0.5, size = 2, #add scatter plot,
+                           aes(fill = party))+ #fill dots by party + make transparent 
+                scale_fill_manual(values = colours, #fill dots with party colour
+                                  breaks = c("con_2015", "lab_2015", "ld_2015","ukip_2015"), #change labels
+                                  labels = c("Conservative", "Labour", "Lib Dems", "UKIP"))+   
+                scale_colour_manual(values = colours, #outline with party colour
+                                    breaks = c("con_2015", "lab_2015", "ld_2015","ukip_2015"), #change labels
+                                    labels = c("Conservative", "Labour", "Lib Dems", "UKIP"))+
+                scale_x_continuous(limits = c(0, 82))+          #set limits of x scale
+                scale_y_continuous(limits = c(20, 100))+        #set limits of y scale
+                geom_smooth(method= lm, #add regression lines
+                            size = 0.5, #decrease line weight
+                            aes(group=party, color = party)) + #group and colour lines by party
+                theme_bw() + #ad black and white theme
+                theme(legend.position = "bottom", #position legend at the bottom
+                      legend.title = element_blank()) + #delete legend title
+                labs(title = "How political affiliation translated to Brexit Voting", #add title
+                     x = "Party % in the UK 2015 general election", #add axis labels
+                     y = "Leave % in the 2016 Brexit referendum") +
+                NULL
+
+#save and scale differently if needed
+#ggsave("brexit_plot.png", plot = brexit_plot, width = 11, height = 7, path = here::here("data", "images"))
+#knitr::include_graphics(here::here("data", "images", "brexit_plot.png"))
+
+#otherwise just print as it is
+brexit_plot
+  
+```
+
+In this final analysis we plot the respective share of voters for the Conservative Party, Labour Party, Liberal Democrats and UKIP per constituency in 2015 compared to the respective leave share in the Brexit referendum in 2016. 
+
+We find that two positive relationships and two negative relationships. More precisely, we find a steep regression line between the UKIP share and leave-share and a slightly upward facing slope for the regression line between the Conservative Party share and the leave share. This would indicate that the higher the share of UKIP voters in a constituency, the higher the share of pro-Brexit voters. 
+
+Despite the regression line being slightly positive, the scatterplot of the Conservative party does not allow for a clear interpretation. This is also true for the Labour Party, despite this regression line being slightly downward sloped.
+
+The scatterplot and regression line of the Liberal Democrats Party is also negatively sloped and is a little more clear on this relationship. This means, we can interpret that the lower the share of Liberal Democrat voters in a constituency, the higher the share of pro-Brexit voters.
+
+Only looking at this analysis, we would now conclude that there is no clear opinion on Brexit within voters of the Conservative- and Labour Party while there is a tendency that UKIP party voters support Brexit and Liberal Democrats do not support Brexit.
+
+This is, however, a rather superficial analysis and in order to find meaningful and definitive interpreations, we would have to look at relationships between further variables. 
+
+
