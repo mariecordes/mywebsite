@@ -220,11 +220,6 @@ disqusShortname = ""
       icon = "fa-instagram"
       url= "https://www.instagram.com/schokomarie/"
       label = "Instagram"
-      
-    [[params.footer.social]]
-      icon = "cv"
-      url= "docs/MC_CV_092020.pdf"
-      label = "CV"
 
     [[params.footer.quicklinks]]
       text = "Design: "
