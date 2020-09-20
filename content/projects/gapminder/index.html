@@ -49,7 +49,354 @@ head(gapminder, 10)</code></pre>
 ##  8 Afghanistan Asia       1987    40.8 13867957      852.
 ##  9 Afghanistan Asia       1992    41.7 16317921      649.
 ## 10 Afghanistan Asia       1997    41.8 22227415      635.</code></pre>
-<p><strong>WHAT DO WE FIND?? SKIM?</strong></p>
+<pre class="r"><code>#skim data
+skim(gapminder)</code></pre>
+<table style='width: auto;'
+        class='table table-condensed'>
+<caption>
+(#tab:raw_data_summary_statistics)Data summary
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Name
+</td>
+<td style="text-align:left;">
+gapminder
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of rows
+</td>
+<td style="text-align:left;">
+1704
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Number of columns
+</td>
+<td style="text-align:left;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+_______________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Column type frequency:
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+factor
+</td>
+<td style="text-align:left;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+________________________
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Group variables
+</td>
+<td style="text-align:left;">
+None
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: factor</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:left;">
+ordered
+</th>
+<th style="text-align:right;">
+n_unique
+</th>
+<th style="text-align:left;">
+top_counts
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+country
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+142
+</td>
+<td style="text-align:left;">
+Afg: 12, Alb: 12, Alg: 12, Ang: 12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+continent
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;">
+Afr: 624, Asi: 396, Eur: 360, Ame: 300
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+skim_variable
+</th>
+<th style="text-align:right;">
+n_missing
+</th>
+<th style="text-align:right;">
+complete_rate
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+p0
+</th>
+<th style="text-align:right;">
+p25
+</th>
+<th style="text-align:right;">
+p50
+</th>
+<th style="text-align:right;">
+p75
+</th>
+<th style="text-align:right;">
+p100
+</th>
+<th style="text-align:left;">
+hist
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+year
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1.98e+03
+</td>
+<td style="text-align:right;">
+1.73e+01
+</td>
+<td style="text-align:right;">
+1952.0
+</td>
+<td style="text-align:right;">
+1.97e+03
+</td>
+<td style="text-align:right;">
+1.98e+03
+</td>
+<td style="text-align:right;">
+1.99e+03
+</td>
+<td style="text-align:right;">
+2.01e+03
+</td>
+<td style="text-align:left;">
+▇▅▅▅▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lifeExp
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5.95e+01
+</td>
+<td style="text-align:right;">
+1.29e+01
+</td>
+<td style="text-align:right;">
+23.6
+</td>
+<td style="text-align:right;">
+4.82e+01
+</td>
+<td style="text-align:right;">
+6.07e+01
+</td>
+<td style="text-align:right;">
+7.08e+01
+</td>
+<td style="text-align:right;">
+8.26e+01
+</td>
+<td style="text-align:left;">
+▁▆▇▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pop
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2.96e+07
+</td>
+<td style="text-align:right;">
+1.06e+08
+</td>
+<td style="text-align:right;">
+60011.0
+</td>
+<td style="text-align:right;">
+2.79e+06
+</td>
+<td style="text-align:right;">
+7.02e+06
+</td>
+<td style="text-align:right;">
+1.96e+07
+</td>
+<td style="text-align:right;">
+1.32e+09
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gdpPercap
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+7.22e+03
+</td>
+<td style="text-align:right;">
+9.86e+03
+</td>
+<td style="text-align:right;">
+241.2
+</td>
+<td style="text-align:right;">
+1.20e+03
+</td>
+<td style="text-align:right;">
+3.53e+03
+</td>
+<td style="text-align:right;">
+9.33e+03
+</td>
+<td style="text-align:right;">
+1.14e+05
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+</tbody>
+</table>
+<p>For a broad overview, we find that the data set has 1,704 observations within 6 variables.</p>
+<p>The variables are:</p>
+<ul>
+<li><code>country</code></li>
+<li><code>continent</code></li>
+<li><code>year</code></li>
+<li><code>lifeExp</code>: The average life expectancy for the respective country within the respective year</li>
+<li><code>pop</code>: The population of the respective country within the respective year</li>
+<li><code>gdpPercap</code>: Gross Domestic Product (GDP) per capity (per person) in the respective country within the respective year</li>
+</ul>
+<p>While the first two variables are <em>characters</em>, the others are <em>numeric</em> variables.</p>
+<p>Using the <code>skim()</code> function, we find that all observations are complete and none of the variables misses any values. We further find that there are 142 unique values for <code>country</code> as well as 5 unique values for <code>continent</code>, meaning the 1,704 observations spread across 142 countries on 5 continents. Since the data includes observations from 1952 to 2007, every country and continent includes multiple observations of the other variables at several, different points in time.</p>
 </div>
 <div id="country-comparison" class="section level1">
 <h1>Country Comparison</h1>
@@ -64,7 +411,8 @@ continent_data &lt;- gapminder %&gt;%
        aes(x = year, y = lifeExp)) +
      geom_point() +
      geom_smooth(se = FALSE) +
-     labs(title = &quot;Life Expectancy in Germany (1957-2007)&quot;,
+     labs(title = &quot;We&#39;re getting older and older&quot;,
+          subtitle = &quot;Life Expectancy in Germany (1957-2007)&quot;,
           x = &quot;Year&quot;,
           y = &quot;Life Expectancy in years of age&quot;) +
      NULL</code></pre>
@@ -75,9 +423,10 @@ continent_data &lt;- gapminder %&gt;%
        aes(x = year, y = lifeExp)) +
    geom_point() + 
    geom_smooth(se = FALSE) +
-  labs(title = &quot;Life Expectancy in Europe (1957-2007)&quot;,
-         x = &quot;Year&quot;,
-         y = &quot;Life Expectancy in years of age&quot;) + 
+  labs(title = &quot;People in Europe can grow older and older&quot;, 
+       subtitle = &quot;Life Expectancy in Europe (1957-2007)&quot;,
+       x = &quot;Year&quot;,
+       y = &quot;Life Expectancy in years of age&quot;) + 
    NULL</code></pre>
 <p><img src="/projects/gapminder/index_files/figure-html/lifeExp_one_continent_1-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>The plot above includes all countries in one graph. Alternatively, we can facet the plot per country to show the differences within the countries in Europe.</p>
@@ -85,10 +434,14 @@ continent_data &lt;- gapminder %&gt;%
        aes(x = year, y = lifeExp)) +
    geom_point() + 
    geom_smooth(se = FALSE) +
-   facet_wrap(~country) +
-labs(title = &quot;Life Expectancy in Europe per country (1957-2007)&quot;,
-         x = &quot;Year&quot;,
-         y = &quot;Life Expectancy in years of age&quot;) + 
+  
+  #facet by country
+  facet_wrap(~country) +
+  
+  labs(title = &quot;Increasing life expectancy in all countries in Europe&quot;, 
+       subtitle = &quot;Life Expectancy in Europe per country (1957-2007)&quot;,
+       x = &quot;Year&quot;,
+       y = &quot;Life Expectancy in years of age&quot;) + 
    NULL</code></pre>
 <p><img src="/projects/gapminder/index_files/figure-html/lifeExp_one_continent_2-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Despite there being differences within a continent, we can also look at the differences between continents. Here, we create a plot from the original <code>gapminder</code> data (not the filtered datasets created before), showing the life expectancy over the years <em>per</em> continent.</p>
@@ -96,11 +449,17 @@ labs(title = &quot;Life Expectancy in Europe per country (1957-2007)&quot;,
        aes(x = year , y = lifeExp)) +
    geom_point() + 
    geom_smooth(se = FALSE) +
+  
+  #facet by continent
    facet_wrap(~continent) +
+  
+  #delete legend
    theme(legend.position=&quot;none&quot;) +
-  labs(title = &quot;Life Expectancy over all continents&quot;,
-         x = &quot;Year&quot;,
-         y = &quot;Life Expectancy in years of age&quot;) + 
+  
+  labs(title = &quot;People all over the world are getting older and older&quot;,
+       subtitle = &quot;Life Expectancy over all continents&quot;,
+       x = &quot;Year&quot;,
+       y = &quot;Life Expectancy in years of age&quot;) + 
    NULL</code></pre>
 <p><img src="/projects/gapminder/index_files/figure-html/lifeExp_facet_by_continent-1.png" width="648" style="display: block; margin: auto;" /></p>
 <div id="analysis-interpretation" class="section level2">
@@ -116,10 +475,10 @@ lives.</p>
 </div>
 <div id="gapminder-2.0" class="section level1">
 <h1>Gapminder 2.0</h1>
-<div id="tidy-and-clean-data" class="section level2">
-<h2>Tidy and clean data</h2>
-<p>Again recalling the original <code>gapminder</code> data frame from the gapminder package, we find that that data frame contains just six columns from the larger <a href="https://www.gapminder.org/data/">data in Gapminder World</a>.</p>
-<p>In this part, we join a few dataframes with more data than the ‘gapminder’ package. Specifically, we look at data on</p>
+<div id="data-cleaning-and-tidying" class="section level2">
+<h2>Data cleaning and tidying</h2>
+<p>Recalling the original <code>gapminder</code> data frame from the gapminder package, we find that that data frame we investigated until now contains just six columns from the larger <a href="https://www.gapminder.org/data/">data in Gapminder World</a>.</p>
+<p>In this part, we join a few data frames with more data than the ‘gapminder’ package. Specifically, we look at data on</p>
 <ul>
 <li>Life expectancy at birth (life_expectancy_years.csv)</li>
 <li>GDP per capita in constant 2010 US$ (<a href="https://data.worldbank.org/indicator/NY.GDP.PCAP.KD" class="uri">https://data.worldbank.org/indicator/NY.GDP.PCAP.KD</a>)</li>
@@ -182,20 +541,42 @@ countries &lt;- vroom(here::here(&quot;data&quot;, &quot;countries.csv&quot;))
 regions_countries_HIV &lt;- countries %&gt;% 
   left_join(hiv_tidy, by=&quot;country&quot;) 
 
+#create new data set with missing values for selected variables
 missinghiv &lt;- regions_countries_HIV %&gt;% 
-  select(admin_region, cases) %&gt;% 
-  group_by(admin_region) %&gt;% 
-  summarize(na_count = sum(is.na(cases))) %&gt;% 
-  arrange(desc(na_count)) %&gt;% 
-  na.omit() #some countries are not placed in administrative regions, so we removed them
+  select(admin_region, cases) %&gt;%
+  
+  #group by region
+  group_by(admin_region) %&gt;%
+  
+  #count missing values
+  summarize(na_count = sum(is.na(cases))) %&gt;%
+  
+  #order in most to least missing values
+  arrange(desc(na_count)) %&gt;%
+  
+  #remove countries that are not placed in administrative regions
+  na.omit() 
 
-ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = admin_region)) + 
+
+#plot newly created dataset
+ggplot(missinghiv, 
+       aes(x= reorder(admin_region, -na_count), 
+           y=na_count,
+           
+           #colour by region so that we have a legend and no labels on the x axis
+           fill = admin_region)) +  
+  
   geom_col()+
-  scale_x_discrete(label= &quot;&quot;)+
+  
+  #eliminate x axis labels
+  scale_x_discrete(label=&quot;&quot;)+
+  
   labs(title = &quot;Most data gaps for Sub-Saharan Africa&quot;,
        subtitle = &quot;Number of missing values for HIV Data per region&quot;,
        y=&quot;missing values for HIV Data&quot;,
        x=&quot;&quot;) +
+  
+  #delete axes text and legend title
   theme(axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
         legend.title = element_blank()) +
@@ -206,7 +587,8 @@ ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = a
 <div id="hiv-vs.-life-expectancy" class="section level2">
 <h2>HIV vs. life expectancy</h2>
 <p>As a first analysis, we generate a scatterplot with a smoothing line to investigate the the relationship between HIV prevalence and life expectancy.</p>
-<pre class="r"><code>ggplot(data = world_hiv_life, aes(x= cases.x, y = cases.y)) + 
+<pre class="r"><code>ggplot(data = world_hiv_life, 
+       aes(x= cases.x, y = cases.y)) + 
         geom_point()+ 
         geom_smooth() +
         labs(title = &quot;Does HIV decrease a country&#39;s life expectancy?&quot; ,
@@ -217,8 +599,11 @@ ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = a
 <p><img src="/projects/gapminder/index_files/figure-html/get_data3-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>The graph shows a somewhat inverse relationships between HIV prevalence and life expectancy - however, this is only true for a lower percentage of HIV prevelance (below around 5%). We can further notice, that there are many more data points with a relatively low HIV prevalence. We can see that for an extremely low HIV prevelance (below around 3%), life expectancy is overall highest at up to more than 80. HIV prevalence of around 5%-30% corresponds to a somewhat lower life expectancy between 40 and 60.</p>
 <p>As the graph does not separate the time variable and plots several years for a country, we want to look at two graphs from 1990 (beginning of most data points) and 2011 (last data points) to understand if/how this relationship has developed over time.</p>
-<pre class="r"><code>world_hiv_life %&gt;% 
-  filter(date == &quot;1990&quot;) %&gt;% 
+<pre class="r"><code>world_hiv_life %&gt;%
+  
+  #filter data for year 1990
+  filter(date == &quot;1990&quot;) %&gt;%
+  
     ggplot(aes(x= cases.x, y = cases.y)) + 
         geom_point()+
         geom_smooth()+ 
@@ -228,9 +613,12 @@ ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = a
              x = &quot;HIV Prevalence (%)&quot;, 
              y = &quot;Life Expectancy (years of age)&quot;) + 
         NULL</code></pre>
-<p><img src="/projects/gapminder/index_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>world_hiv_life %&gt;% 
+<p><img src="/projects/gapminder/index_files/figure-html/unnamed-chunk-2-1.png" width="648" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>world_hiv_life %&gt;%
+  
+  #filter data for year 2011
   filter(date == &quot;2011&quot;) %&gt;% 
+  
     ggplot(aes(x= cases.x, y = cases.y)) + 
         geom_point()+
         geom_smooth()+ 
@@ -240,7 +628,7 @@ ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = a
              x = &quot;HIV Prevalence (%)&quot;, 
              y = &quot;Life Expectancy (years of age)&quot;) + 
         NULL</code></pre>
-<p><img src="/projects/gapminder/index_files/figure-html/unnamed-chunk-4-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>We find that the nature of the relationship (negative relationship) has stayed the same over time - it seems as if it even intensified over the years.</p>
 <p>Finally, we cannot tell from this analysis if the higher life expectancy is <strong>because of</strong> fewer relative HIV cases or if countries with generally higher life expectancy due to higher economic wealth and better health infrastructures are, thus, also less likely to experience HIV cases or earlier deaths caused by HIV.</p>
 <p>As the picture is not really clear, in a further analysis, we would use <code>facet_wrap</code> on this plot to investigate if there are any regional differences.</p>
@@ -254,16 +642,19 @@ worldbank_data_regions &lt;- wb_data(country = &quot;regions_only&quot; , #use a
                                   start_date = 1960, 
                                   end_date = 2016)
 
-#select relevant variables
+#create new data set and select relevant variables
 world_clean_regions &lt;- worldbank_data_regions %&gt;% 
   select(&quot;date&quot;,&quot;country&quot;,&quot;SP.DYN.TFRT.IN&quot;,&quot;SE.PRM.NENR&quot;, &quot;SH.DYN.MORT&quot;, &quot;NY.GDP.PCAP.KD&quot;)
 
-
+#plot newly created data set
 ggplot(data = world_clean_regions, 
        aes(x= SP.DYN.TFRT.IN, y = NY.GDP.PCAP.KD)) + 
           geom_point() +
           geom_smooth()+
+  
+  #facet by country and set scale of each plot free so that we can observe trend directions rather than absolute value comparisons
           facet_wrap( ~ country, scale = &quot;free&quot;) +
+  
           labs (title = &quot;More babies, more money?&quot;, 
                 subtitle = &quot;Relationship between fertility rate and GDP per capita per region&quot;,
                 x = &quot;Fertility Rate (Number of babies per woman)&quot;, 
@@ -277,14 +668,16 @@ ggplot(data = world_clean_regions,
        aes(x= SP.DYN.TFRT.IN, y = NY.GDP.PCAP.KD, 
            colour = date)) + 
           geom_point() +
-          facet_wrap( ~ country, 
-                      scale = &quot;free&quot;) +
+  
+  #facet by country and set scale of each plot free so that we can observe trend directions rather than absolute value comparisons
+          facet_wrap( ~ country, scale = &quot;free&quot;) +
+  
           labs (title = &quot;More babies, more money?&quot;, 
                 subtitle = &quot;Relationship between fertility rate and GDP per capita per region&quot;,
                 x = &quot;Fertility Rate (Number of babies per woman)&quot;, 
                 y = &quot;GDP per capita ($)&quot;) + 
           NULL</code></pre>
-<p><img src="/projects/gapminder/index_files/figure-html/unnamed-chunk-5-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/unnamed-chunk-4-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Consequently, we find that time is actually a highly influencing factor that we cannot disregard. Every graph (every region) clearly shows that there was a generally higher fertility rate and lower GDP per capita in the past which developed into a respectively higher (still on relative terms as there are still vast differences between countries’ GDP per capita) GDP per capita along with a lower fertility rate.</p>
 <p>This trend may have many influencing factors, one being women starting to work in full-time jobs over the past decades, increasing a countries GDP through added work while at the same time, potentially, leaving less time to have (many) children.</p>
 </div>
@@ -360,7 +753,7 @@ kbl(east_asia_top,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-6">Table 1: </span>Top 5 most improved in East Asia &amp; Pacific
+<span id="tab:unnamed-chunk-5">Table 1: </span>Top 5 most improved in East Asia &amp; Pacific
 </caption>
 <thead>
 <tr>
@@ -428,7 +821,7 @@ kbl(east_asia_bottom,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-6">Table 1: </span>Top 5 least improved in East Asia &amp; Pacific
+<span id="tab:unnamed-chunk-5">Table 1: </span>Top 5 least improved in East Asia &amp; Pacific
 </caption>
 <thead>
 <tr>
@@ -499,7 +892,7 @@ kbl(sa_top,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-7">Table 2: </span>Top 5 most improved South Asia
+<span id="tab:unnamed-chunk-6">Table 2: </span>Top 5 most improved South Asia
 </caption>
 <thead>
 <tr>
@@ -567,7 +960,7 @@ kbl(sa_bottom,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-7">Table 2: </span>Top 3 least improved in South Asia
+<span id="tab:unnamed-chunk-6">Table 2: </span>Top 3 least improved in South Asia
 </caption>
 <thead>
 <tr>
@@ -622,7 +1015,7 @@ kbl(europe_asia_top,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-8">Table 3: </span>Top 5 most improved in Europe &amp; Central Asia
+<span id="tab:unnamed-chunk-7">Table 3: </span>Top 5 most improved in Europe &amp; Central Asia
 </caption>
 <thead>
 <tr>
@@ -689,7 +1082,7 @@ kbl(europe_asia_bottom,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-8">Table 3: </span>Top 5 least improved in Europe &amp; Central Asia
+<span id="tab:unnamed-chunk-7">Table 3: </span>Top 5 least improved in Europe &amp; Central Asia
 </caption>
 <thead>
 <tr>
@@ -760,7 +1153,7 @@ kbl(latam_top,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-9">Table 4: </span>Top 5 most improved in Latin America &amp; Caribbean
+<span id="tab:unnamed-chunk-8">Table 4: </span>Top 5 most improved in Latin America &amp; Caribbean
 </caption>
 <thead>
 <tr>
@@ -827,7 +1220,7 @@ kbl(latam_bottom,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-9">Table 4: </span>Top 5 least improved in Latin America &amp; Caribbean
+<span id="tab:unnamed-chunk-8">Table 4: </span>Top 5 least improved in Latin America &amp; Caribbean
 </caption>
 <thead>
 <tr>
@@ -897,7 +1290,7 @@ kbl(mena_top,caption=&quot;Top 5 most improved in Middle East &amp; North Africa
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-10">Table 5: </span>Top 5 most improved in Middle East &amp; North Africa
+<span id="tab:unnamed-chunk-9">Table 5: </span>Top 5 most improved in Middle East &amp; North Africa
 </caption>
 <thead>
 <tr>
@@ -964,7 +1357,7 @@ kbl(mena_bottom,caption=&quot;Top 5 least improved in Middle East &amp; North Af
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-10">Table 5: </span>Top 5 least improved in Middle East &amp; North Africa
+<span id="tab:unnamed-chunk-9">Table 5: </span>Top 5 least improved in Middle East &amp; North Africa
 </caption>
 <thead>
 <tr>
@@ -1035,7 +1428,7 @@ kbl(na_top,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-11">Table 6: </span>USA &amp; Canada
+<span id="tab:unnamed-chunk-10">Table 6: </span>USA &amp; Canada
 </caption>
 <thead>
 <tr>
@@ -1083,7 +1476,7 @@ kbl(ssa_top,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-12">Table 7: </span>Top 5 most improved in Sub-Saharan Africa
+<span id="tab:unnamed-chunk-11">Table 7: </span>Top 5 most improved in Sub-Saharan Africa
 </caption>
 <thead>
 <tr>
@@ -1150,7 +1543,7 @@ kbl(ssa_bottom,
   kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-12">Table 7: </span>Top 5 least improved in Sub-Saharan Africa
+<span id="tab:unnamed-chunk-11">Table 7: </span>Top 5 least improved in Sub-Saharan Africa
 </caption>
 <thead>
 <tr>
@@ -1234,23 +1627,8 @@ ay_no_na &lt;- no_na %&gt;%
             date == &quot;2000&quot;| 
             date == &quot;2010&quot;| 
             date == &quot;2016&quot;) 
-
-ay_no_na</code></pre>
-<pre><code>## # A tibble: 480 x 8
-##    iso2c iso3c country  date NY.GDP.PCAP.KD SE.PRM.NENR SH.DYN.MORT
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;          &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
-##  1 AO    AGO   Angola   2010          3588.        75.8       120. 
-##  2 AL    ALB   Albania  2000          2245.        95.4        27.2
-##  3 AL    ALB   Albania  2010          4094.        86.0        13.2
-##  4 AL    ALB   Albania  2016          4682.        94.1         9.4
-##  5 AE    ARE   United…  1980        116233.        76.2        35  
-##  6 AE    ARE   United…  1990         68781.        96.9        16.6
-##  7 AE    ARE   United…  2016         41045.        94.6         7.8
-##  8 AR    ARG   Argent…  1970          7084.        95.1        71.8
-##  9 AR    ARG   Argent…  2000          8224.        98.9        19.6
-## 10 AR    ARG   Argent…  2010         10386.        98.7        14.4
-## # … with 470 more rows, and 1 more variable: SP.DYN.TFRT.IN &lt;dbl&gt;</code></pre>
-<pre class="r"><code>#create plot and facet by time period
+  
+#create plot with new time-period-data set and facet by time period
 ggplot(data = ay_no_na, 
        aes(x = SP.DYN.TFRT.IN, y = SE.PRM.NENR))+ 
   geom_point() +
@@ -1258,11 +1636,15 @@ ggplot(data = ay_no_na,
        subtitle = &quot;Relationship between primary school enrollment and fertility rate over time&quot;,
        x=&quot;Fertility rate (babies per woman)&quot;,
        y=&quot;Primary School enrollment(%)&quot;)+
+  
+  #facet by time period
   facet_wrap(~ date) +
-  geom_smooth()</code></pre>
+  
+  geom_smooth() +
+  NULL</code></pre>
 <p><img src="/projects/gapminder/index_files/figure-html/get_data8-2.png" width="648" style="display: block; margin: auto;" /></p>
 <p>As fertility rate increases primary school enrollment seems to be decreasing, highlighting an inverse relationship. The same can be inferred both by looking at the first scatterplot with the aggregates of all observations over time and the latter scatterplots, separating the time variable and showing the relationship at different points in time.</p>
 <p>This trend is most likely due to the fact that it is common for less developed countries to have large families with a great number of children - however, these poorer countries can often not send all of their children to school. On the other hand, in advanced countries, it is common to only have, on average, 2 children. The education system being more advanced and the families wealthier, these fewer children per family can, however, all attend primary school. This trend solidified over time. Nevertheless, with recent data from 2010 and 2016, it seems as also developing countries are more and more able to also provide primary education to their children as the data points do show a tendency to move to the upper part of the graph (higher primary school enrollment) over the years.</p>
-<p>To support this analysis, we would, as a next step, look at the data per region.</p>
+<p>To support this analysis, we would, in a future analysis, look at the data per region.</p>
 </div>
 </div>

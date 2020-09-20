@@ -65,7 +65,7 @@ ggthemr('solarized')
 
 The `gapminder` dataset has data on life expectancy, population, and GDP per capita for 142 countries from 1952 to 2007. To get an understanding of the dataframe, namely to see the variable names, variable types, etc., we use the `glimpse` function. We also have a look at the first 10 rows of data.
 
-```{r}
+```{r, raw_data_summary_statistics}
 #load gapminder data
 library(gapminder)
 
@@ -74,9 +74,25 @@ glimpse(gapminder)
 
 #look at the first 10 rows of the data set
 head(gapminder, 10)
+
+#skim data
+skim(gapminder)
 ```
 
-**WHAT DO WE FIND?? SKIM?**
+For a broad overview, we find that the data set has 1,704 observations within 6 variables. 
+
+The variables are:
+
+- `country`
+- `continent`
+- `year`
+- `lifeExp`: The average life expectancy for the respective country within the respective year
+- `pop`: The population of the respective country within the respective year
+- `gdpPercap`: Gross Domestic Product (GDP) per capity (per person) in the respective country within the respective year
+
+While the first two variables are _characters_, the others are _numeric_ variables. 
+
+Using the `skim()` function, we find that all observations are complete and none of the variables misses any values. We further find that there are 142 unique values for `country` as well as 5 unique values for `continent`, meaning the 1,704 observations spread across 142 countries on 5 continents. Since the data includes observations from 1952 to 2007, every country and continent includes multiple observations of the other variables at several, different points in time.
 
 # Country Comparison
 
@@ -98,7 +114,8 @@ ggplot(country_data,
        aes(x = year, y = lifeExp)) +
      geom_point() +
      geom_smooth(se = FALSE) +
-     labs(title = "Life Expectancy in Germany (1957-2007)",
+     labs(title = "We're getting older and older",
+          subtitle = "Life Expectancy in Germany (1957-2007)",
           x = "Year",
           y = "Life Expectancy in years of age") +
      NULL
@@ -114,9 +131,10 @@ ggplot(continent_data,
        aes(x = year, y = lifeExp)) +
    geom_point() + 
    geom_smooth(se = FALSE) +
-  labs(title = "Life Expectancy in Europe (1957-2007)",
-         x = "Year",
-         y = "Life Expectancy in years of age") + 
+  labs(title = "People in Europe can grow older and older", 
+       subtitle = "Life Expectancy in Europe (1957-2007)",
+       x = "Year",
+       y = "Life Expectancy in years of age") + 
    NULL
 ```
 
@@ -127,10 +145,14 @@ ggplot(continent_data,
        aes(x = year, y = lifeExp)) +
    geom_point() + 
    geom_smooth(se = FALSE) +
-   facet_wrap(~country) +
-labs(title = "Life Expectancy in Europe per country (1957-2007)",
-         x = "Year",
-         y = "Life Expectancy in years of age") + 
+  
+  #facet by country
+  facet_wrap(~country) +
+  
+  labs(title = "Increasing life expectancy in all countries in Europe", 
+       subtitle = "Life Expectancy in Europe per country (1957-2007)",
+       x = "Year",
+       y = "Life Expectancy in years of age") + 
    NULL
 ```
 
@@ -141,11 +163,17 @@ ggplot(gapminder,
        aes(x = year , y = lifeExp)) +
    geom_point() + 
    geom_smooth(se = FALSE) +
+  
+  #facet by continent
    facet_wrap(~continent) +
+  
+  #delete legend
    theme(legend.position="none") +
-  labs(title = "Life Expectancy over all continents",
-         x = "Year",
-         y = "Life Expectancy in years of age") + 
+  
+  labs(title = "People all over the world are getting older and older",
+       subtitle = "Life Expectancy over all continents",
+       x = "Year",
+       y = "Life Expectancy in years of age") + 
    NULL
 ```
 
@@ -164,11 +192,11 @@ It is, however, difficult to make clear analyses per continent as most continent
 
 # Gapminder 2.0
 
-## Tidy and clean data
+## Data cleaning and tidying
 
-Again recalling the original `gapminder` data frame from the gapminder package, we find that that data frame contains just six columns from the larger [data in Gapminder World](https://www.gapminder.org/data/). 
+Recalling the original `gapminder` data frame from the gapminder package, we find that that data frame we investigated until now contains just six columns from the larger [data in Gapminder World](https://www.gapminder.org/data/). 
 
-In this part, we join a few dataframes with more data than the 'gapminder' package. Specifically, we look at data on 
+In this part, we join a few data frames with more data than the 'gapminder' package. Specifically, we look at data on 
 
 - Life expectancy at birth (life_expectancy_years.csv)
 - GDP per capita in constant 2010 US$ (https://data.worldbank.org/indicator/NY.GDP.PCAP.KD)
@@ -244,20 +272,42 @@ countries <- vroom(here::here("data", "countries.csv"))
 regions_countries_HIV <- countries %>% 
   left_join(hiv_tidy, by="country") 
 
+#create new data set with missing values for selected variables
 missinghiv <- regions_countries_HIV %>% 
-  select(admin_region, cases) %>% 
-  group_by(admin_region) %>% 
-  summarize(na_count = sum(is.na(cases))) %>% 
-  arrange(desc(na_count)) %>% 
-  na.omit() #some countries are not placed in administrative regions, so we removed them
+  select(admin_region, cases) %>%
+  
+  #group by region
+  group_by(admin_region) %>%
+  
+  #count missing values
+  summarize(na_count = sum(is.na(cases))) %>%
+  
+  #order in most to least missing values
+  arrange(desc(na_count)) %>%
+  
+  #remove countries that are not placed in administrative regions
+  na.omit() 
 
-ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = admin_region)) + 
+
+#plot newly created dataset
+ggplot(missinghiv, 
+       aes(x= reorder(admin_region, -na_count), 
+           y=na_count,
+           
+           #colour by region so that we have a legend and no labels on the x axis
+           fill = admin_region)) +  
+  
   geom_col()+
-  scale_x_discrete(label= "")+
+  
+  #eliminate x axis labels
+  scale_x_discrete(label="")+
+  
   labs(title = "Most data gaps for Sub-Saharan Africa",
        subtitle = "Number of missing values for HIV Data per region",
        y="missing values for HIV Data",
        x="") +
+  
+  #delete axes text and legend title
   theme(axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
         legend.title = element_blank()) +
@@ -272,7 +322,8 @@ We find that, by far, the most values are missing within the Sub-Saharan Africa 
 As a first analysis, we generate a scatterplot with a smoothing line to investigate the the relationship between HIV prevalence and life expectancy.
 
 ```{r, get_data3, cache=TRUE}
-ggplot(data = world_hiv_life, aes(x= cases.x, y = cases.y)) + 
+ggplot(data = world_hiv_life, 
+       aes(x= cases.x, y = cases.y)) + 
         geom_point()+ 
         geom_smooth() +
         labs(title = "Does HIV decrease a country's life expectancy?" ,
@@ -287,8 +338,11 @@ The graph shows a somewhat inverse relationships between HIV prevalence and life
 As the graph does not separate the time variable and plots several years for a country, we want to look at two graphs from 1990 (beginning of most data points) and 2011 (last data points) to understand if/how this relationship has developed over time.
 
 ```{r, cache=TRUE}
-world_hiv_life %>% 
-  filter(date == "1990") %>% 
+world_hiv_life %>%
+  
+  #filter data for year 1990
+  filter(date == "1990") %>%
+  
     ggplot(aes(x= cases.x, y = cases.y)) + 
         geom_point()+
         geom_smooth()+ 
@@ -301,8 +355,11 @@ world_hiv_life %>%
 ```
 
 ```{r, cache=TRUE}
-world_hiv_life %>% 
+world_hiv_life %>%
+  
+  #filter data for year 2011
   filter(date == "2011") %>% 
+  
     ggplot(aes(x= cases.x, y = cases.y)) + 
         geom_point()+
         geom_smooth()+ 
@@ -331,16 +388,19 @@ worldbank_data_regions <- wb_data(country = "regions_only" , #use aggregate regi
                                   start_date = 1960, 
                                   end_date = 2016)
 
-#select relevant variables
+#create new data set and select relevant variables
 world_clean_regions <- worldbank_data_regions %>% 
   select("date","country","SP.DYN.TFRT.IN","SE.PRM.NENR", "SH.DYN.MORT", "NY.GDP.PCAP.KD")
 
-
+#plot newly created data set
 ggplot(data = world_clean_regions, 
        aes(x= SP.DYN.TFRT.IN, y = NY.GDP.PCAP.KD)) + 
           geom_point() +
           geom_smooth()+
+  
+  #facet by country and set scale of each plot free so that we can observe trend directions rather than absolute value comparisons
           facet_wrap( ~ country, scale = "free") +
+  
           labs (title = "More babies, more money?", 
                 subtitle = "Relationship between fertility rate and GDP per capita per region",
                 x = "Fertility Rate (Number of babies per woman)", 
@@ -359,8 +419,10 @@ ggplot(data = world_clean_regions,
        aes(x= SP.DYN.TFRT.IN, y = NY.GDP.PCAP.KD, 
            colour = date)) + 
           geom_point() +
-          facet_wrap( ~ country, 
-                      scale = "free") +
+  
+  #facet by country and set scale of each plot free so that we can observe trend directions rather than absolute value comparisons
+          facet_wrap( ~ country, scale = "free") +
+  
           labs (title = "More babies, more money?", 
                 subtitle = "Relationship between fertility rate and GDP per capita per region",
                 x = "Fertility Rate (Number of babies per woman)", 
@@ -666,10 +728,8 @@ ay_no_na <- no_na %>%
             date == "2000"| 
             date == "2010"| 
             date == "2016") 
-
-ay_no_na
   
-#create plot and facet by time period
+#create plot with new time-period-data set and facet by time period
 ggplot(data = ay_no_na, 
        aes(x = SP.DYN.TFRT.IN, y = SE.PRM.NENR))+ 
   geom_point() +
@@ -677,12 +737,16 @@ ggplot(data = ay_no_na,
        subtitle = "Relationship between primary school enrollment and fertility rate over time",
        x="Fertility rate (babies per woman)",
        y="Primary School enrollment(%)")+
+  
+  #facet by time period
   facet_wrap(~ date) +
-  geom_smooth()
+  
+  geom_smooth() +
+  NULL
 ```
 
 As fertility rate increases primary school enrollment seems to be decreasing, highlighting an inverse relationship. The same can be inferred both by looking at the first scatterplot with the aggregates of all observations over time and the latter scatterplots, separating the time variable and showing the relationship at different points in time. 
 
 This trend is most likely due to the fact that it is common for less developed countries to have large families with a great number of children - however, these poorer countries can often not send all of their children to school. On the other hand, in advanced countries, it is common to only have, on average, 2 children. The education system being more advanced and the families wealthier, these fewer children per family can, however, all attend primary school. This trend solidified over time. Nevertheless, with recent data from 2010 and 2016, it seems as also developing countries are more and more able to also provide primary education to their children as the data points do show a tendency to move to the upper part of the graph (higher primary school enrollment) over the years.
 
-To support this analysis, we would, as a next step, look at the data per region.
+To support this analysis, we would, in a future analysis, look at the data per region.

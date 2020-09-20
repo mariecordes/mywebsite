@@ -174,9 +174,10 @@ hr_cleaned %>%
   #select relevant variables
   select(age, monthly_income, num_companies_worked, total_working_years, years_at_company, years_since_last_promotion, gender) %>%
   
-  #create ggpairs plots
-  GGally::ggpairs(aes(colour = gender), alpha = 0.4)
-
+  #create ggpairs plots and colour data by gender
+  GGally::ggpairs(aes(colour = gender), alpha = 0.4) +
+            labs(title = "Quick overview of what is happening in our data",
+                 subtitle = "Correlations and distributions for most relevant variables coloured by gender")
 ```
 
 Although this plot is full of a vast amount of information, we can still see some relevant trends that we will investigate further in the next sections. For example, we see that there are relatively high correlations between age and all of the other selected variables. This shows a very common dynamic that the older you are, the longer you have worked and the more money you make. This trend can also be seen between the positive (and in this selection highest) correlation between monthly income and total working years of 0.773. Most people that have worked for several years are in senior positions where they also work more. 

@@ -385,7 +385,9 @@ glimpse(brexit_results)</code></pre>
 <pre class="r"><code>brexit_results %&gt;% 
   select(-Seat, -degree) %&gt;%  #deselect irrelevant variables seat and degree 
   GGally::ggpairs(alpha = 0.2) +
-      theme_minimal()</code></pre>
+      theme_minimal() +
+      labs(title = &quot;Quick overview of what is happening in our data&quot;,
+           subtitle = &quot;Correlations and distributions for most relevant variables&quot;)</code></pre>
 <p><img src="/projects/brexitvoting/index_files/figure-html/ggpairs-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>In the following, we describe a few findings based on these plots - no definitive results!</p>
 <p>We find an extremely high positive correlation of 0.85 between <code>leave_share</code> and <code>ukip_2015</code> as well as another significant positive correlation between <code>born_in_uk</code> and <code>leave_share</code>.</p>

@@ -1483,8 +1483,10 @@ head(hr_cleaned, 5)</code></pre>
   #select relevant variables
   select(age, monthly_income, num_companies_worked, total_working_years, years_at_company, years_since_last_promotion, gender) %&gt;%
   
-  #create ggpairs plots
-  GGally::ggpairs(aes(colour = gender), alpha = 0.4)</code></pre>
+  #create ggpairs plots and colour data by gender
+  GGally::ggpairs(aes(colour = gender), alpha = 0.4) +
+            labs(title = &quot;Quick overview of what is happening in our data&quot;,
+                 subtitle = &quot;Correlations and distributions for most relevant variables coloured by gender&quot;)</code></pre>
 <p><img src="/projects/ibmhr/index_files/figure-html/ggpairs-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Although this plot is full of a vast amount of information, we can still see some relevant trends that we will investigate further in the next sections. For example, we see that there are relatively high correlations between age and all of the other selected variables. This shows a very common dynamic that the older you are, the longer you have worked and the more money you make. This trend can also be seen between the positive (and in this selection highest) correlation between monthly income and total working years of 0.773. Most people that have worked for several years are in senior positions where they also work more.</p>
 <p>Another interesting find is the high, positive correlation of 0.628 between total working years and years at the company. This indicates that most people that have worked many years in their lives have worked at this regarded company (IBM) for a long time as well. As we also find a similar high correlation between years at the company and years since the last promotion, we can assume that the longer an employee works at IBM, the less frequently he/she will be promoted - a typical trend for more senior roles.</p>
