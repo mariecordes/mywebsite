@@ -74,7 +74,7 @@ disqusShortname = ""
     #    name = "NameOfLink"
     #    url = "UrlOfLink"
 
-    Button Style 1
+    # Button Style 1
     [[params.navigation.button1]]
     name = "Download my CV"
     url = "docs/MC_CV_092020"
