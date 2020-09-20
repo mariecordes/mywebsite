@@ -492,7 +492,7 @@ Generally, the points in the plot clearly cluster in the upper right corner, sho
   
   #pivot longer to summarize party variables
             pivot_longer(2:5, names_to = &quot;party&quot;, values_to = &quot;percent&quot; )             </code></pre>
-<p>With the manipulated data set, we can now produce a plot that shows the relationship between a voter’s political affiliation and the leave-share. In order to colour each political party with its actual party colour, we find the official colour codes per party <a href="http://blog.richardallen.co.uk/uk-political-party-web-colours/">here</a>.</p>
+<p>With the manipulated data set, we can now produce a plot that shows the relationship between a voter’s political affiliation and the leave-share. In order to colour each political party with its actual party colour, we find the official colour codes per party <a href="https://blog.richardallen.co.uk/uk-political-party-web-colours/">here</a>.</p>
 <pre class="r"><code>#reset ggtjemr theme because we will add own aes to the next plot
 ggthemr_reset() 
 

@@ -15,10 +15,10 @@ output:
 
 
 
-<p><img src="https://www.ibm.com/innovate/branding/logoartwork/logoartwork.nsf/IBM_logo_blue60_CMYK.jpg" /></p>
+<p>In the following project, we will investigate a data set on Human Resoruce Analytics. The <a href="https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset">IBM HR Analytics Employee Attrition &amp; Performance data set</a> is a fictional data set created by IBM data scientists.</p>
+<p>We start by loading and having a first look at the data, then cleaning the data, then visualizing some of the most relevant relationships between the variables of the data set and finish this analysis by drawing some conclusions about the interpretation of the data.</p>
 <div id="data-set" class="section level1">
 <h1>Data set</h1>
-<p>In this project, we analyse a data set on Human Resoruce Analytics. The <a href="https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset">IBM HR Analytics Employee Attrition &amp; Performance data set</a> is a fictional data set created by IBM data scientists.</p>
 <p>First, we load the data and have a first look at it.</p>
 <pre class="r"><code>#load data
 hr_dataset &lt;- vroom(here::here(&quot;data&quot;, &quot;datasets_1067_1925_WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;))
@@ -1567,7 +1567,7 @@ ggplot(hr_cleaned,
             size = 5) + #size of label font
 
 #add plot labels
-            labs(title = &quot;Most employees thing their work-life-balance is great - but not perfect&quot;, 
+            labs(title = &quot;Most employees think their work-life-balance is great\n- but not perfect&quot;, 
                  subtitle = &quot;Distribution of employees&#39; satisfaction with their work-life-balance&quot;,
                  x = &quot;Work-life-balance&quot;,
                  y = &quot;Number of employees&quot;) +
@@ -1856,4 +1856,5 @@ ggplot(hr_cleaned,
 <p>To conclude, the <strong>IBM HR Analytics Employee Attrition &amp; Performance data set</strong> gives a broad overview of the dynamics of a group of employees in a fictional company. While we can observe an attrition rate of 19%, we cannot judge whether this is high or low as we have no indication of the industry in which this company works in and what is considered a high/low attrition rate there. We do, however, find that both job satisfaction and opinion on work-life balance are high/good. This indicates that most employees are satisfied and there is no high attrition due to an unpleasant work environment or stressful jobs.</p>
 <p>While we can observe an almost Normal distribution for the employees’ age, we find that the majority of employees has been at the company less then approx. 10 years. There are, however, a few people that have worked at the company for 20 or even over 30 years. We, further find that employees are relatively quickly promoted as for most employees, the last promotion is fewer than approx. 3 years ago while for almost no employee the last promotion is over 10 years ago. While there are a few people earning more than 10,000USD per month, the majority of employees earn below, indicating a common company structure with many low-salary jobs and only few high-salary jobs.</p>
 <p>When investigating the monthly income in detail, we neither find a distinct relationship between monthly income and education level nor between monthly income and gender. We do however find positive relationships between monthly income and age as well as monthly income and job role, indicating that an older employee is more likely to be in a senior job position and the more senior a job position is, the higher the salary.</p>
+<p><img src="https://www.ibm.com/innovate/branding/logoartwork/logoartwork.nsf/IBM_logo_blue60_CMYK.jpg" /></p>
 </div>

@@ -268,7 +268,7 @@ brexit <- brexit_results %>%
             pivot_longer(2:5, names_to = "party", values_to = "percent" )             
 ```
 
-With the manipulated data set, we can now produce a plot that shows the relationship between a voter's political affiliation and the leave-share. In order to colour each political party with its actual party colour, we find the official colour codes per party [here](http://blog.richardallen.co.uk/uk-political-party-web-colours/).
+With the manipulated data set, we can now produce a plot that shows the relationship between a voter's political affiliation and the leave-share. In order to colour each political party with its actual party colour, we find the official colour codes per party [here](https://blog.richardallen.co.uk/uk-political-party-web-colours/).
 
 ```{r, political_aff_plot}
 #reset ggtjemr theme because we will add own aes to the next plot
