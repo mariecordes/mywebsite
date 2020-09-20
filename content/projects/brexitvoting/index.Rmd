@@ -50,11 +50,9 @@ library(bbplot)
 library(ggthemr)
 ```
 
-![Brexit](https://www.bundesregierung.de/resource/image/1712628/hero_desktop/1170/585/8459b4440eaf8440a5f47fe94ee0aebc/nV/2020-01-15-fahnen-von-grossbritannien-und-europa.jpg)
+In this project, we will conduct an Exploratory Data Analysis of the data set concerning the results of the 2016 Brexit vote in the UK. We ill begin by investigating the **raw data**, then look at the **summary statistics** and finally create some **informative visualizations**. Let's dive right in!
 
 # Exploratory Data Analysis
-
-In the following we will look at a dataset concerning the results of the 2016 Brexit vote in the UK.
 
 ## Raw Data
 
@@ -70,6 +68,7 @@ glimpse(brexit_results)
 We find that the data set has 632 observations (rows) and 11 variables (coloumns). 
 
 The variables are the following:
+
 - `Seat`: character; the respective name of the constituencies
 - `con_2015`: double; the share of the Conservative Party voters per constituency in 2015
 - `lab_2015`: double; the share of the Labour Party voters per constituency in 2015
@@ -82,7 +81,7 @@ The variables are the following:
 - `degree`: _unsure of meaning_
 - `age_18to24`: double; the share of people aged 18 to 24 in the respective constituency
 
-## Summary Analysis 
+## Summary Statistics
 
 Next, we will skim the data.
 
@@ -90,7 +89,8 @@ Next, we will skim the data.
 skim(brexit_results)
 ```
 
-We find that that none of the variables have missing values except for `degree`. This variable has 59 missing values. However, we will not go further into this as this variable is not relevant to us. 
+We find that that none of the variables have missing values except for `degree` - this variable has 59 missing values. However, we will not go further into this, as this variable is not relevant to us. 
+
 We also find that our only character variable `Seat` has 632 unique values which lets us know that there are no duplicates in the list of constituencies. 
 
 We will have a more detailed look at the statistics of our numeric variables using `favstats()` next. 
@@ -116,13 +116,13 @@ favstats(brexit_results$age_18to24)
 
 ```
 
-We will not go into too much detail but feel free to have a look at the minimum and maximum values, the mean and median or the standard deviation for each variable. 
+Again, we will not go into too much detail but anyone can feel free to have a look at the minimum and maximum values, the mean and median or the standard deviation for each variable. 
 
 Some conclusions we can, for example, draw is that those variables that have an equal (or similar) mean and median are roughly normally distributed. This is true for `lab_2015`, `ukip_2015`, `leave_share`, `male` and `unemployed`. 
 
 ## Visualizations
 
-In order to add the `ggthemr` **fresh** theme to all the following ggplots, we run this command:
+In order to add the `ggthemr` **dust** theme to all the following ggplots, we run this command:
 
 ```{r, add_fresh_theme}
 ggthemr('dust')
@@ -131,78 +131,90 @@ ggthemr('dust')
 
 ### Correlations
 
-To get a sense of the data and the relationships between the variables, we plot create a `ggpairs` plot which shows each respective correlation and scatterplot for all two variable pairs. 
+To get a sense of the data and the relationships between the variables, we create a `ggpairs` plot which shows each respective correlation and scatterplot for all two variable pairs. 
 
 
 ```{r, ggpairs}
 brexit_results %>% 
-  select(-Seat, -degree) %>% 
+  select(-Seat, -degree) %>%  #deselect irrelevant variables seat and degree 
   GGally::ggpairs(alpha = 0.2) +
       theme_minimal()
 ```
 
 In the following, we describe a few findings based on these plots - no definitive results!
 
-We find an extremely high positive correlation at 0.85 between `leave_share` and `ukip_2015` as well as another significant positive correlations between `born_in_uk` and `leave_share`. 
+We find an extremely high positive correlation of 0.85 between `leave_share` and `ukip_2015` as well as another significant positive correlation between `born_in_uk` and `leave_share`. 
 
 The first observation may show that the majority of UKIP voters was also pro-Brexit. The latter relationship will be further investigated later on.
 
-We also find significant negative relationships, e.g. between `lab_2015` and `con_2015`, clearly indicating that the more Labour Party voters there are in a constituency, the less Conservative Party voters there are and vice versa (quite obvious as those are the two biggest parties in the UK). Further negative relationships include those between `unemployed` and `con_2015` as well as `age_18to24` and `con_2015` indicating that the Conservative Party does not necessarily have many unemployed voters or voters below 24 years of age. 
+We also find significant negative relationships, e.g. between `lab_2015` and `con_2015`, clearly indicating that the more Labour Party voters there are in a constituency, the less Conservative Party voters there are and vice versa (quite obvious as those are the two biggest parties in the UK). Further negative relationships include those between `unemployed` and `con_2015` as well as `age_18to24` and `con_2015`, indicating that the Conservative Party does not necessarily have many unemployed voters or voters below 24 years of age. 
 
 Another interesting dynamic stems from the negative correlations between `age_18to24` and `leave_share` as well as `born_in_uk`. This may indicate that the more younger voters are in a district, the fewer people are pro-Brexit. A common dynamic during the Brexit referendum was actually that older generations were generally pro Brexit while younger generations were against it. Further, the more voters are between the age of 18 to 24, the less voters were born in the UK. This may stem from many young immigrants settling in the UK. 
 
-There are further similar relationships that can be seen in the graph but we will not go into all of them in detail.
+There are further similar relationships that can be seen in the graph; we will, however not go into detail on all of them.
 
-### Distribution
+### Distributions
 
-To understand the data further, we plot a histogram and a density plot of the leave share in all constituencies.
+To understand the data and the potential influencing factors on the share of pro-Brexit vothers further, we plot a histogram and a density plot of the leave share in all constituencies.
 
 ```{r brexit_histogram, warning=FALSE, message=FALSE}
-ggplot(brexit_results, aes(x = leave_share)) +
-  geom_histogram(binwidth = 2.5) +
-  labs(title = "Spread of 'leave-votes' share",
-        subtitle = "Histogram showing the spread of the proportion of 'leave the EU-votes' over all constituencies",
-         x = "Share of leave-votes",
-         y = "Count of constituencies") +
+#creating histogram with binwidth of 2.5
+ggplot(brexit_results, 
+       aes(x = leave_share)) +
+        geom_histogram(binwidth = 2.5) + 
+        labs(title = "The majority of the majority want to leave the EU",
+             subtitle = "Histogram showing the spread of the proportion of 'leave the EU-votes'\n over all constituencies",
+             x = "Share of leave-votes (%)",
+             y = "Count of constituencies") +
   NULL
 
-ggplot(brexit_results, aes(x = leave_share)) +
-  geom_density() +
- labs(title = "Density of 'leave-votes' share",
-        subtitle = "Density plot showing the spread/density of the proportion of 'leave the EU-votes' over all constituencies",
-         x = "Share of leave-votes",
-         y = "Density over all constituencies") +
+  #creating density plot
+ggplot(brexit_results, 
+       aes(x = leave_share)) +
+        geom_density() +
+        labs(title = "The majority of the majority want to leave the EU",
+             subtitle = "Density plot showing the spread/density of the proportion of 'leave the EU-votes'\n over all constituencies",
+             x = "Share of leave-votes (%)",
+             y = "Density over all constituencies") +
   NULL
-
-
 ```
 
 ### Born in the UK vs. Leave-share
 
-One common explanation for the Brexit outcome was fear of immigration and opposition to the EU's more open border policy. We can check the relationship (or correlation) between the proportion of native born residents (`born_in_uk`) in a constituency and its `leave_share` by calculating the correlation between the two variables.
+One common explanation for the Brexit outcome was fear of immigration and opposition to the EU's more open border policy. We can check the relationship between the proportion of native born residents (`born_in_uk`) in a constituency and its `leave_share` by calculating the correlation between the two variables.
 
 ```{r brexit_immigration_correlation}
 brexit_results %>% 
+  
+  #select relevant variables
   select(leave_share, born_in_uk) %>% 
+  
+  #calculate correlation
   cor()
 ```
 
 The correlation is almost **0.5**, which shows that the two variables are positively correlated. 
 
-We can also create a scatterplot between these two variables using `geom_point`. We also add the best fit line, using  `geom_smooth(method = "lm")`. 
+We can also create a scatterplot between these two variables using `geom_point`. We add the best fit line, using  `geom_smooth(method = "lm")`. 
 
 ```{r brexit_immigration_plot}
-ggplot(brexit_results, aes(x = born_in_uk, y = leave_share)) +
-  geom_point(alpha=0.3) +
-  geom_smooth(method = "lm") +
-  labs(title = "Share of UK-born voters and share of leave-EU voters relationship",
-       subtitle = "Relationship between the share of voters born in the UK \n and the share of voters that voted to leave the EU over all constituencies",
-       x = "Share of UK-born voters",
-       y = "Share of leave-voters") +
-   
+ggplot(brexit_results, 
+       aes(x = born_in_uk, y = leave_share)) +
+  
+  #creating scatterplot
+        geom_point(alpha=0.3) +
+  
+  #creating trend line
+        geom_smooth(method = "lm") +
+  
+        labs(title = "Are all UK-born voters pro Brexit?",
+             subtitle = "Relationship between the share of voters born in the UK \n and the share of voters that voted to leave the EU over all constituencies",
+             x = "Share of UK-born voters (%)",
+             y = "Share of leave-voters (%)") +
   NULL
 ```
 
+#### Analysis & Interpretation
 
 Looking at the above graph and the derived correlation of 0.49, a positive relationship between the share of UK-born voters and voters that voted to leave the EU becomes visible. This means that the higher the share of UK-born voters a constituency in the UK has, the more likely the constituency is to also have a higher share of pro-Brexit voters. On the other hand, the higher the share of voters that were born outside of the UK belong to/vote in a constitucency, the lower the share of voters in favour of staying in the EU. 
 
@@ -213,8 +225,32 @@ Next to the topic of values and traditions, as mentioned above: _"One common exp
 Lastly, the graph clearly shows that there are more constituencies in the UK with a higher share (approx. 80% and above) of UK-born voters. This is not a surprise since the majority of the population in the UK is also UK-born. Nevertheless, the plot shows some outliers to the overall trend as a few constituencies with a high share of UK-born voters (e.g. >90%) have a relatively low share of leave-voters (<30%). Most of the constituencies with <80% of UK-born voters are relatively widely-spread within a range of 20% to 60% share of leave-voters. There is a slight trend towards lower share of UK-born voters translating to lower share of leave-votes but overall, these observations are quite scattered and it's difficult to determine a definitive, clear trend.
 Generally, the points in the plot clearly cluster in the upper right corner, showing that most of the consitutencies consist of mainly UK-born voters and have a relatively high share of leave-voters. In the end, this was logically followed by the UK voters deciding to leave the EU.
 
-In a next step, it would be interesting to also analyse the relationship between the `leave-share` variable and the `age_18to24` variable. As most often the younger generations in the UK were more likely to be in favour of keeping an alliance with the EU in order to stay globally connected, I would expect this analysis to show that a higher share of 18 to 24 year-olds in a constituency means a relatively lower share of leave-voters.
+### Age 18-24 vs. Leave-share
 
+In a next step, it is interesting to also analyse the relationship between the `leave-share` variable and the `age_18to24` variable. We create the same plot as above but replace `born_in_uk`with `age_18to24`.
+
+```{r brexit_below24_plot}
+ggplot(brexit_results, 
+       aes(x = age_18to24, y = leave_share)) +
+  
+  #creating scatterplot
+        geom_point(alpha=0.3) +
+  
+  #creating trend line
+        geom_smooth(method = "lm") +
+  
+        labs(title = "Are all young voters against Brexit?",
+             subtitle = "Relationship between the share of voters below the age of 24 \n and the share of voters that voted to leave the EU over all constituencies",
+             x = "Share of voters aged below 24 (%)",
+             y = "Share of leave-voters (%)") +
+  NULL
+```
+
+#### Analysis & Interpretation
+
+As most often the younger generations in the UK are more likely to be in favour of keeping an alliance with the EU in order to stay globally connected, this analysis, as expected, shows that a higher share of 18 to 24 year-olds in a constituency means a relatively lower share of leave-voters. 
+
+The reason for this is most likely, again, the large difference between the generations in which older generations highly value the UK's tradition and history and want to cut ties with the EU to return to their national values, while younger generations are interested in the international exchange the EU provides and, therefore, are not voting to leave the EU.
 
 ### Political affiliation vs. Leave-share
 
@@ -224,35 +260,63 @@ As the four party share variables are all on the x-axis in the final plot, we wi
 
 ```{r, pivot_longer}
 brexit <- brexit_results %>% 
-            select(Seat, con_2015, lab_2015, ld_2015, ukip_2015, leave_share) %>%      #eliminate irrelevant variables
-            pivot_longer(2:5, names_to = "party", values_to = "percent" )             #pivot longer to summarize party variables
+  
+  #eliminate irrelevant variables, select relevant party variables
+            select(Seat, con_2015, lab_2015, ld_2015, ukip_2015, leave_share) %>% 
+  
+  #pivot longer to summarize party variables
+            pivot_longer(2:5, names_to = "party", values_to = "percent" )             
 ```
 
-With the manipulated data set, we can now reproduce the plot as above.
+With the manipulated data set, we can now produce a plot that shows the relationship between a voter's political affiliation and the leave-share. In order to colour each political party with its actual party colour, we find the official colour codes per party [here](http://blog.richardallen.co.uk/uk-political-party-web-colours/).
 
-```{r, plot}
-ggthemr_reset() #reset 'fresh' theme because we will add own aes to the next plot
+```{r, political_aff_plot}
+#reset ggtjemr theme because we will add own aes to the next plot
+ggthemr_reset() 
 
-colours <- c("#0087dc", "#d50000", "#FDBB30", "#EFE600") #define vector with party-specific colours
+#define vector with party-specific colours
+colours <- c("#0087dc", "#d50000", "#FDBB30", "#EFE600") 
 
 brexit_plot <- brexit %>% 
                 ggplot(aes(x=percent, y=leave_share)) +
-                geom_point(shape = 21, stroke = 0, alpha = 0.5, size = 2, #add scatter plot,
-                           aes(fill = party))+ #fill dots by party + make transparent 
-                scale_fill_manual(values = colours, #fill dots with party colour
+  
+  #add scatter plot with slightly transparent dots (alpha) and slightly bigger size
+                geom_point(shape = 21, stroke = 0, alpha = 0.5, size = 2, 
+                           
+                           #colour fill dots by party
+                           aes(fill = party))+ 
+  
+  #fill dots with party colour
+                scale_fill_manual(values = colours, #
                                   breaks = c("con_2015", "lab_2015", "ld_2015","ukip_2015"), #change labels
-                                  labels = c("Conservative", "Labour", "Lib Dems", "UKIP"))+   
-                scale_colour_manual(values = colours, #outline with party colour
+                                  labels = c("Conservative", "Labour", "Lib Dems", "UKIP"))+
+  #outline dots with party colour
+                scale_colour_manual(values = colours, 
                                     breaks = c("con_2015", "lab_2015", "ld_2015","ukip_2015"), #change labels
                                     labels = c("Conservative", "Labour", "Lib Dems", "UKIP"))+
-                scale_x_continuous(limits = c(0, 82))+          #set limits of x scale
-                scale_y_continuous(limits = c(20, 100))+        #set limits of y scale
-                geom_smooth(method= lm, #add regression lines
-                            size = 0.5, #decrease line weight
-                            aes(group=party, color = party)) + #group and colour lines by party
-                theme_bw() + #ad black and white theme
-                theme(legend.position = "bottom", #position legend at the bottom
-                      legend.title = element_blank()) + #delete legend title
+  
+  #set limits of x and y scale
+                scale_x_continuous(limits = c(0, 82))+          
+                scale_y_continuous(limits = c(20, 100))+
+  
+  #add regression lines
+                geom_smooth(method= lm,
+                            
+                            #decrease line weight
+                            size = 0.5, 
+                            
+                            #group and colour lines by party
+                            aes(group=party, 
+                                color = party)) + 
+  #ad black and white theme
+                theme_bw() +
+  
+  #position legend at the bottom
+                theme(legend.position = "bottom", 
+                      
+                      #delete legend title
+                      legend.title = element_blank()) + 
+  
                 labs(title = "How political affiliation translated to Brexit Voting", #add title
                      x = "Party % in the UK 2015 general election", #add axis labels
                      y = "Leave % in the 2016 Brexit referendum") +
@@ -267,6 +331,8 @@ brexit_plot
   
 ```
 
+#### Analysis & Interpretation
+
 In this final analysis we plot the respective share of voters for the Conservative Party, Labour Party, Liberal Democrats and UKIP per constituency in 2015 compared to the respective leave share in the Brexit referendum in 2016. 
 
 We find that two positive relationships and two negative relationships. More precisely, we find a steep regression line between the UKIP share and leave-share and a slightly upward facing slope for the regression line between the Conservative Party share and the leave share. This would indicate that the higher the share of UKIP voters in a constituency, the higher the share of pro-Brexit voters. 
@@ -279,4 +345,4 @@ Only looking at this analysis, we would now conclude that there is no clear opin
 
 This is, however, a rather superficial analysis and in order to find meaningful and definitive interpreations, we would have to look at relationships between further variables. 
 
-
+![Brexit](https://www.bundesregierung.de/resource/image/1712628/hero_desktop/1170/585/8459b4440eaf8440a5f47fe94ee0aebc/nV/2020-01-15-fahnen-von-grossbritannien-und-europa.jpg)

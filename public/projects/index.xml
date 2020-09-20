@@ -16,10 +16,8 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/projects/brexitvoting/</guid>
-      <description>Brexit
- Exploratory Data Analysis In the following we will look at a dataset concerning the results of the 2016 Brexit vote in the UK.
-Raw Data We will have a quick look at the results of the 2016 Brexit vote in the UK. First we read the data using vroom and have a quick glimpse at the data.
-brexit_results &amp;lt;- vroom::vroom(here::here(&amp;quot;data&amp;quot;,&amp;quot;brexit_results.csv&amp;quot;)) glimpse(brexit_results) ## Rows: 632 ## Columns: 11 ## $ Seat &amp;lt;chr&amp;gt; &amp;quot;Aldershot&amp;quot;, &amp;quot;Aldridge-Brownhills&amp;quot;, &amp;quot;Altrincham and Sale … ## $ con_2015 &amp;lt;dbl&amp;gt; 50.</description>
+      <description>In this project, we will conduct an Exploratory Data Analysis of the data set concerning the results of the 2016 Brexit vote in the UK. We ill begin by investigating the raw data, then look at the summary statistics and finally create some informative visualizations. Let’s dive right in!
+Exploratory Data Analysis Raw Data We will have a quick look at the results of the 2016 Brexit vote in the UK.</description>
     </item>
     
     <item>
