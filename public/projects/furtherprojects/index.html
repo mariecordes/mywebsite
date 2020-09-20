@@ -81,14 +81,24 @@
                             
 
 
+<p>In the following, you can have a quick look at some projects that I am currently working on. As these are not yet finished, you may find missing explanations, interpretations or planned but not yet executed analyses.</p>
+<p>I know you’re excited to see more of my work but please bear with me! These are works in progress and once I was able to continue, refine, finish and polish these, they will appear as individual projects in my portfolio for you to inspect.</p>
+<p>Consider this as a <strong>teaser</strong>… they will leave you wanting more!</p>
+<div id="content" class="section level1">
+<h1>Content</h1>
+<p>The projects that you can currently find here are:</p>
+<ol style="list-style-type: decimal">
+<li>Climate change and temperature anomalies</li>
+<li>General Social Survey (GSS)</li>
+</ol>
+</div>
 <div id="climate-change-and-temperature-anomalies" class="section level1">
-<h1>Climate change and temperature anomalies</h1>
+<h1>1. Climate change and temperature anomalies</h1>
 <p><img src="https://wallpapercave.com/wp/wp2354251.jpg" /></p>
 <p>We want to study climate change and find data for that on the <em>Combined Land-Surface Air and Sea-Surface Water Temperature Anomalies</em> in the Northern Hemisphere at <a href="https://data.giss.nasa.gov/gistemp">NASA’s Goddard Institute for Space Studies</a>. The <a href="https://data.giss.nasa.gov/gistemp/tabledata_v3/NH.Ts+dSST.txt">tabular data of temperature anomalies can be found here</a></p>
 <p>To define temperature anomalies you need to have a reference, or base, period which NASA clearly states that it is the period between 1951-1980.</p>
 <p>First, we load the file:</p>
-<pre class="r"><code>weather &lt;- 
-  read_csv(&quot;https://data.giss.nasa.gov/gistemp/tabledata_v3/NH.Ts+dSST.csv&quot;, 
+<pre class="r"><code>weather &lt;- read_csv(&quot;https://data.giss.nasa.gov/gistemp/tabledata_v3/NH.Ts+dSST.csv&quot;, 
            skip = 1, 
            na = &quot;***&quot;)</code></pre>
 <p>Here, we use two additional options: <code>skip</code> and <code>na</code>.</p>
@@ -131,16 +141,25 @@ tidyweather &lt;- tidyweather %&gt;%
 ggplot(tidyweather, aes(x=date, y = delta))+
   geom_point()+
   geom_smooth(color=&quot;red&quot;) + #add red trend line
-  theme_bw() +
-  labs (
-    title = &quot;Increasing weather anomalies in the past few decades&quot;,
+  labs (title = &quot;Increasing weather anomalies in the past few decades&quot;,
     subtitle = &quot;Temperature deviations per month over time&quot;,
     x = &quot;Year&quot;,
     y = &quot;Temp deviation from expectation&quot;
-    
   )</code></pre>
 <p><img src="/projects/furtherprojects/index_files/figure-html/scatter_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Next, we want to find out if the effect of increasing temperature deviations is more pronounced in some months. We use <code>facet_wrap()</code> to produce a separate scatter plot for each month, again with a smoothing line.</p>
+<pre class="r"><code>ggplot(tidyweather, aes(x=date, y = delta))+
+  geom_point()+
+  geom_smooth(color=&quot;red&quot;) +
+  
+  #facet by month
+  facet_wrap(~month) +
+  
+  labs (title = &quot;Temperature&#39;s rising!&quot;,
+    subtitle = &quot;Temperature deviations per month over the years&quot;,
+    x = &quot;Year&quot;,
+    y = &quot;Temp deviation from expectation&quot;
+  )</code></pre>
 <p><img src="/projects/furtherprojects/index_files/figure-html/facet_wrap-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Looking at the produced plots, we find that the increase in temperature deviations from the normal (expected) temperature has increased over the years in <strong>every</strong> month of the year. Although the trend line has similar shapes in all months, the curve is flatter in some months and steeper in others. We find that the delta has increased more significantly in the winter months (e.g. Nov, Dec, Jan) than the summer months (e.g. Jun, Jul, Aug). This may mean that winters have become significantly hotter or colder but summers have only become slightly hotter or colder over the past decades.</p>
 <p>To investigate the historical data further, it may be useful to group it into different time periods.</p>
@@ -160,9 +179,9 @@ ggplot(tidyweather, aes(x=date, y = delta))+
 <p>Now that we have the <code>interval</code> variable, we can create a density plot to study the distribution of monthly deviations (<code>delta</code>), grouped by the different time periods we are interested in. We set <code>fill</code> to <code>interval</code> in order to group and colour the data by different time periods.</p>
 <pre class="r"><code>ggplot(comparison, aes(x=delta, fill=interval))+
   geom_density(alpha=0.2) +   #density plot with transparency set to 20%
-  theme_bw() +                #theme
+                  #theme
   labs (
-    title = &quot;Temperatures increasing over the last century&quot;,
+    title = &quot;Temperatures have been increasing over the last century&quot;,
       subtitle = &quot;Density plot for monthly temperature anomalies with 1951-1980 as base period&quot;,
     y     = &quot;Density&quot;,         #changing y-axis label to sentence case
     x = &quot;Temp deviation from expectation&quot;
@@ -185,7 +204,7 @@ ggplot(average_annual_anomaly, aes(x=Year, y= annual_average_delta))+
   geom_smooth(method = &quot;loess&quot;) +
   
   #change to theme_bw() to have white background + black frame around plot
-  theme_bw() +
+  
   labs (
     title = &quot;Significant temperature anomalies since 1970s&quot;,
       subtitle = &quot;Average yearly temperature deviation from the normal&quot;,
@@ -253,7 +272,7 @@ percentile_ci #print 95% CI</code></pre>
 </div>
 </div>
 <div id="general-social-survey-gss" class="section level1">
-<h1>General Social Survey (GSS)</h1>
+<h1>2. General Social Survey (GSS)</h1>
 <p><img src="https://www.seo-kueche.de/wp-content/uploads/2020/03/social-media-news-apps-scaled.jpg" /></p>
 <p>The <a href="http://www.gss.norc.org/">General Social Survey (GSS)</a> gathers data on American society in order to monitor and explain trends in attitudes, behaviours, and attributes. Many trends have been tracked for decades, so one can see the evolution of attitudes, etc in American Society.</p>
 <p>In this assignment, we analyze data from the <strong>2016 GSS sample data</strong>, using it to estimate values of <em>population parameters</em> of interest about US adults. The GSS sample data file has 2867 observations of 935 variables, but we are only interested in very few of these variables and, therefore, use a smaller file with 2867 observations of 7 variables.</p>
@@ -501,7 +520,7 @@ gss_new3 %&gt;%
     geom_vline(xintercept = median_email, size = 0.5, colour = &quot;green&quot;)+  #add median line in green
     geom_text(aes(x=mean_email+270, label=paste0(&quot;Mean\n&quot;, mean_email), y=0.0025)) + #add label to mean
     geom_text(aes(x=median_email-270, label=paste0(&quot;Median\n&quot;, median_email), y=0.0005)) + #add label to median
-    theme_bw() +
+    
     labs(title = &quot;Most emails answered within 8 hours&quot;,
          subtitle = &quot;Distribution of minutes spend on emails among Americans&quot;,
          x = &quot;Minutes&quot;,
