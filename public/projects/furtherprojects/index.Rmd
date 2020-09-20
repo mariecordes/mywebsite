@@ -2,6 +2,7 @@
 title: "Ongoing projects"
 author: "Marie Cordes"
 date: "September 2020`"
+image: pic06.jpg
 output:
   html_document:
     theme: flatly

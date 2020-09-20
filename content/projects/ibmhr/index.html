@@ -2,6 +2,7 @@
 title: "IBM HR Analysis"
 author: Marie Cordes
 date: "September 2020"
+image: pic05.jpg
 output:
   html_document:
     theme: flatly
@@ -1484,7 +1485,7 @@ head(hr_cleaned, 5)</code></pre>
   
   #create ggpairs plots
   GGally::ggpairs(aes(colour = gender), alpha = 0.4)</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/ggpairs-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/ggpairs-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Although this plot is full of a vast amount of information, we can still see some relevant trends that we will investigate further in the next sections. For example, we see that there are relatively high correlations between age and all of the other selected variables. This shows a very common dynamic that the older you are, the longer you have worked and the more money you make. This trend can also be seen between the positive (and in this selection highest) correlation between monthly income and total working years of 0.773. Most people that have worked for several years are in senior positions where they also work more.</p>
 <p>Another interesting find is the high, positive correlation of 0.628 between total working years and years at the company. This indicates that most people that have worked many years in their lives have worked at this regarded company (IBM) for a long time as well. As we also find a similar high correlation between years at the company and years since the last promotion, we can assume that the longer an employee works at IBM, the less frequently he/she will be promoted - a typical trend for more senior roles.</p>
 <p>We don’t find any sigfinicant differences between women and men, apart from the fact that men have, on average, worked in less companies so far than women.</p>
@@ -1507,7 +1508,7 @@ ggplot(hr_cleaned,
              x = &quot;Attrition?&quot;,
              y = &quot;Number of employees&quot;) +
                     NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/attrition_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/attrition_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Summing all the observations that were “Yes” for attrition and looking at the bar plot below, we find that 237 employees left the company, whereas X of the observed employees still work for IBM.</p>
 <p>This means that on average …</p>
 <pre class="r"><code># divide the people that have left the company by all 
@@ -1545,7 +1546,7 @@ ggplot(hr_cleaned,
                  x = &quot;Job satisfaction&quot;,
                  y = &quot;Number of employees&quot;) +
                     NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/job_satisfaction_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/job_satisfaction_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>As can be seen, a majority of <strong>61.29%</strong> of employees are highly or very highly satisfied with their job.</p>
 <pre class="r"><code>#put work-life balance levels in order
 hr_cleaned$work_life_balance &lt;- factor(hr_cleaned$work_life_balance, levels = c(&quot;Bad&quot;, &quot;Good&quot;, &quot;Better&quot;, &quot;Best&quot;))
@@ -1571,7 +1572,7 @@ ggplot(hr_cleaned,
                  x = &quot;Work-life-balance&quot;,
                  y = &quot;Number of employees&quot;) +
                     NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/work_life_balance_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/work_life_balance_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>As can be seen in this plot, a small minority of <strong>5.4%</strong> of employees is not satisfied with their work-life balance. A majority of <strong>60.7%</strong> of employees rates their work-life balance 3 out of 4, namely “better”. Nevertheless, the scale could be improved by introducing a “medium” option or balancing the positive and negative attributes as of now, there is one bad and three good options to describe one’s work-life balance.</p>
 <p>Altogether, most employees seem to be satisfied with their job and work-life balance, indicating that the 19% attrition rate is either rather low compared to industry standards or there are other reasons than employees’ happiness causing attrition.</p>
 </div>
@@ -1603,7 +1604,7 @@ ggplot(hr_cleaned_selected, aes(age)) +
                 x = &quot;Age&quot;,
                 y = &quot;Density&quot;) +
           NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/density_plots-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/density_plots-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#plot years_at_company distribution
 ggplot(hr_cleaned_selected, aes(years_at_company)) +
           geom_density()+
@@ -1612,7 +1613,7 @@ ggplot(hr_cleaned_selected, aes(years_at_company)) +
                 x = &quot;Years&quot;,
                 y = &quot;Density&quot;) +
           NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/density_plots-2.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/density_plots-2.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#plot years_since_last_promotion distribution
 ggplot(hr_cleaned_selected, aes(years_since_last_promotion)) +
           geom_density()+
@@ -1621,7 +1622,7 @@ ggplot(hr_cleaned_selected, aes(years_since_last_promotion)) +
                 x = &quot;Years&quot;,
                 y = &quot;Density&quot;) +
           NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/density_plots-3.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/density_plots-3.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#plot monthly_income distribution
 ggplot(hr_cleaned_selected, aes(monthly_income)) +
           geom_density()+
@@ -1630,7 +1631,7 @@ ggplot(hr_cleaned_selected, aes(monthly_income)) +
                 x = &quot;Monthly income ($)&quot;,
                 y = &quot;Density&quot;) +
           NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/density_plots-4.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/density_plots-4.png" width="648" style="display: block; margin: auto;" /></p>
 <p>As expected, we can observe a roughly Normal distribution for the employees’ age. We find that the majority of employees has been at the company less then 10 years. There are, however, a few people that have worked at the company for 20 or even over 30 years. We, further find that for most employees, the last promotion is fewer than approx. 3 years ago while for only a small minority of employees the last promotion is over 10 years ago.</p>
 <p>As there are a few people earning more than 10,000USD per month, the majority of employees earn a lower monthly income, indicating a common company structure with many low-salary jobs and only few high-salary jobs. In the next section, we will investigate <strong>monthly income</strong> further.</p>
 </div>
@@ -1652,7 +1653,7 @@ ggplot(hr_cleaned,
                x = &quot;Education level&quot;,
                y = &quot;Monthly income ($)&quot;) +
      NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/education_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/education_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Generally, we can see that a higher level of education means a higher median monthly income. However, all education levels apart from Doctor show several outliers that earn between 15,000-20,000USD in contrast to relatively low medians around/below 5,000USD and 3rd quartile values of significantly lower than 10,000USD. No significant relationship can be observed.</p>
 <p>For further investigation, we calculate and plot a bar chart of the mean (also called average) and median income by education level.</p>
 <pre class="r"><code>#defining the mean per education level
@@ -1687,7 +1688,7 @@ ggplot(mean_ed,
              subtitle = &quot;Average income by education Level&quot;,
              x=&quot;Education level&quot;,
              y=&quot;Average monthly income ($)&quot;)</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/income_mean-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/income_mean-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#defining the median per education level
 median_ed &lt;- hr_cleaned %&gt;%
   
@@ -1720,7 +1721,7 @@ ggplot(median_ed,
                subtitle= &quot;Median income by education level&quot;,
                x=&quot;Education level&quot;,
                y=&quot;Median monthly income ($)&quot;)</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/income_median-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/income_median-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>The median monthly income shows no direct positive relationship with the level of education as the median monthly income of employees with a bachelor is lower than that of people with a college degree. Nevertheless, the average (mean) monthly income shows a positive relationship with the education level as people with the lowest education level (Below College) earn the lowest monthly income on average, employees with the second lowest education level (College) earn the second lowest monthly income and so on.</p>
 <p>Finally, we plot the distribution of monthly income by education level. The colouring also indicates the gender of the respective monthly income.</p>
 <pre class="r"><code>#plot distribution of monthly income
@@ -1736,7 +1737,7 @@ ggplot(hr_cleaned,
                  x = &quot;Monthly income ($)&quot;,
                  y = &quot;Number of employees&quot;) +
      NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/income_education_distribution-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/income_education_distribution-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Here, again, we can only observe that there are a generally more low-salary jobs than high-salary jobs. The majority of all education levels except Doctor earn below 10,000USD but there is no clear indication as to which level of education earns the least. While there are only a few employees with a Doctor, their level of monthly income varies and shows no directly connected level of income.</p>
 <p>Altogether, these plots may show that while it is generally possible for some people to earn a comparatively higher salary with a higher level of education, there is no strict rule and, thus, also no significant positive relationship between employees’ monthly income and highest level of education. We may find other factors such as gender or job role to be a more significant influence.</p>
 </div>
@@ -1752,7 +1753,7 @@ ggplot(hr_cleaned,
              x = &quot;Gender&quot;,
              y = &quot;Monthly income ($)&quot;) +
      NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/income_gender-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/income_gender-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>We see, again, that most employees generally are in the lower monthly income range (i.e., &lt; 10,000USD) and the median employee salary is around 5,000USD - this is true for both men and women. We don’t see significant differences between male and female employees. In fact, the median salary of women is actually slightly higher than men’s within this group of employees.</p>
 <p>While most women are in this lower range, there are a few women earning up to 20,000USD. Even though there are also fewer men earning within the higher income range than within the lower, there are overall more men earning such relatively high monthly incomes (more outliers visible).</p>
 <p>Nonetheless, this graph does not take into consideration the number of female/male employees. Let’s have a look at that.</p>
@@ -1803,7 +1804,7 @@ ggplot(hr_cleaned,
              x = &quot;Job role&quot;,
              y = &quot;Monthly income ($)&quot;) +
       NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/jobrole_income-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/jobrole_income-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>With this plot, we can clearly see that job roles can be a meaningful indicator of monthly income. When sorting the job roles by highest to lowest average monthly income, it becomes clear that high-seniority positions such as managers, directors and executives earn a higher level income than low-seniority jobs as a laboratory technician or sales representative.</p>
 <p>This result is is not surprising as a commonly approved approach to determining an employee’s salary is to take their job role rather than their level of education or gender into consideration. These influencing factors, of course, also play a role but are nowhere near as decisive as what kind of role an employee takes on and how much responsibility he/she carries.</p>
 </div>
@@ -1823,7 +1824,7 @@ ggplot(hr_cleaned,
              x = &quot;Age&quot;,
              y = &quot;Monthly income ($)&quot;) +
      NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/age_income-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/age_income-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Although we can see that there are people of all ages earning a monthly income of below 5,000USD, it is clear that there are almost no people (just one person) younger than 30 that earn more than 10,000USD and only few (namely five) people between 30 and 40 that earn more than 15,000USD. Only employees above 40 years of age earn within the higher monthly income range of 15,000-20,000USD. This analysis clearly shows a positive relationship between age and monthly income, meaning the older an employee, the more likely he/she earns relatively more money.</p>
 <p>As a higher age is commonly associated with a higher (more senior) job role and consequently also a higher salary, we facet the prior plot per job role for further analysis.</p>
 <pre class="r"><code>#put job role levels in order according to highest median monthly income
@@ -1845,7 +1846,7 @@ ggplot(hr_cleaned,
              x = &quot;Age&quot;,
              y = &quot;Monthly income ($)&quot;) +
      NULL</code></pre>
-<p><img src="/projects/project4/index_files/figure-html/age_income_jobrole-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/ibmhr/index_files/figure-html/age_income_jobrole-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>This analysis prints a cohesive picture with our previous analysis. There are no to only a few employees below 30 in high-seniority positions such as Manager and Reseach Director which both record the highest levels of monthly income. There are people of almost all ages in the other job roles. While people in HR are relatively middle-aged with a few employees at the lower and upper age range, most people working as Sales Representatives are relatively young with a few older people and only two employees above 50.</p>
 </div>
 </div>

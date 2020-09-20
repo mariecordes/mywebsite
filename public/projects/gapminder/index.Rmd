@@ -2,6 +2,7 @@
 title: "Gapminder Analysis"
 author: "Marie Cordes"
 date: "September 2020"
+image: pic03.jpg
 output:
   html_document:
     theme: flatly

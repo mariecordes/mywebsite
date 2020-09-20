@@ -2,6 +2,7 @@
 title: "IBM HR Analysis"
 author: Marie Cordes
 date: "September 2020"
+image: pic05.jpg
 output:
   html_document:
     theme: flatly

@@ -54,13 +54,7 @@
             
                 <li><a href="/aboutme">About me</a></li>
             
-                <li><a href="/projects/brexitvoting">Analysis - Brexit Voting</a></li>
-            
-                <li><a href="/projects/ibmhr">Analysis - IBM HR</a></li>
-            
-                <li><a href="/projects/gapminder">Analysis - Gapminder</a></li>
-            
-                <li><a href="/projects/furtherprojects">Further Analyses</a></li>
+                <li><a href="/projects">All projects</a></li>
             
 
         </ul>
@@ -81,6 +75,8 @@
                             <header class="major">
                                 <h1>Gapminder Analysis</h1>
                             </header>
+                            
+                                <span class="image main"><img src="/img/projects/pic03.jpg" alt="" /></span>
                             
                             
 <script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
@@ -138,7 +134,7 @@ continent_data &lt;- gapminder %&gt;%
           x = &quot;Year&quot;,
           y = &quot;Life Expectancy in years of age&quot;) +
      NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/lifeExp_one_country-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/lifeExp_one_country-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Next, we want to produce a graph to see how the life expectancy has changed over the years in Europe - the continent which Germany belongs to.</p>
 <p>We creat a plot with the continent data to give an overview of the development of life expectancy in Europe.</p>
 <pre class="r"><code>ggplot(continent_data, 
@@ -149,7 +145,7 @@ continent_data &lt;- gapminder %&gt;%
          x = &quot;Year&quot;,
          y = &quot;Life Expectancy in years of age&quot;) + 
    NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/lifeExp_one_continent_1-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/lifeExp_one_continent_1-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>The plot above includes all countries in one graph. Alternatively, we can facet the plot per country to show the differences within the countries in Europe.</p>
 <pre class="r"><code>ggplot(continent_data, 
        aes(x = year, y = lifeExp)) +
@@ -160,7 +156,7 @@ labs(title = &quot;Life Expectancy in Europe per country (1957-2007)&quot;,
          x = &quot;Year&quot;,
          y = &quot;Life Expectancy in years of age&quot;) + 
    NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/lifeExp_one_continent_2-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/lifeExp_one_continent_2-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Despite there being differences within a continent, we can also look at the differences between continents. Here, we create a plot from the original <code>gapminder</code> data (not the filtered datasets created before), showing the life expectancy over the years <em>per</em> continent.</p>
 <pre class="r"><code>ggplot(gapminder, 
        aes(x = year , y = lifeExp)) +
@@ -172,7 +168,7 @@ labs(title = &quot;Life Expectancy in Europe per country (1957-2007)&quot;,
          x = &quot;Year&quot;,
          y = &quot;Life Expectancy in years of age&quot;) + 
    NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/lifeExp_facet_by_continent-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/lifeExp_facet_by_continent-1.png" width="648" style="display: block; margin: auto;" /></p>
 <div id="analysis-interpretation" class="section level2">
 <h2>Analysis &amp; Interpretation</h2>
 <p>The life expectancy of humans overall increases over the years 1952 to 2007 on all continents.
@@ -270,7 +266,7 @@ ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = a
         axis.ticks.x=element_blank(),
         legend.title = element_blank()) +
   NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/get_data5-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/get_data5-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>We find that, by far, the most values are missing within the Sub-Saharan Africa data observations. We will take these findings into consideration when regarding further analysis and their applicabilaty.</p>
 </div>
 <div id="hiv-vs.-life-expectancy" class="section level2">
@@ -284,7 +280,7 @@ ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = a
              x = &quot;HIV Prevalence (%)&quot;, 
              y = &quot;Life Expectancy (years of age)&quot;) + 
         NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/get_data3-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/get_data3-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>The graph shows a somewhat inverse relationships between HIV prevalence and life expectancy - however, this is only true for a lower percentage of HIV prevelance (below around 5%). We can further notice, that there are many more data points with a relatively low HIV prevalence. We can see that for an extremely low HIV prevelance (below around 3%), life expectancy is overall highest at up to more than 80. HIV prevalence of around 5%-30% corresponds to a somewhat lower life expectancy between 40 and 60.</p>
 <p>As the graph does not separate the time variable and plots several years for a country, we want to look at two graphs from 1990 (beginning of most data points) and 2011 (last data points) to understand if/how this relationship has developed over time.</p>
 <pre class="r"><code>world_hiv_life %&gt;% 
@@ -298,7 +294,7 @@ ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = a
              x = &quot;HIV Prevalence (%)&quot;, 
              y = &quot;Life Expectancy (years of age)&quot;) + 
         NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>world_hiv_life %&gt;% 
   filter(date == &quot;2011&quot;) %&gt;% 
     ggplot(aes(x= cases.x, y = cases.y)) + 
@@ -310,7 +306,7 @@ ggplot(missinghiv, aes(x= reorder(admin_region, -na_count), y=na_count, fill = a
              x = &quot;HIV Prevalence (%)&quot;, 
              y = &quot;Life Expectancy (years of age)&quot;) + 
         NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/unnamed-chunk-4-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/unnamed-chunk-4-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>We find that the nature of the relationship (negative relationship) has stayed the same over time - it seems as if it even intensified over the years.</p>
 <p>Finally, we cannot tell from this analysis if the higher life expectancy is <strong>because of</strong> fewer relative HIV cases or if countries with generally higher life expectancy due to higher economic wealth and better health infrastructures are, thus, also less likely to experience HIV cases or earlier deaths caused by HIV.</p>
 <p>As the picture is not really clear, in a further analysis, we would use <code>facet_wrap</code> on this plot to investigate if there are any regional differences.</p>
@@ -339,7 +335,7 @@ ggplot(data = world_clean_regions,
                 x = &quot;Fertility Rate (Number of babies per woman)&quot;, 
                 y = &quot;GDP per capita ($)&quot;) + 
           NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/get_data4-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/get_data4-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Again, the analyses are not 100% clear but there seem to be somewhat inverse relationships between fertility rate and a country’s GDP per capita in all regions - apart from some bumps inbetween. This effect is clearer in some areas (e.g. South Asia) than others (e.g. North America). However, we must not disregard the fact that some regions have a wide variety of countries and individual economic dynamics while other regions, such as North America, have fewer countries (here, only USA &amp; Canada), which could lead to difficulties in comparing everything one on one.</p>
 <p>Generally, one can observe a general trend of more a higher fertility rate translating to a lower GDP per capita and vice versa. This is a common difference between advanced and developing countries, where in developing countries, families often have multiple children while for families in advanced countries (with higher GDP per capita) it is more common to have around 2 children.</p>
 <p>Again, it is difficult to observe time as an important variable here. For further investigation, we add the colour graphics in the graph below and delete the geom_smooth trend line.</p>
@@ -354,7 +350,7 @@ ggplot(data = world_clean_regions,
                 x = &quot;Fertility Rate (Number of babies per woman)&quot;, 
                 y = &quot;GDP per capita ($)&quot;) + 
           NULL</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/unnamed-chunk-5-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/unnamed-chunk-5-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Consequently, we find that time is actually a highly influencing factor that we cannot disregard. Every graph (every region) clearly shows that there was a generally higher fertility rate and lower GDP per capita in the past which developed into a respectively higher (still on relative terms as there are still vast differences between countries’ GDP per capita) GDP per capita along with a lower fertility rate.</p>
 <p>This trend may have many influencing factors, one being women starting to work in full-time jobs over the past decades, increasing a countries GDP through added work while at the same time, potentially, leaving less time to have (many) children.</p>
 </div>
@@ -396,7 +392,7 @@ ggplot(data = trend_under5,
         scale_x_discrete(name=&quot;&quot;,
                          breaks  = c(&quot;1960&quot;,&quot;1970&quot;,&quot;1980&quot;,&quot;1990&quot;,&quot;2000&quot;,&quot;2010&quot;,&quot;2020&quot;) 
         )</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/get_data6-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/get_data6-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>As we can see, mortality rates for children under 5 have decreased in all regions over the past decades. This trend is most probably because of better health infrastructures and wealthier economies all around the world. More peace and less war will be an influencing factor too.</p>
 <p>Moving on, the following tables represent the percent changes in mortality rate for under 5 from 1970 to 2018. WHY 1970</p>
 <p>We will look at a number of tables that show the top 5 countries with both the greatest and worst improvement in mortality rates under 5. You will find the specific title commented in the code and then a table with the name of the 5 countries and their respective percent change (<code>pct_change</code> in percentage points).</p>
@@ -1295,7 +1291,7 @@ ggplot(data = no_na,
          subtitle = &quot;Relationship between primary school enrollment and fertility rate&quot;,
          x=&quot;Fertility rate (babies per woman)&quot;,
          y=&quot;Primary School enrollment(%)&quot;)</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/get_data8-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/get_data8-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#create  new data set with time periods
 ay_no_na &lt;- no_na %&gt;% 
   filter(date == &quot;1970&quot;| 
@@ -1330,7 +1326,7 @@ ggplot(data = ay_no_na,
        y=&quot;Primary School enrollment(%)&quot;)+
   facet_wrap(~ date) +
   geom_smooth()</code></pre>
-<p><img src="/projects/project3/index_files/figure-html/get_data8-2.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/gapminder/index_files/figure-html/get_data8-2.png" width="648" style="display: block; margin: auto;" /></p>
 <p>As fertility rate increases primary school enrollment seems to be decreasing, highlighting an inverse relationship. The same can be inferred both by looking at the first scatterplot with the aggregates of all observations over time and the latter scatterplots, separating the time variable and showing the relationship at different points in time.</p>
 <p>This trend is most likely due to the fact that it is common for less developed countries to have large families with a great number of children - however, these poorer countries can often not send all of their children to school. On the other hand, in advanced countries, it is common to only have, on average, 2 children. The education system being more advanced and the families wealthier, these fewer children per family can, however, all attend primary school. This trend solidified over time. Nevertheless, with recent data from 2010 and 2016, it seems as also developing countries are more and more able to also provide primary education to their children as the data points do show a tendency to move to the upper part of the graph (higher primary school enrollment) over the years.</p>
 <p>To support this analysis, we would, as a next step, look at the data per region.</p>

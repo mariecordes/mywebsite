@@ -1,7 +1,8 @@
 ---
 title: "Brexit Voting Analysis"
 author: "Marie Cordes"
-date: "16.09.2020"
+date: "September 2020"
+image: pic02.jpg
 output:
   html_document:
     theme: flatly
@@ -321,7 +322,7 @@ We also find that our only character variable <code>Seat</code> has 632 unique v
   select(-Seat, -degree) %&gt;% 
   GGally::ggpairs(alpha = 0.2) +
       theme_minimal()</code></pre>
-<p><img src="/projects/project2/index_files/figure-html/ggpairs-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/brexitvoting/index_files/figure-html/ggpairs-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>In the following, we describe a few findings based on these plots - no definitive results!</p>
 <p>We find an extremely high positive correlation at 0.85 between <code>leave_share</code> and <code>ukip_2015</code> as well as another significant positive correlations between <code>born_in_uk</code> and <code>leave_share</code>.</p>
 <p>The first observation may show that the majority of UKIP voters was also pro-Brexit. The latter relationship will be further investigated later on.</p>
@@ -339,7 +340,7 @@ We also find that our only character variable <code>Seat</code> has 632 unique v
          x = &quot;Share of leave-votes&quot;,
          y = &quot;Count of constituencies&quot;) +
   NULL</code></pre>
-<p><img src="/projects/project2/index_files/figure-html/brexit_histogram-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/brexitvoting/index_files/figure-html/brexit_histogram-1.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>ggplot(brexit_results, aes(x = leave_share)) +
   geom_density() +
  labs(title = &quot;Density of &#39;leave-votes&#39; share&quot;,
@@ -347,7 +348,7 @@ We also find that our only character variable <code>Seat</code> has 632 unique v
          x = &quot;Share of leave-votes&quot;,
          y = &quot;Density over all constituencies&quot;) +
   NULL</code></pre>
-<p><img src="/projects/project2/index_files/figure-html/brexit_histogram-2.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/brexitvoting/index_files/figure-html/brexit_histogram-2.png" width="648" style="display: block; margin: auto;" /></p>
 </div>
 <div id="born-in-the-uk-vs.-leave-share" class="section level3">
 <h3>Born in the UK vs. Leave-share</h3>
@@ -369,7 +370,7 @@ We also find that our only character variable <code>Seat</code> has 632 unique v
        y = &quot;Share of leave-voters&quot;) +
    
   NULL</code></pre>
-<p><img src="/projects/project2/index_files/figure-html/brexit_immigration_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/brexitvoting/index_files/figure-html/brexit_immigration_plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>Looking at the above graph and the derived correlation of 0.49, a positive relationship between the share of UK-born voters and voters that voted to leave the EU becomes visible. This means that the higher the share of UK-born voters a constituency in the UK has, the more likely the constituency is to also have a higher share of pro-Brexit voters. On the other hand, the higher the share of voters that were born outside of the UK belong to/vote in a constitucency, the lower the share of voters in favour of staying in the EU.</p>
 <p>This result is not surprising when we look at the pro and con arguments for Brexit. Brexit means leaving the EU and, thereby, returning the UK to its traditional values, seperated from the EU’s values and regulations. It also means focusing on the UK first and the British being able to govern the country as they like - without major interferences or guidelines from the EU. This means a return to a more traditional and historic UK with less influence from the rest of the continent. Obviously, this is more ingrained into people that were born in the UK and are interested in keeping its culture and values alive. Voters that were not born in the UK may be more interested in well-established international relations as well as a country that is more adapted to the rest of the continent and supports globalized values.</p>
 <p>Next to the topic of values and traditions, as mentioned above: <em>“One common explanation for the Brexit outcome was fear of immigration and opposition to the EU’s more open border policy.”</em> Here, it becomes clear that non-UK-born voters are immigrants themselves and, therefore, most probably support more open-minded policies regarding immigrants as well as open border policies. These non-UK-born voters may be interested in the UK being on good terms with their own home country. Further, they may be interested to be able to easily and freely travel to their home countries and back as well as work in the UK. These arguments support the observation that the higher the share of non-UK-born voters live in a constituency, the lower the share of leave-voters.</p>
@@ -418,7 +419,7 @@ brexit_plot &lt;- brexit %&gt;%
 
 #otherwise just print as it is
 brexit_plot</code></pre>
-<p><img src="/projects/project2/index_files/figure-html/plot-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/projects/brexitvoting/index_files/figure-html/plot-1.png" width="648" style="display: block; margin: auto;" /></p>
 <p>In this final analysis we plot the respective share of voters for the Conservative Party, Labour Party, Liberal Democrats and UKIP per constituency in 2015 compared to the respective leave share in the Brexit referendum in 2016.</p>
 <p>We find that two positive relationships and two negative relationships. More precisely, we find a steep regression line between the UKIP share and leave-share and a slightly upward facing slope for the regression line between the Conservative Party share and the leave share. This would indicate that the higher the share of UKIP voters in a constituency, the higher the share of pro-Brexit voters.</p>
 <p>Despite the regression line being slightly positive, the scatterplot of the Conservative party does not allow for a clear interpretation. This is also true for the Labour Party, despite this regression line being slightly downward sloped.</p>
