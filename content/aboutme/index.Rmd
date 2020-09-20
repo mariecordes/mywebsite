@@ -1,7 +1,8 @@
 ---
 title: 'About Me'
 author: "Marie Cordes"
-date: "22/08/2020"
+date: "August 2020"
+image: pic01.jpg
 output:
   html_document:
     highlight: zenburn
@@ -20,7 +21,7 @@ library(here)
 ```
 
 
-# **Marie Cordes** - A short biography
+# Mini biography
 
 ## Intro
 
@@ -28,7 +29,7 @@ My name is Marie Cordes and I was born on December 6th, 1996 in Bremen, Germany.
 
 I am an open-minded, curious and enthusiastic person. I love to smile and I
 love to make others smile, too. Always up for a new adventure, I love going 
-new places and trying new things. Athough I can be very stubborn, I am a loving
+new places and trying new things. Although I can be very stubborn, I am a loving
 person that puts _all_ of her emotions into the people and things she loves. 
 
 I am a food lover and world traveler. If I'm home, I love to cook and bake
@@ -49,12 +50,12 @@ I was born in Germany and spent all my life there with my family until I was 18.
 
 This is my home town **Bremen**:
 
-![Bremen](https://a.cdn-hotels.com/gdcs/production129/d1584/99bef550-7f75-11e8-9bad-0242ac110002.jpg)
+![Bremen city centre](https://a.cdn-hotels.com/gdcs/production129/d1584/99bef550-7f75-11e8-9bad-0242ac110002.jpg)
 
 
 After graduating from high school, I was ready to explore the world and wanted 
 to see something new. I moved to the UK and lived in **Bedford** as an au-pair 
-for a year. A year later, I moved to a small village in Germany called 
+for a year. One year later, I moved to a small village in Germany called 
 **Vallendar** to start my bachelor's degree at WHU - Otto Beisheim School of 
 Management. I had an incredible 3 years at WHU, meeting great people, making 
 good friends, learning a whole lot more about the world (_learning a whole lot 
@@ -64,10 +65,10 @@ As part of my studies, I spent my first summer internship in **Hong Kong**,
 working at a music-tech start-up. I loved living in Hong Kong, getting to 
 know the city, its people and its culture.
 
-My favourite dishes I got to know there are:
+My favourite dishes that I got to know there are:
 
 - BBQ Pork Buns
-- Xiao Long Bao (Soup dumplings)
+- Xiao Long Bao (soup dumplings)
 - Vietnamese Rice Vermicelli
 
 _(If this makes you hungry, try [this](https://thewoksoflife.com/steamed-bbq-pork-buns-char-siu-bao/))_
@@ -76,7 +77,7 @@ After spending some time back at uni and doing another internship in
 **Frankfurt**, I spent a semester abroad at Tulane University in **New Orleans** 
 in the US. I had a great time there, exploring the American South and its unique culture. If you have not been there - go see yourself. There is no place like NOLA! 
 
-![NOLA](https://images.canusa.de/img/regionen/usa/suedstaaten/louisiana/new-orleans/no-content-pg-french-quarter-cathedral.cr3500x2328-0x0.1280x0.q50.jpg)
+![New Orleans city centre](https://images.canusa.de/img/regionen/usa/suedstaaten/louisiana/new-orleans/no-content-pg-french-quarter-cathedral.cr3500x2328-0x0.1280x0.q50.jpg)
 
 _Don't forget to try the **beignets**!_
 
@@ -85,6 +86,10 @@ as a _gap year_. I did several internships in **Berlin** and **Hamburg** and
 traveled through Portugal and Italy (_since I wasn't able go to Asia as originally
 planned... - hopefully another time!_)
 
+## Next steps
+
 Now I am ready for a new adventure and am looking forward to starting my new 
 chapter at LBS in **London**.
+
+![London Business School campus](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/LBS_campus_2.jpg/1280px-LBS_campus_2.jpg)
 
