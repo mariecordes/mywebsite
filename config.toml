@@ -110,7 +110,7 @@ disqusShortname = ""
       title = "CV"
       subtitle = "Learn more about my career path"
       image = "pic04.jpg"
-      url = "blogs/cv"
+      url = "docs/MC_CV_092020.pdf"
 
     [[params.tiles.showcase]]
       title = "Brexit Voting Analysis"
