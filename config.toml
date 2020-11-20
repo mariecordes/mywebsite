@@ -117,15 +117,15 @@ disqusShortname = ""
       url = "docs/Marie_Cordes_CV_Nov2020.pdf"
 
 [[params.tiles.showcase]]
-      title = "Cluster Analysis Report - BBC iPlayer"
-      subtitle = "Read the report on my cluster analysis of the BBC iPlayer's customer segments (Please find the code to the right)"
-      image = "pic08.jpg"
+      title = "BBC iPlayer - Cluster Analysis Report"
+      subtitle = "Read the report on my cluster analysis of the BBC iPlayer's customer segments\n(Please find the code to the right)"
+      image = "pic07.jpg"
       url = "docs/bbciplayer_clusteranalysis.pdf"
 
 [[params.tiles.showcase]]
       title = "Cluster Analysis - BBC iPlayer"
       subtitle = "Learn more about my cluster analysis of the BBC iPlayer's customer segments using data mining techniques (Tools: k-means, k-medoid, hierarchical clustering, elobow analysis, silhouette analysis, PCA, dendograms)"
-      image = "pic07.jpg"
+      image = "pic08.jpg"
       url = "projects/bbciplayer"
       
 [[params.tiles.showcase]]
