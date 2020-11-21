@@ -124,7 +124,7 @@ disqusShortname = ""
 
 [[params.tiles.showcase]]
       title = "BBC iPlayer - Cluster Analysis"
-      subtitle = "Learn more about my cluster analysis of the BBC iPlayer's customer segments using data mining techniques (Tools: k-means, k-medoid, hierarchical clustering, elobow analysis, silhouette analysis, PCA, dendograms)"
+      subtitle = "Learn more about my cluster analysis of the BBC iPlayer's customer segments using data mining techniques (Tools: k-means, k-medoid, hierarchical clustering, elbow analysis, silhouette analysis, PCA, dendograms)"
       image = "pic08.jpg"
       url = "projects/bbciplayer"
       
