@@ -1,0 +1,1834 @@
+---
+title: "Classification with Logistic Regression for the Lending Club"
+author: "Marie Cordes"
+date: "October 2020"
+image: pic09.jpg
+output:
+  html_document:
+    theme: cerulean
+    highlight: zenburn
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Welcome to the second Lending Club data analysis. Now, we will take the perspective of an investor to the lending club. Our goal is to select a subset of the most promising loans to invest. We will do so using the method of logistic regression. Feel free to consult the R markdown file of session 4.</p>
+<div id="load-the-data" class="section level2">
+<h2>Load the data</h2>
+<p>First we need to start by loading the data.</p>
+<pre class="r"><code>lc_raw &lt;- read_csv(here::here(&quot;data&quot;, &quot;LendingClub Data.csv&quot;),  skip=1) %&gt;%  #since the first row is a title we want to skip it. 
+  clean_names() # use janitor::clean_names()</code></pre>
+</div>
+</div>
+<div id="ice-the-data-inspect-clean-explore" class="section level1">
+<h1>ICE the data: Inspect, Clean, Explore</h1>
+<p>Any data science engagement starts with ICE. Inspecting, Clean and Explore the data.</p>
+<div id="inspect-the-data" class="section level2">
+<h2>Inspect the data</h2>
+<p>We inspect the data to understand what different variables mean.</p>
+<pre class="r"><code>glimpse(lc_raw)</code></pre>
+<pre><code>## Rows: 42,538
+## Columns: 80
+## $ int_rate            &lt;dbl&gt; 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0…
+## $ loan_amnt           &lt;dbl&gt; 8000, 6000, 6500, 8000, 5500, 6000, 10200, 15000,…
+## $ term_months         &lt;dbl&gt; 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 3…
+## $ installment         &lt;dbl&gt; 241.28, 180.96, 196.04, 241.28, 165.88, 180.96, 3…
+## $ dti                 &lt;dbl&gt; 2.11, 5.73, 17.68, 22.71, 5.75, 21.92, 18.62, 9.7…
+## $ delinq_2yrs         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+## $ annual_inc          &lt;dbl&gt; 50000, 52800, 35352, 79200, 240000, 89000, 110000…
+## $ grade               &lt;chr&gt; &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;, &quot;A&quot;,…
+## $ emp_title           &lt;chr&gt; NA, &quot;coral graphics&quot;, NA, &quot;Honeywell&quot;, &quot;O T Plus,…
+## $ emp_length          &lt;chr&gt; &quot;5 years&quot;, &quot;&lt; 1 year&quot;, &quot;n/a&quot;, &quot;n/a&quot;, &quot;10+ years&quot;,…
+## $ home_ownership      &lt;chr&gt; &quot;MORTGAGE&quot;, &quot;MORTGAGE&quot;, &quot;MORTGAGE&quot;, &quot;MORTGAGE&quot;, &quot;…
+## $ verification_status &lt;chr&gt; &quot;Verified&quot;, &quot;Source Verified&quot;, &quot;Not Verified&quot;, &quot;V…
+## $ issue_d             &lt;chr&gt; &quot;9/1/2011&quot;, &quot;9/1/2011&quot;, &quot;9/1/2011&quot;, &quot;9/1/2011&quot;, &quot;…
+## $ zip_code            &lt;chr&gt; &quot;977xx&quot;, &quot;228xx&quot;, &quot;864xx&quot;, &quot;322xx&quot;, &quot;278xx&quot;, &quot;760…
+## $ addr_state          &lt;chr&gt; &quot;OR&quot;, &quot;VA&quot;, &quot;AZ&quot;, &quot;FL&quot;, &quot;NC&quot;, &quot;TX&quot;, &quot;CT&quot;, &quot;WA&quot;, &quot;…
+## $ loan_status         &lt;chr&gt; &quot;Fully Paid&quot;, &quot;Charged Off&quot;, &quot;Fully Paid&quot;, &quot;Fully…
+## $ desc                &lt;chr&gt; &quot;Borrower added on 09/08/11 &gt; Consolidating debt …
+## $ purpose             &lt;chr&gt; &quot;debt_consolidation&quot;, &quot;vacation&quot;, &quot;credit_card&quot;, …
+## $ title               &lt;chr&gt; &quot;Credit Card Payoff $8K&quot;, &quot;bad choice&quot;, &quot;Credit C…
+## $ x20                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x21                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x22                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x23                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x24                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x25                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x26                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x27                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x28                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x29                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x30                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x31                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x32                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x33                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x34                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x35                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x36                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x37                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x38                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x39                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x40                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x41                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x42                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x43                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x44                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x45                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x46                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x47                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x48                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x49                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x50                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x51                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x52                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x53                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x54                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x55                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x56                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x57                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x58                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x59                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x60                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x61                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x62                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x63                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x64                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x65                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x66                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x67                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x68                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x69                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x70                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x71                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x72                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x73                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x74                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x75                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x76                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x77                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x78                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x79                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ x80                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</code></pre>
+<pre class="r"><code>skim(lc_raw)</code></pre>
+<table>
+<caption><span id="tab:Inspect">Table 1: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">lc_raw</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">42538</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">80</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">12</td>
+</tr>
+<tr class="odd">
+<td align="left">logical</td>
+<td align="left">61</td>
+</tr>
+<tr class="even">
+<td align="left">numeric</td>
+<td align="left">7</td>
+</tr>
+<tr class="odd">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">grade</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">7</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">emp_title</td>
+<td align="right">7008</td>
+<td align="right">0.84</td>
+<td align="right">2</td>
+<td align="right">78</td>
+<td align="right">0</td>
+<td align="right">27368</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">emp_length</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">3</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">12</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">home_ownership</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">3</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">verification_status</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">8</td>
+<td align="right">15</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">issue_d</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">8</td>
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">55</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">zip_code</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">696</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">addr_state</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">30</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">loan_status</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">10</td>
+<td align="right">11</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">desc</td>
+<td align="right">17233</td>
+<td align="right">0.59</td>
+<td align="right">1</td>
+<td align="right">3987</td>
+<td align="right">0</td>
+<td align="right">25263</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">purpose</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">3</td>
+<td align="right">18</td>
+<td align="right">0</td>
+<td align="right">14</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">title</td>
+<td align="right">4679</td>
+<td align="right">0.89</td>
+<td align="right">1</td>
+<td align="right">81</td>
+<td align="right">0</td>
+<td align="right">18502</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: logical</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="left">count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">x20</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x21</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x22</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x23</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x24</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x25</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x26</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x27</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x28</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x29</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x30</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x31</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x32</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x33</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x34</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x35</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x36</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x37</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x38</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x39</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x40</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x41</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x42</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x43</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x44</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x45</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x46</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x47</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x48</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x49</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x50</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x51</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x52</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x53</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x54</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x55</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x56</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x57</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x58</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x59</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x60</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x61</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x62</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x63</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x64</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x65</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x66</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x67</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x68</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x69</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x70</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x71</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x72</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x73</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x74</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x75</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x76</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x77</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="odd">
+<td align="left">x78</td>
+<td align="right">42538</td>
+<td align="right">0.00</td>
+<td align="right">NaN</td>
+<td align="left">:</td>
+</tr>
+<tr class="even">
+<td align="left">x79</td>
+<td align="right">39878</td>
+<td align="right">0.06</td>
+<td align="right">0</td>
+<td align="left">FAL: 2660</td>
+</tr>
+<tr class="odd">
+<td align="left">x80</td>
+<td align="right">39820</td>
+<td align="right">0.06</td>
+<td align="right">0</td>
+<td align="left">FAL: 2718</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="9%" />
+<col width="12%" />
+<col width="8%" />
+<col width="8%" />
+<col width="7%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="10%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">int_rate</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">0.12</td>
+<td align="right">0.04</td>
+<td align="right">0.05</td>
+<td align="right">0.09</td>
+<td align="right">0.12</td>
+<td align="right">0.15</td>
+<td align="right">0.25</td>
+<td align="left">▅▇▅▂▁</td>
+</tr>
+<tr class="even">
+<td align="left">loan_amnt</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">11252.88</td>
+<td align="right">7463.78</td>
+<td align="right">500.00</td>
+<td align="right">5500.00</td>
+<td align="right">10000.00</td>
+<td align="right">15000.00</td>
+<td align="right">35000.00</td>
+<td align="left">▇▇▃▂▁</td>
+</tr>
+<tr class="odd">
+<td align="left">term_months</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">42.46</td>
+<td align="right">10.65</td>
+<td align="right">36.00</td>
+<td align="right">36.00</td>
+<td align="right">36.00</td>
+<td align="right">60.00</td>
+<td align="right">60.00</td>
+<td align="left">▇▁▁▁▃</td>
+</tr>
+<tr class="even">
+<td align="left">installment</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">332.58</td>
+<td align="right">214.29</td>
+<td align="right">15.68</td>
+<td align="right">168.59</td>
+<td align="right">288.33</td>
+<td align="right">449.05</td>
+<td align="right">1305.19</td>
+<td align="left">▇▆▂▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">dti</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">13.28</td>
+<td align="right">6.69</td>
+<td align="right">0.00</td>
+<td align="right">8.14</td>
+<td align="right">13.36</td>
+<td align="right">18.58</td>
+<td align="right">29.99</td>
+<td align="left">▅▇▇▆▁</td>
+</tr>
+<tr class="even">
+<td align="left">delinq_2yrs</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">0.15</td>
+<td align="right">0.49</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">11.00</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">annual_inc</td>
+<td align="right">4669</td>
+<td align="right">0.89</td>
+<td align="right">69147.86</td>
+<td align="right">61667.03</td>
+<td align="right">4000.00</td>
+<td align="right">40800.00</td>
+<td align="right">59534.00</td>
+<td align="right">82800.00</td>
+<td align="right">6000000.00</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="clean-the-data" class="section level2">
+<h2>Clean the data</h2>
+<p>Are there any redundant columns and rows? Are all the variables in the correct format (e.g., numeric, factor, date)? Lets fix it.</p>
+<p>The variable “loan_status” contains information as to whether the loan has been repaid or charged off (i.e., defaulted). Let’s create a binary factor variable for this. This variable will be the focus of this workshop.</p>
+<pre class="r"><code>lc_clean&lt;- lc_raw %&gt;%
+  dplyr::select(-x20:-x80) %&gt;% #delete empty columns
+  filter(!is.na(int_rate)) %&gt;%   #delete empty rows
+  mutate(
+    issue_d = mdy(issue_d),  # lubridate::mdy() to fix date format
+    term = factor(term_months),     # turn &#39;term&#39; into a categorical variable
+    delinq_2yrs = factor(delinq_2yrs) # turn &#39;delinq_2yrs&#39; into a categorical variable
+  ) %&gt;% 
+  mutate(default = dplyr::recode(loan_status, 
+                      &quot;Charged Off&quot; = &quot;1&quot;, 
+                      &quot;Fully Paid&quot; = &quot;0&quot;))%&gt;%
+    mutate(default = as.factor(default)) %&gt;%
+  dplyr::select(-emp_title,-installment, -term_months, everything()) #move some not-so-important variables to the end. </code></pre>
+</div>
+<div id="explore-the-data" class="section level2">
+<h2>Explore the data</h2>
+<p>Let’s explore loan defaults by creating different visualizations. We start with examining how prevalent defaults are, whether the default rate changes by loan grade or number of delinquencies, and a couple of scatter plots of defaults against loan amount and income.</p>
+<pre class="r"><code>#bar chart of defaults
+def_vis1&lt;-ggplot(data=lc_clean, aes(x=default)) +geom_bar(aes(y = (..count..)/sum(..count..))) + labs(x=&quot;Default, 1=Yes, 0=No&quot;, y=&quot;relative frequencies&quot;) +scale_y_continuous(labels=scales::percent) +geom_text(aes( label = scales::percent((..count..)/sum(..count..) ),y=(..count..)/sum(..count..) ), stat= &quot;count&quot;,vjust=-0.5) 
+def_vis1</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/visualization%20of%20defaults-1.png" width="672" /></p>
+<pre class="r"><code>#bar chart of defaults per loan grade
+def_vis2&lt;-ggplot(data=lc_clean, aes(x=default), group=grade) +geom_bar(aes(y = (..count..)/sum(..count..), fill = factor(..x..)), stat=&quot;count&quot;)  + labs(title=&quot;Defaults by Grade&quot;, x=&quot;Default, 1=Yes, 0=No&quot;, y=&quot;relative frequencies&quot;) +scale_y_continuous(labels=scales::percent) +facet_grid(~grade) + theme(legend.position = &quot;none&quot;) +geom_text(aes( label = scales::percent((..count..)/sum(..count..) ),y=(..count..)/sum(..count..) ), stat= &quot;count&quot;,vjust=-0.5) 
+def_vis2</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/visualization%20of%20defaults-2.png" width="672" /></p>
+<pre class="r"><code>#bar chart of defaults per number of Delinquencies
+def_vis3&lt;-lc_clean %&gt;%
+  filter(as.numeric(delinq_2yrs)&lt;4) %&gt;%
+  ggplot(aes(x=default), group=delinq_2yrs) +geom_bar(aes(y = (..count..)/sum(..count..), fill = factor(..x..)), stat=&quot;count&quot;)  + labs(title=&quot;Defaults by Number of Delinquencies&quot;, x=&quot;Default, 1=Yes, 0=No&quot;, y=&quot;relative frequencies&quot;)  +scale_y_continuous(labels=scales::percent) +facet_grid(~delinq_2yrs) + theme(legend.position = &quot;none&quot;) +geom_text(aes( label = scales::percent((..count..)/sum(..count..) ),y=(..count..)/sum(..count..) ), stat= &quot;count&quot;,vjust=-0.5)
+
+def_vis3</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/visualization%20of%20defaults-3.png" width="672" /></p>
+<pre class="r"><code>#scatter plots 
+
+#We select 2000 random loans to display only to make the display less busy. 
+set.seed(1234)
+reduced&lt;-lc_clean[sample(0:nrow(lc_clean), 2000, replace = FALSE),]%&gt;%
+  mutate(default=as.numeric(default)-1) # also convert default to a numeric {0,1} to make it easier to plot.
+
+          
+# scatter plot of defaults against loan amount                         
+def_vis4&lt;-ggplot(data=reduced, aes(y=default,x=I(loan_amnt/1000)))  + labs(y=&quot;Default, 1=Yes, 0=No&quot;, x=&quot;Loan Amnt (1000 $)&quot;) +geom_jitter(width=0, height=0.05, alpha=0.7) #We use jitter to offset the display of defaults/non-defaults to make the data easier to interpert. We have also changed the amount to 1000$ to reduce the number of zeros on the horizontal axis.
+
+def_vis4</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/visualization%20of%20defaults-4.png" width="672" /></p>
+<pre class="r"><code>#scatter plot of defaults against loan amount.
+def_vis5&lt;-ggplot(data=reduced, aes(y=default,x=I(annual_inc/1000)))   + labs(y=&quot;Default, 1=Yes, 0=No&quot;, x=&quot;Annual Income(1000 $)&quot;) +geom_jitter(width=0, height=0.05, alpha=0.7) +  xlim(0,400)
+
+def_vis5</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/visualization%20of%20defaults-5.png" width="672" /></p>
+<p>We can also estimate a correlation table between defaults and other continuous variables.</p>
+<pre class="r"><code># correlation table using GGally::ggcor()
+# this takes a while to plot
+
+lc_clean %&gt;% 
+    mutate(default=as.numeric(default)-1) %&gt;%
+  select(loan_amnt, dti, annual_inc, int_rate, default) %&gt;% #keep Y variable last
+ ggcorr(method = c(&quot;pairwise&quot;, &quot;pearson&quot;), label_round=2, label = TRUE)</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/correlation%20table-1.png" width="672" /></p>
+<pre class="r"><code>#bar chart of defaults per number of term months
+def_vis6&lt;-lc_clean %&gt;%
+  ggplot(aes(x=default), group=term) +
+  geom_bar(aes(y = (..count..)/sum(..count..), fill = factor(..x..)), stat=&quot;count&quot;)  + 
+  labs(title=&quot;Defaults by Loan Term Months&quot;, 
+       x=&quot;Default, 1=Yes, 0=No&quot;, 
+       y=&quot;relative frequencies&quot;)  +
+  scale_y_continuous(labels=scales::percent,limits=c(0,0.7)) +
+  facet_grid(~term) + 
+  theme(legend.position = &quot;none&quot;) +
+  geom_text(aes( label = scales::percent((..count..)/sum(..count..) ),y=(..count..)/sum(..count..) ), 
+            stat= &quot;count&quot;,vjust=-0.5)
+
+def_vis6</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>Comment: The graph above shows the relative frequencies of defaulted and not-defaulted loans compared by a loan term of 36 months vs. 60 months. We can see that there are more 36-months loans overall but, comparing default vs. no default per individual term length, we find that the share of loans that do not default compared to the share of loans that do default is greater for a loan term of 36 months than a loan of 60 months. Alternatively, a relatively greater share of 60-months loans defaults compared to a smaller proportion of 36 months that defaults.</p>
+</div>
+</div>
+<div id="linear-vs.-logistic-regression-for-binary-response-variables" class="section level1">
+<h1>Linear vs. logistic regression for binary response variables</h1>
+<p>It is certainly possible to use the OLS approach to find the line that minimizes the sum of square errors when the dependent variable is binary (i.e., default no default). In this case, the predicted values take the interpretation of a probability. We can also estimate a logistic regression instead. We do both below.</p>
+<pre class="r"><code>model_lm&lt;-lm(as.numeric(default)~I(annual_inc/1000), lc_clean)
+summary(model_lm)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = as.numeric(default) ~ I(annual_inc/1000), data = lc_clean)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.1595 -0.1494 -0.1444 -0.1332  1.3268 
+## 
+## Coefficients:
+##                      Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         1.161e+00  2.703e-03 429.312   &lt;2e-16 ***
+## I(annual_inc/1000) -2.479e-04  2.918e-05  -8.496   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3501 on 37867 degrees of freedom
+## Multiple R-squared:  0.001903,   Adjusted R-squared:  0.001876 
+## F-statistic: 72.19 on 1 and 37867 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>logistic1&lt;-glm(default~I(annual_inc/1000), family=&quot;binomial&quot;, lc_clean)
+summary(logistic1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = default ~ I(annual_inc/1000), family = &quot;binomial&quot;, 
+##     data = lc_clean)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.6246  -0.5786  -0.5572  -0.5115   3.6388  
+## 
+## Coefficients:
+##                      Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)        -1.5191545  0.0292430  -51.95   &lt;2e-16 ***
+## I(annual_inc/1000) -0.0040801  0.0003998  -10.21   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 31130  on 37868  degrees of freedom
+## Residual deviance: 31005  on 37867  degrees of freedom
+## AIC: 31009
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>ggplot(data=reduced, aes(x=I(annual_inc/1000), y=default)) + geom_smooth(method=&quot;lm&quot;, se=0, aes(color=&quot;OLS&quot;))+ geom_smooth(method = &quot;glm&quot;, method.args = list(family = &quot;binomial&quot;),  se=0, aes(color=&quot;Logistic&quot;))+ labs(y=&quot;Prob of Default&quot;, x=&quot;Annual Income(1000 $)&quot;)+  xlim(0,450)+scale_y_continuous(labels=scales::percent)+geom_jitter(width=0, height=0.05, alpha=0.7) + scale_colour_manual(name=&quot;Fitted Model&quot;, values=c(&quot;blue&quot;, &quot;red&quot;))</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;
+## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/linear%20and%20logisitc%20regression%20with%20binary%20response%20variable-1.png" width="672" /></p>
+<blockquote>
+<p>Which model is more suitable for predicting probability of default, the linear regression or the logistic? Why?</p>
+</blockquote>
+<p>As the measure of fit for the linear regression is the R-squared (here 0.001903) but the measure of fit for the logistic regression is the Deviance (here 31005), we cannot compare these models along the lines of their measures of fit.</p>
+<p>However, as the goal is to predict a probability of default, the logistic regression is more suitable for prediction regardless of the measure of fit. As we are predicting the probability of the binary variable <code>default</code>, we are predicting if <code>default</code> is 1 or 0. However, the OLS method does not take into account that, therefore, the only reasonable output is that the probability of a loan defaulting (default = 1) is (between) 0% and 100%. As can be seen in the graph above, the linear regression also predicts probabilities that are less than 0. Hence, the linear regression goes over the boundaries that are applicable for this prediction and we conclude that the logistic regression is more suitable here, as it limits the output probabilities at 0 and 1. This can be seen in the graph as the logistic model regression line does not go below 0 whereas the OLS regression line already does. According to the OLS regression, the loans of people with an annual income of more than approx $350,000 would have a negative probability of default - which is clearly not feasible in real life. The logistic model is limited at 0 and all probabilities of loan defaults for people with an annual income greater than $350k approach 0% but never become negative. Hence, the logistic regression is more suitable for predicting probability of default.</p>
+</div>
+<div id="multivariate-logistic-regression" class="section level1">
+<h1>Multivariate logistic regression</h1>
+<p>We can estimate logistic regression with multiple explanatory variables as well. Let’s use annual_inc, term, grade, and loan amount as features. Let’s call this model logistic 2.</p>
+<pre class="r"><code>logistic2 &lt;- glm(default ~ annual_inc + term + grade + loan_amnt, family = &quot;binomial&quot;, lc_clean)
+summary(logistic2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = default ~ annual_inc + term + grade + loan_amnt, 
+##     family = &quot;binomial&quot;, data = lc_clean)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.0635  -0.6079  -0.4815  -0.3455   4.0988  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -2.432e+00  5.056e-02 -48.093   &lt;2e-16 ***
+## annual_inc  -6.019e-06  4.727e-07 -12.733   &lt;2e-16 ***
+## term60       4.790e-01  3.561e-02  13.451   &lt;2e-16 ***
+## gradeB       6.599e-01  5.270e-02  12.521   &lt;2e-16 ***
+## gradeC       1.031e+00  5.392e-02  19.128   &lt;2e-16 ***
+## gradeD       1.288e+00  5.703e-02  22.578   &lt;2e-16 ***
+## gradeE       1.415e+00  6.662e-02  21.241   &lt;2e-16 ***
+## gradeF       1.666e+00  8.630e-02  19.302   &lt;2e-16 ***
+## gradeG       1.769e+00  1.340e-01  13.198   &lt;2e-16 ***
+## loan_amnt    2.841e-06  2.347e-06   1.211    0.226    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 31130  on 37868  degrees of freedom
+## Residual deviance: 29286  on 37859  degrees of freedom
+## AIC: 29306
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>#compare the fit of logistic 1 and logistic 2
+anova(logistic1,logistic2)</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:multivariate logistic regression">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Resid. Df</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Resid. Dev</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Df</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Deviance</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">3.79e+04</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">3.1e+04&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;"></td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">3.79e+04</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.93e+04</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">8</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">1.72e+03</td></tr>
+</table>
+
+<blockquote>
+<p>Based on logistic 2, we explain the following:
+a. Estimated Coefficients
+b. Standard error of coefficient
+c. p-value of coefficient
+d. Deviance
+e. AIC
+f. Null Deviance
+g. Is Logistic 2 a better model than logistic 1? Why or why not?</p>
+</blockquote>
+<ol style="list-style-type: lower-alpha">
+<li><p>The estimated coefficients must be transformed to probabilities with the following formula: <code>P=exp(x)/(1+exp(x))</code>. This will generate a probability per estimated coefficient. This probability describes the additional probability of increasing the respective coefficient’s unit by 1 that will be added to the predicted probability of the loan defaulting. For example, the <code>term60</code> estimated coefficient is 4.790e-01; its probability is hence P = exp(0.479)/(1+exp(0.479)) = 0.6175117. This means that, compared to a 36-months loan, a 60-months loan has a 0.62 higher probability of default.</p></li>
+<li><p>The Standard Error of each coefficient is an estimate of the standard deviation of the respective estimated coefficient; meaning, the amount the respective coefficient varies across cases. It measures the precision with which the respective coefficient is measured. For example, with a Std Error of 4.727e-07, <code>annual_inc</code> has the lowest estimated standard deviation of all coefficient estimates.</p></li>
+<li><p>The p-value of each estimated coefficient determines the probability of extreme results as it tests the null hypothesis that the respective variable has no correlation with the dependent variable, namely here, that the respective variable has no correlation with a loan’s default. A variable is seen as statistically significant for a p-value below 5% (0.05). In the logistic2 model, we find that all variables except for <code>loan_amnt</code> are statistically significant (p-value &lt; 0.05). As the p-value of <code>loan_amnt</code> is 0.226 &gt;&gt; 0.05, this coefficient is regarded as not significant in our logistic2 model.</p></li>
+<li><p>We assess the in-sample goodness of fit of logistic regression with the Deviance (compared to the R-squared in linear regression). The lower the deviance, the better. R calculates: <code>Deviance = -2log(L)</code> where <code>L</code> is the maximum likelihood. Hence, the deviance is the difference of the likelihoods between the fitted model and a perfect model (=saturated model). The likelihood of the saturated/perfect model is exactly one, hence, the deviance is always larger than or equal to 0; being 0 if the fit is perfect. As part of the model <code>summary()</code>, R reports the deviance of the estimated model with all the specified features as well as the <strong>Null Deviance</strong> of the model with only the intercept as a comparison (assuming no explanatory variables). Here, the Null Deviance is 31130 while the Residual Deviance of our logistic2 model is lower at 29286. This means that logistic2 model with annual_inc, term, grade, and loan amount as predictors improves fit over the null model which does not have any predictors.</p></li>
+<li><p>The AIC (Akaike Information Criterion) is similar to the Deviance as it assesses a model’s goodness of fit but it penalizes for the number of coefficients used in the model. In logistic regression, the AIC is to the Deviance what the adjusted R-squared is to the R-squared in linear regression. Its formula is: <code>AIC = -2log(L) + 2k</code> where <code>k</code> is the number of estimated coefficients. It is useful to compare different models with different numbers of features estimated on the same dataset. The Deviance of logistic 2 is 29286 and the AIC is relatively similar at 29306; considering that we use 4 features in our model, the AIC is more meaningful to assess the models goodness-of-fit.</p></li>
+<li><p>Th Null Deviance is used as a benchmark to evaluate the magnitude of the Residual Deviance. It is the deviance of the worst model (a model fitted without any predictors) compared to the perfect/saturated model. The Null Deviance helps to understand how much a model improves by adding predictors. Here, the Null Deviance is 31130 and the Residual Deviance is 29286, indicating that adding our explanatory variables as part of logistic2 improves (reduces) the deviance of the model compared to the Null Deviance significantly.</p></li>
+<li><p>logistic1 has a deviance of 31005 and logistic 2 has a deviance of 29286 as well as an AIC of 29306. Since when comparing different models with a different number of features, we consider their Deviance, we conclude that logistic2 is better than logistic1 because its Deviance is lower than that of logistic1.</p></li>
+</ol>
+<blockquote>
+<p>We calculate the predicted probabilities associated with logistic 2 and plot them as a density chart. We also plot the density of the predictions for those loans that did default, and for the loans that did not.</p>
+</blockquote>
+<pre class="r"><code>#Predict the probability of default
+prob_default2&lt;-predict(logistic2,lc_clean, type=&quot;response&quot;)
+
+#plot 1: Density of predictions
+ggplot(lc_clean, aes(x=prob_default2))+  
+  geom_density(size =0.75)+
+  labs(title = &quot;Predicted Probability with logistic2&quot;,
+       x = &quot;Estimated Probability&quot;,
+       y = &quot;Density&quot;)+
+  NULL</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>#plot 2: Density of predictions by default
+ggplot(lc_clean, aes(x=prob_default2, colour = default))+  
+  geom_density(size =0.75)+
+  labs(title = &quot;Predicted Probability by default with logistic2&quot;,
+       x = &quot;Estimated Probability&quot;,
+       y = &quot;Density&quot;,
+       colour = &quot;Default: \nNo = 0,\nYes = 1&quot;)+
+  NULL</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<p>In the first plot, we see that the odds are the highest for a predicted default probability of approx. 0.06. We can also see that an estimated probability of approx. 0.125 (second peak) is approx. 6.2/8.1 = ~77% less likely.</p>
+<p>Looking at the predicted probabilities by default (second graph) gives a better understanding of the differences between the defaulted and the non-defaulted loans as we see that the density curves do not follow the same trend and have different peaks, meaning different odds for different estimated probabilities of occurrence. While the peak of the non-defaulted loans density curve is at an estimated probability of approx. 0.06, the peak of the defaulted loans density curve is at approx. 0.175.</p>
+<p>Since the two density plots overlap, we know that there will be a sharp trade-off between sensitivity and specificity of the outcomes. This means that it is difficult (up to impossible) to avoid situations in which we make many mistakes (either predicting a loan to default when it actually does not default or predicting a loan to not default when it actually does default). Had the two density curves not/hardly overlapped, we would’ve been more likely to make fewer mistakes while, at the same time, it would have been easier for us to determine a cut-off threshold (see next exercise).</p>
+<div id="from-probability-to-classification" class="section level2">
+<h2>From probability to classification</h2>
+<p>The logistic regression model gives us a sense of how likely defaults are; it gives us a probability estimate. To convert this into a prediction, we need to choose a cutoff probability and classify every loan with a predicted probability of default above the cutoff as a prediction of default (and vice versa for loans with a predicted probability below this cutoff).</p>
+<p>Let’s choose a threshold of 20%. Of course some of our predictions will turn out to be right but some will turn out to be wrong – we can see this in the density figures of the previous section. Let’s call “default” the “positive” class since this is the class we are trying to predict. We could be making two types of mistakes. False positives (i.e., predict that a loan will default when it will not) and false negatives (I.e., predict that a loan will not default when it does). These errors are summarized in the confusion matrix.</p>
+<blockquote>
+<p>We Produce the confusion matrix for the model logistic 2 for a cutoff of 18%</p>
+</blockquote>
+<pre class="r"><code>#using the logistic 2 model predict default probabilities
+#already defined in code chunk above
+
+#prob_default2&lt;-predict(logistic2,lc_clean, type=&quot;response&quot;)
+  
+#Call any loan with probability more than 18% as default and any loan with lower probability as non-default. Making sure our prediction is a factor with the same levels as the default variable in the lc_clean data frame
+
+#if probability is greater than cutoff 18%, then output is 1, otherwise output is 0
+one_or_zero &lt;- ifelse(prob_default2 &gt; 0.18,&quot;1&quot;,&quot;0&quot;)
+
+#class prediction (vector of predictions of default (1) vs. non-default (0))
+p_class &lt;- factor(one_or_zero, levels = levels(lc_clean$default))
+  
+#produce the confusion matrix and set default as the positive outcome (i.e. consider outcome default as positive)
+conmat &lt;- confusionMatrix(p_class, lc_clean$default, positive = &quot;1&quot;)
+
+#print the confusion matrix
+conmat</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction     0     1
+##          0 24674  2818
+##          1  7766  2611
+##                                         
+##                Accuracy : 0.7205        
+##                  95% CI : (0.716, 0.725)
+##     No Information Rate : 0.8566        
+##     P-Value [Acc &gt; NIR] : 1             
+##                                         
+##                   Kappa : 0.1751        
+##                                         
+##  Mcnemar&#39;s Test P-Value : &lt;2e-16        
+##                                         
+##             Sensitivity : 0.48094       
+##             Specificity : 0.76060       
+##          Pos Pred Value : 0.25161       
+##          Neg Pred Value : 0.89750       
+##              Prevalence : 0.14336       
+##          Detection Rate : 0.06895       
+##    Detection Prevalence : 0.27402       
+##       Balanced Accuracy : 0.62077       
+##                                         
+##        &#39;Positive&#39; Class : 1             
+## </code></pre>
+<blockquote>
+<p>Using the confusion matrix, we explain the following and show how they are calculated
+a. Accuracy
+b. Sensitivity
+c. Specificity
+For each of this, we explain what they mean in the context of the lending club and the goal of predicting loan defaults.</p>
+</blockquote>
+<p>Answer:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Accuracy = 0.7205. This is the probability that a prediction will be correct (given by number of true predictions divided by the total number of predictions). Here, the probability that a default is truly predicted as a default or a non-default is truly predicted as a non-default is 72.05%. This is calculated by <code>(sum of defaults correctly predicted as defaults + sum of non-defaults correctly predicted as non-defaults)/(total number of all predictions)</code>.</p></li>
+<li><p>Sensitivity = 0.48094. This tells us how often positive outcomes (i.e., defaults) are predicted correctly (also referred to as true positive rate). Here, the probability that a default is correctly predicted as a default is ~48.1%. This is calculated by <code>(sum of defaults correctly predicted as defaults)/(total number of all default predictions)</code>.</p></li>
+<li><p>Specificity = 0.76060. This tells us how often negative outcomes (i.e., non-defaults) are predicted correctly (also referred to as true negative rate). Here, the probability that a non-default is correctly predicted as a non-default is ~76.1%. This is calculated by <code>(sum of non-defaults correctly predicted as non-defaults)/(total number of all non-default predictions)</code>.</p></li>
+</ol>
+<blockquote>
+<p>Using the model logistic 2, we produce the ROC curve and calculate the AUC measure. We xplain what the ROC shows and what the AUC measure means. Why do we expect the AUC of any predictive model to be between 0.5 and 1? Could the AUC ever be below 0.5 or above 1?</p>
+</blockquote>
+<pre class="r"><code>#estimate the ROC curve for Logistic 2
+ROC_logistic2 &lt;- roc(lc_clean$default, prob_default2)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1</code></pre>
+<pre><code>## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#estimate the AUC for Logistic 2 and round it to two decimal places
+AUC2&lt;-round(auc(lc_clean$default,prob_default2)*100, digits=2)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1
+## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#Plot the ROC curve and display the AUC in the title
+ROC2 &lt;- ggroc(ROC_logistic2,  alpha = 0.5) + 
+  ggtitle(paste(&quot;Model Logistic 2: AUC=&quot;, AUC2, &quot;%&quot;)) +
+  geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), color=&quot;grey&quot;, linetype=&quot;dashed&quot;) +
+  geom_segment(aes(x = 1, xend = 1, y = 0, yend = 1), color=&quot;black&quot;, linetype=&quot;dashed&quot;) +
+  geom_segment(aes(x = 1, xend = 0, y = 1, yend = 1), color=&quot;black&quot;, linetype=&quot;dashed&quot;) +
+  NULL
+
+ROC2</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/ROC%20curves-1.png" width="672" /></p>
+<p>ROC and AUC are crucial evaluation metrics for the performance of any classification model. The ROC curve is another way to assess model performance that is agnostic to the cost of classification errors; it can help us in deciding which threshold value to choose. It does this by plotting the specificity against the respective sensitivity of all cutoff rates between 0 and 1. AUC means <strong>Area under the curve</strong> and gives the rate of successful classification by our logistic model. While the AUC is a helpful summary statistic of how well a model explains the data, it also helps in comparing ROC curves of models with each other. The higher the AUC per curve, the better; meaning, the better the model did at classification.</p>
+<p>The gray dashed line describes a model that is not better than chance (i.e. a random classifier) in which the ROC curve would be a straight line from (1,0) to (0,1) with an AUC (area under the curve) of 0.5 (50%). The black dashed line, on the other hand, describes a perfect classifier in which all predictions are 100% correct and, therefore, both specificity as well as sensitivity would be 100%. The AUC, here, would be 1 (100%). Usually, the AUC is, therefore, between 0.5 and 1 as a useful model should perform better than random but could never perform better than getting 100% right - it could never be above 1. Theoretically, however, the AUC could also be below 0.5. This would mean that the classifier performs even worse than a random classifier and, thereby, indicate an non-useful model. Usually, this indicates that something went wrong or that we were particularly unlucky with our data split into train and test sets in a way that the patterns that are supposed to be classified are systematically different.</p>
+<p>To sum up, the AUC values always lie between 0 and 1; meaning, the AUC can be below 0.5 but not above 1 (and not below 0). We do however expect it to be greater than 0.5 as a useful model should perform better than random chance. This indicates a constant trade-off between sensitivity and specificity.
+Above, we can see that our logistic2 model is better than a random classifier but not as good as the perfect classifier with an AUC of 68.01%.</p>
+<blockquote>
+<p>So far we have only worked in-sample. We, now, split the data into training and testing and estimate the models ROC curve and AUC measure out of sample. Is there any evidence of over fitting?</p>
+</blockquote>
+<pre class="r"><code># splitting the data into training and testing
+set.seed(1234)
+train_test_split &lt;- initial_split(lc_clean, prop = 0.8)
+testing &lt;- testing(train_test_split) #20% of the data is set aside for testing
+training &lt;- training(train_test_split) #80% of the data is set aside for training
+
+# run logistic 2 on the training set 
+logistic2_train &lt;- glm(default ~ annual_inc + term + grade + loan_amnt, family= &quot;binomial&quot;, training)</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>#calculate probability of default in the training sample 
+p_in &lt;- predict(logistic2_train, training, type = &quot;response&quot;) 
+
+#ROC curve using in-sample predictions
+ROC_logistic2_in &lt;- roc(training$default, p_in)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1</code></pre>
+<pre><code>## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#AUC using in-sample predictions
+AUC_logistic2_in &lt;- round(auc(training$default, p_in)*100, digits=2)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1
+## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#calculate probability of default out of sample 
+p_out &lt;- predict(logistic2_train, testing, type = &quot;response&quot;) 
+
+#ROC curve using out-of-sample predictions
+ROC_logistic2_out &lt;- roc(testing$default, p_out)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1
+## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#AUC using out-of-sample predictions
+AUC_logistic2_out &lt;- round(auc(testing$default, p_out)*100, digits=2)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1
+## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#plot in the same figure both ROC curves and print the AUC of both curves in the title
+ROC_both &lt;- ggroc(list(&quot;Logistic 2 in-sample&quot;=ROC_logistic2_in, &quot;Logistic 2 out-of-sample&quot;=ROC_logistic2_out)) +
+  ggtitle(paste(&quot;Model Logistic 2 in-sample AUC=&quot;, 
+                AUC_logistic2_in,&quot;%\nModel Logistic 2 out-of-sample AUC=&quot;,
+                AUC_logistic2_out,&quot;%&quot;))+
+  geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), color=&quot;grey&quot;, linetype=&quot;dashed&quot;)+
+  geom_segment(aes(x = 1, xend = 1, y = 0, yend = 1), color=&quot;black&quot;, linetype=&quot;dashed&quot;) +
+  geom_segment(aes(x = 1, xend = 0, y = 1, yend = 1), color=&quot;black&quot;, linetype=&quot;dashed&quot;) +
+  labs(colour = &quot;ROC curves&quot;) +
+  NULL
+
+ROC_both</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/out-of-sample%20ROC%20curve-1.png" width="672" /></p>
+<p>Above, we can see that the in-sample and the out-of-sample logistic2 ROC curves are very similar and both have a similar AUC of 68.13% and 67.51% respectively. These results are subject to the set seed and, thereby, how the data is divided between testing and training set.</p>
+<p>We cannot use the training set (in-sample) by itself to evaluate overfitting as it cannot measure the logistic2 model’s generalization performance. However, comparing the ROC curves of the training and testing set, namely the size of the gap between both, can help us to investigate overfitting. A large gap between the training and testing metrics indicates overfitting, whereas no gap indicates underfitting; a good model should always produce a small gap. While it is difficult to make a precise judgement, we can see small gaps between the in-sample and out-of-sample ROC curves as well as a small difference of both AUCs and can, therefore, conclude that our logistic2 model does not suffer from overfitting but is a rather good fit/model.</p>
+</div>
+<div id="selecting-loans-to-invest-using-the-model-logistic-2." class="section level2">
+<h2>Selecting loans to invest using the model Logistic 2.</h2>
+<p>Before we look for a better model than logistic 2 let’s see how we can use this model to select loans to invest. Let’s make the simplistic assumption that every loan generates $20 profit if it is paid off and $100 loss if it is charged off for an investor. Let’s use a cut-off value to determine which loans to invest in, that is, if the predicted probability of default for a loan is below this value then we invest in that loan and not if it is above.</p>
+<p>To do this we split the data in three parts: training, validation, and testing.</p>
+<pre class="r"><code># splitting the data into training and testing
+set.seed(1234)
+train_test_split &lt;- initial_split(lc_clean, prop = 0.6)
+training &lt;- training(train_test_split) #60% of the data is set aside for training
+remaining &lt;- testing(train_test_split) #40% of the data is set aside for validation &amp; testing
+set.seed(4321)
+train_test_split &lt;- initial_split(remaining, prop = 0.5)
+validation&lt;-training(train_test_split) #50% of the remaining data (20% of total data) will be used for validation
+testing&lt;-testing(train_test_split) #50% of the remaining data (20% of total data) will be used for testing</code></pre>
+<blockquote>
+<p>We train logistic 2 on the training set above. We use the trained model to determine the optimal cut-off threshold based on the validation test. What is the optimal cutoff threshold? How much profit does it generate? Using the testing set, what is the profit per loan associated with the cutoff?</p>
+</blockquote>
+<pre class="r"><code>#train logistic2 on the training set
+logistic2_train &lt;- glm(default ~ annual_inc + term + grade + loan_amnt, family=&quot;binomial&quot;, training)</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>#predict probability of default on the validation set
+p_val &lt;- predict(logistic2_train, validation, type = &quot;response&quot;) 
+
+#we select the cutoff threshold using the estimated model and the validation set
+#define profit and threshold
+profit=0 
+threshold=0
+#loop over 100 thresholds
+for(i in 1:100) {
+  threshold[i] = i/400  
+  one_or_zero_search &lt;- ifelse(p_val &gt; threshold[i],&quot;1&quot;,&quot;0&quot;)
+  p_class_search &lt;- factor(one_or_zero_search, levels = levels(validation$default))
+  con_search &lt;- confusionMatrix(p_class_search, validation$default, positive=&quot;1&quot;)
+  #calculate profit according to the threshold
+  profit[i] = con_search$table[1,1] * 20 -con_search$table[1,2] *100}
+
+#plot profit against threshold
+ggplot(as.data.frame(threshold), aes(x=threshold, y=profit)) + 
+  geom_smooth(method = &#39;loess&#39;, se = 0) +
+  labs(title = &quot;Profit curve with logistic2 (based on the validation set)&quot;,
+       x = &quot;Cutoff threshold&quot;,
+       y = &quot;Profit&quot;) +
+  NULL</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>#output the maximum profit and the associated threshold based on the validation set
+paste0(&quot;Based on the validation set, maximum profit per loan is $&quot;, round(max(profit) / nrow(validation), 2), &quot; achieved at a cutoff threshold of &quot;, threshold[which.is.max(profit)] * 100, &quot;%.&quot;)</code></pre>
+<pre><code>## [1] &quot;Based on the validation set, maximum profit per loan is $5.92 achieved at a cutoff threshold of 15.5%.&quot;</code></pre>
+<pre class="r"><code>#optimal threshold based on the validation set
+threshold = threshold[which.is.max(profit)]
+threshold</code></pre>
+<pre><code>## [1] 0.155</code></pre>
+<pre class="r"><code>#Using the model estimated on the training set above to predict probabilities of default on the testing set
+#predict probability of default on the testing set
+p_test&lt;-predict(logistic2_train, testing, type = &quot;response&quot;)
+
+#use the threshold estimated using the validation set to estimate the profits on the testing set
+one_or_zero &lt;- ifelse(p_test&gt;threshold,&quot;1&quot;,&quot;0&quot;)
+p_class &lt;- factor(one_or_zero, levels = levels(testing$default))
+con_test &lt;- confusionMatrix(p_class, testing$default, positive = &quot;1&quot;)
+profit = con_test$table[1,1] * 20 - con_test$table[1,2] * 100
+paste0(&quot;Based on the testing set, the profit per loan associated with a cuttoff threshold of &quot;, threshold*100, &quot;% is: $&quot;, round(profit/nrow(testing),2))</code></pre>
+<pre><code>## [1] &quot;Based on the testing set, the profit per loan associated with a cuttoff threshold of 15.5% is: $5.4&quot;</code></pre>
+<p>Above, we firstly trained logistic2 on the previously defined training set. Then, we used this trained model on the validation set and, thereby, determined the maximum profit per loan to be $5.92 achieved at a cutoff threshold of 15.5% (peak of the curve in the profit curve plot) based on the validation set. Lastly, we used the trained model on the testing set and, using the 15.5% optimal cutoff threshold, found the profit per loan to be $5.40.</p>
+</div>
+</div>
+<div id="more-realistic-revenue-model" class="section level1">
+<h1>More realistic revenue model</h1>
+<p>Let’s build a more realistic profit and loss model. Each loan has different terms (e.g., different interest rate and different duration) and therefore a different return if fully paid. For example, a 36 month loan of $5000 with installment of $163 per month would generate a return of <code>163*36/5000-1</code> if there was no default. Let’s assume that it would generate a loss of -60% if there was a default (the loss is not 100% because the loan may not default immediately and/or the lending club may be able to recover part of the loan).</p>
+<blockquote>
+<p>Under these assumptions, how much return would we get if we invested $1 in each loan in the validation set?</p>
+</blockquote>
+<pre class="r"><code>#investment of $1 per loan in validation set 
+invest &lt;- validation %&gt;% 
+            count()
+
+invest # = 7574 loans meaning investment of $7574</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-5">
+<col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">n</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">7574</td></tr>
+</table>
+
+<pre class="r"><code>#calculate return per each loan in validation set for $1 investment in each loan
+val_return &lt;- validation %&gt;%
+  #create new return column
+ mutate(return = 
+          #if default per loan equals 0 / if loan did not default
+          ifelse(default==&quot;0&quot;,
+                 #calculate return like this
+                 (installment*term_months/loan_amnt -1),
+                 #if loan did default, -60% (here -0.6 as this is -60% of $1)
+                 -0.6))%&gt;%
+  summarize(
+    #calculate total return
+    total_return = sum(round(return,4)),
+    #calculate return on investment in %
+    return_on_invest = (round(total_return/as.numeric(invest)*100,5))
+    )
+
+val_return</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-5">
+<col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">return_on_invest</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">862</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">11.4</td></tr>
+</table>
+
+<p>When investing $1 per loan in the validation set, we would invest a total of $7574 in all loans. According to the profit and loss dynamics, we would make a total return of ~$861.96 on these loans, meaning we would make a 11.38% return on investment (861.9565/7574*100).</p>
+<p>Unfortunately, we cannot use the realized return to select loans to invest (as at the time we make the investment decision we do not know which loan will default). Instead, we can calculate an expected return using the estimated probabilities of default – expected return = return if not default * (1-prob(default)) + return if default * prob(default).</p>
+<blockquote>
+<p>We calculate the expected return of the loans in the validation set using the logistic 2 model trained in the training set. Can we use the expected return metric to select a portfolio of the <span class="math inline">\(n\)</span> most promising loans to invest in (<span class="math inline">\(n\)</span> is an integer number)? How does the realized return vary as we change <span class="math inline">\(n\)</span>? What is the profit for <span class="math inline">\(n=800\)</span>?</p>
+</blockquote>
+<pre class="r"><code>#logistic2_train &lt;- glm(default ~ annual_inc + term + grade + loan_amnt, family=&quot;binomial&quot;, training)
+#p_val &lt;- predict(logistic2_train, validation, type = &quot;response&quot;)
+
+validation_new &lt;- cbind(validation, p_val)
+
+returns &lt;- validation_new %&gt;% 
+  mutate(
+    #return if not default
+    profit = installment*term_months/loan_amnt-1,
+    #return if default
+    loss = -0.6,
+    #probability of not default
+    profit_prob = 1-p_val,
+    #probability of default
+    loss_prob = p_val,
+    #expected return
+    expected_return = profit * profit_prob + loss * loss_prob,
+    ) 
+
+#select a portfolio of the n most promising loans to invest in
+#we use the arrange function to sort by most promising loans to least promising loans
+#use this code for any n
+
+# returns %&gt;% 
+  # arrange(desc(expected_return)) %&gt;% 
+  # top_n(n) %&gt;%
+  # mutate(real_return = ifelse(default == &quot;0&quot;, (installment*term_months/loan_amnt-1),-0.6)) %&gt;%
+  # summarize(
+  # total_exp_return = sum(expected_return),
+  # total_real_return = sum(real_return),
+  # exp_return_on_invest = (total_exp_return/n*100),
+  # real_return_on_invest = (total_real_return/n*100)
+  # )
+
+#for n = 600
+returns %&gt;% 
+  arrange(desc(expected_return)) %&gt;% 
+  top_n(600) %&gt;% 
+  mutate(real_return = ifelse(default == &quot;0&quot;, (installment*term_months/loan_amnt-1),-0.6)) %&gt;%
+  summarize(
+  total_exp_return = sum(expected_return),
+  total_real_return = sum(real_return),
+  exp_return_on_invest = (total_exp_return/600*100),
+  real_return_on_invest = (total_real_return/600*100)
+  )</code></pre>
+<pre><code>## Selecting by expected_return</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-6">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_exp_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_real_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">exp_return_on_invest</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">real_return_on_invest</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">149</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">150</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">24.8</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">24.9</td></tr>
+</table>
+
+<pre class="r"><code>  #total_exp_return = 149.0619  
+  #total_real_return = 149.6932 
+  #exp_return_on_invest = 24.84365  
+  #real_return_on_invest = 24.94886 
+
+#for n = 800
+returns %&gt;% 
+  arrange(desc(expected_return)) %&gt;% 
+  top_n(800) %&gt;% 
+  mutate(real_return = ifelse(default == &quot;0&quot;, (installment*term_months/loan_amnt-1),-0.6)) %&gt;%
+  summarize(
+  total_exp_return = sum(expected_return),
+  total_real_return = sum(real_return),
+  exp_return_on_invest = (total_exp_return/800*100),
+  real_return_on_invest = (total_real_return/800*100)
+  )</code></pre>
+<pre><code>## Selecting by expected_return</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-6">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_exp_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_real_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">exp_return_on_invest</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">real_return_on_invest</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">188</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">186</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">23.6</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">23.3</td></tr>
+</table>
+
+<pre class="r"><code>  #total_exp_return = 188.4074      
+  #total_real_return = 186.4975 
+  #exp_return_on_invest = 23.55093  
+  #real_return_on_invest = 23.31219 
+
+#for n = 1000
+returns %&gt;% 
+  arrange(desc(expected_return)) %&gt;% 
+  top_n(1000) %&gt;% 
+  mutate(real_return = ifelse(default == &quot;0&quot;, (installment*term_months/loan_amnt-1),-0.6)) %&gt;%
+  summarize(
+  total_exp_return = sum(expected_return),
+  total_real_return = sum(real_return),
+  exp_return_on_invest = (total_exp_return/1000*100),
+  real_return_on_invest = (total_real_return/1000*100)
+  )</code></pre>
+<pre><code>## Selecting by expected_return</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-6">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_exp_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_real_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">exp_return_on_invest</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">real_return_on_invest</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">225</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">213</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">22.5</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">21.3</td></tr>
+</table>
+
+<pre class="r"><code>  #total_exp_return = 225.4676  
+  #total_real_return = 212.9639 
+  #exp_return_on_invest = 22.54676
+  #real_return_on_invest = 21.29639 
+
+#for n = 5000
+returns %&gt;% 
+  arrange(desc(expected_return)) %&gt;% 
+  top_n(5000) %&gt;% 
+  mutate(real_return = ifelse(default == &quot;0&quot;, (installment*term_months/loan_amnt-1),-0.6)) %&gt;%
+  summarize(
+  total_exp_return = sum(expected_return),
+  total_real_return = sum(real_return),
+  exp_return_on_invest = (total_exp_return/5000*100),
+  real_return_on_invest = (total_real_return/5000*100)
+  )</code></pre>
+<pre><code>## Selecting by expected_return</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-6">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_exp_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_real_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">exp_return_on_invest</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">real_return_on_invest</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">693</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">680</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">13.9</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">13.6</td></tr>
+</table>
+
+<pre class="r"><code>  #total_exp_return = 692.7218  
+  #total_real_return = 679.7163
+  #exp_return_on_invest = 13.85444  
+  #real_return_on_invest = 13.59433
+
+#for n = 7574 (all)
+returns %&gt;% 
+  arrange(desc(expected_return)) %&gt;% 
+  top_n(7547) %&gt;% 
+  mutate(real_return = ifelse(default == &quot;0&quot;, (installment*term_months/loan_amnt-1),-0.6)) %&gt;%
+  summarize(
+  total_exp_return = sum(expected_return),
+  total_real_return = sum(real_return),
+  exp_return_on_invest = (total_exp_return/7547*100),
+  real_return_on_invest = (total_real_return/7547*100)
+  )</code></pre>
+<pre><code>## Selecting by expected_return</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-6">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_exp_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_real_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">exp_return_on_invest</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">real_return_on_invest</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">868</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">861</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">11.5</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">11.4</td></tr>
+</table>
+
+<pre class="r"><code>  #total_exp_return = 867.8876      
+  #total_real_return = 860.5416 
+  #exp_return_on_invest = 11.49977
+  #real_return_on_invest = 11.40243 </code></pre>
+<p>As can be seen above, inserting different values for n, shows us how the total expected return and the realized return as well as the expected and realized return on investment (in %) differ for different numbers n of the top most promising loans. Here, we arrange the expected returns in descending order to sort the data set by most promising loans to least promising loans. We find that the both the expected return as well as the realized return steadily increase with increasing n (up to a total return of ~$861.96 for all loans as we already calculated in the exercise before). The expected as well as the realized return on investment, however, decrease with increasing n. This is because we have an increasing number of loans (n) while, at the same time, the returns get increasingly smaller (since we sorted the data from highest to lowest expected return). Looking at the 800 most promising loans (n=800), we find the expected profit to be ~$188.41 (ROI of ~23.55%) and the realized profit to be ~$186.50 (ROI of ~23.31%).</p>
+<blockquote>
+<p>For <span class="math inline">\(n=800\)</span>, how sensitive is our answer to the assumption that if a loan defaults we lose 60% of the value? To answer this question, we assess how the realized return of the 800 loans chosen in our portfolio change if the loss proportion varies from 20%-80%?</p>
+</blockquote>
+<pre class="r"><code>#repeat above actions with loss of -20% instead of -60%
+returns_check1 &lt;- validation_new %&gt;% 
+  mutate(
+    profit = installment*term_months/loan_amnt-1,
+    #check for loss of -20%
+    loss = -0.2,
+    profit_prob = 1-p_val,
+    loss_prob = p_val,
+    expected_return = profit * profit_prob + loss * loss_prob,
+    ) 
+
+#for n = 800
+returns_check1 %&gt;% 
+  arrange(desc(expected_return)) %&gt;% 
+  top_n(800) %&gt;% 
+  mutate(real_return = ifelse(default == &quot;0&quot;, (installment*term_months/loan_amnt-1),-0.2)) %&gt;%
+  summarize(
+  total_exp_return = sum(expected_return),
+  total_real_return = sum(real_return),
+  exp_return_on_invest = (total_exp_return/800*100),
+  real_return_on_invest = (total_real_return/800*100)
+  )</code></pre>
+<pre><code>## Selecting by expected_return</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-7">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_exp_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_real_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">exp_return_on_invest</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">real_return_on_invest</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">265</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">261</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">33.2</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">32.6</td></tr>
+</table>
+
+<pre class="r"><code>  #total_exp_return = 265.2958  
+  #total_real_return = 261.097  
+  #exp_return_on_invest = 33.16197  
+  #real_return_on_invest = 32.63712
+
+#repeat above actions with loss of -80% instead of -60%
+returns_check2 &lt;- validation_new %&gt;% 
+  mutate(
+    profit = installment*term_months/loan_amnt-1,
+    #check for loss of -80%
+    loss = -0.8,
+    profit_prob = 1-p_val,
+    loss_prob = p_val,
+    expected_return = profit * profit_prob + loss * loss_prob,
+    ) 
+
+#for n = 800
+returns_check2 %&gt;% 
+  arrange(desc(expected_return)) %&gt;% 
+  top_n(800) %&gt;% 
+  mutate(real_return = ifelse(default == &quot;0&quot;, (installment*term_months/loan_amnt-1),-0.8)) %&gt;%
+  summarize(
+  total_exp_return = sum(expected_return),
+  total_real_return = sum(real_return),
+  exp_return_on_invest = (total_exp_return/800*100),
+  real_return_on_invest = (total_real_return/800*100)
+  )</code></pre>
+<pre><code>## Selecting by expected_return</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-7">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_exp_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_real_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">exp_return_on_invest</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">real_return_on_invest</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">155</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">146</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">19.4</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">18.2</td></tr>
+</table>
+
+<pre class="r"><code>  #total_exp_return = 155.1385          
+  #total_real_return = 145.941  
+  #exp_return_on_invest = 19.39231  
+  #real_return_on_invest = 18.24263 </code></pre>
+<p>Our answers are highly sensitive to the assumption that if a loan defaults, we lose 60% of the value. Testing the same calculations but replacing the -60% once with -20% and once with -80% shows us that the smaller the loss is (e.g. -20%), the higher the expected and realized return - this is logical as our total profit increases when we decrease individual losses. In addition to the higher return, the expected and realized returns on investment also increase with decreasing value loss. Vice versa, we find that increasing the proportional loss (e.g. here to 80%) will significantly decrease our returns as well as the relative returns on investment. More precisely, changing the value loss when a loan defaults from -20% to -60% to -80% decreases the expected (realized) return from $265.30 ($261.10) to $188.41 ($186.50) to $155.14 ($145.94) respectively. At the same time, the expected (realized) return on investment decreases from 33.16 (32.64) to 23.55% (23.31%) to 19.39% (18.24%) respectively.</p>
+<p>Finally and to sum up, the realized return of the 800 most promising loans varies between $261.10 and $145.94 depending on the loss proportion varying between -20% and -80% respectively. This significant difference of ~$115 in realized return depending on the loss proportion indicates that our answers are highly sensitive to the specific loss proportion we assume.</p>
+<blockquote>
+<p>We experiment with different models using more features, interactions, and non-linear transformations. We may also want to try to estimate models using regularization (e.g., LASSO regression) or use data from other sources (making sure our model does not use information that would not be available at the time the loan is extended (e.g., for a 4-year loan given in January 2008, we can’t use macro-economic indicators for 2008 or 2009 to predict whether the loan will default)). We present below our best model and explain why we have chosen it.</p>
+</blockquote>
+<pre class="r"><code>#final model
+finalmodel &lt;- glm(default ~ log(annual_inc) + loan_amnt:int_rate + term + log(int_rate):grade, family = &quot;binomial&quot;, lc_clean)
+summary(finalmodel)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = default ~ log(annual_inc) + loan_amnt:int_rate + 
+##     term + log(int_rate):grade, family = &quot;binomial&quot;, data = lc_clean)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.3077  -0.6034  -0.4693  -0.3275   2.7125  
+## 
+## Coefficients:
+##                        Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)           6.499e+00  4.876e-01  13.328  &lt; 2e-16 ***
+## log(annual_inc)      -5.605e-01  3.124e-02 -17.943  &lt; 2e-16 ***
+## term60                4.470e-01  3.598e-02  12.423  &lt; 2e-16 ***
+## loan_amnt:int_rate    5.838e-05  1.571e-05   3.716 0.000203 ***
+## log(int_rate):gradeA  1.236e+00  1.475e-01   8.380  &lt; 2e-16 ***
+## log(int_rate):gradeB  1.168e+00  1.720e-01   6.789 1.13e-11 ***
+## log(int_rate):gradeC  1.107e+00  1.889e-01   5.858 4.69e-09 ***
+## log(int_rate):gradeD  1.067e+00  2.037e-01   5.237 1.63e-07 ***
+## log(int_rate):gradeE  1.075e+00  2.161e-01   4.977 6.46e-07 ***
+## log(int_rate):gradeF  1.007e+00  2.313e-01   4.355 1.33e-05 ***
+## log(int_rate):gradeG  1.010e+00  2.507e-01   4.027 5.64e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 31130  on 37868  degrees of freedom
+## Residual deviance: 29100  on 37858  degrees of freedom
+## AIC: 29122
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>#compare models
+anova(logistic1, logistic2, finalmodel)</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-8">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Resid. Df</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Resid. Dev</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Df</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Deviance</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">3.79e+04</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">3.1e+04&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;"></td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">3.79e+04</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.93e+04</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">8</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">1.72e+03</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">3.79e+04</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">2.91e+04</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">1</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">186&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+</table>
+
+<pre class="r"><code>#plot ROC of final model
+prob_default_fm&lt;-predict(finalmodel,lc_clean, type=&quot;response&quot;)
+
+ROC_logistic_fm &lt;- roc(lc_clean$default, prob_default_fm)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1</code></pre>
+<pre><code>## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#estimate the AUC for Logistic 2 and round it to two decimal places
+AUC_fm&lt;-round(auc(lc_clean$default,prob_default_fm)*100, digits=2)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1
+## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#Plot the ROC curve and display the AUC in the title
+ROC_fm &lt;- ggroc(ROC_logistic_fm,  alpha = 0.5) + 
+  ggtitle(paste(&quot;Final model: AUC=&quot;, AUC_fm, &quot;%&quot;)) +
+  geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), color=&quot;grey&quot;, linetype=&quot;dashed&quot;) +
+  geom_segment(aes(x = 1, xend = 1, y = 0, yend = 1), color=&quot;black&quot;, linetype=&quot;dashed&quot;) +
+  geom_segment(aes(x = 1, xend = 0, y = 1, yend = 1), color=&quot;black&quot;, linetype=&quot;dashed&quot;) +
+  NULL
+
+ROC_fm</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>#in and out of sample testing
+set.seed(4567)
+train_test_split &lt;- initial_split(lc_clean, prop = 0.8)
+testing &lt;- testing(train_test_split) #20% of the data is set aside for testing
+training &lt;- training(train_test_split) #80% of the data is set aside for training
+
+# run finalmodel on the training set 
+finalmodel_train &lt;- glm(default ~ log(annual_inc) + loan_amnt:int_rate + term + log(int_rate):grade, family= &quot;binomial&quot;, training)
+
+#calculate probability of default in the training sample 
+p_fm_in &lt;- predict(finalmodel_train, training, type = &quot;response&quot;) 
+
+#ROC curve using in-sample predictions
+ROC_fm_in &lt;- roc(training$default, p_fm_in)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1
+## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#AUC using in-sample predictions
+AUC_fm_in &lt;- round(auc(training$default, p_fm_in)*100, digits=2)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1
+## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#calculate probability of default out of sample 
+p_fm_out &lt;- predict(finalmodel_train, testing, type = &quot;response&quot;) 
+
+#ROC curve using out-of-sample predictions
+ROC_fm_out &lt;- roc(testing$default, p_fm_out)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1
+## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#AUC using out-of-sample predictions
+AUC_fm_out &lt;- round(auc(testing$default, p_fm_out)*100, digits=2)</code></pre>
+<pre><code>## Setting levels: control = 0, case = 1
+## Setting direction: controls &lt; cases</code></pre>
+<pre class="r"><code>#plot in the same figure both ROC curves and print the AUC of both curves in the title
+ROC_fm_both &lt;- ggroc(list(&quot;Final model in-sample&quot;=ROC_fm_in, &quot;Final model out-of-sample&quot;=ROC_fm_out)) +
+  ggtitle(paste(&quot;Final model in-sample AUC=&quot;, 
+                AUC_fm_in,&quot;%\nFInal model out-of-sample AUC=&quot;,
+                AUC_fm_out,&quot;%&quot;))+
+  geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), color=&quot;grey&quot;, linetype=&quot;dashed&quot;)+
+  geom_segment(aes(x = 1, xend = 1, y = 0, yend = 1), color=&quot;black&quot;, linetype=&quot;dashed&quot;) +
+  geom_segment(aes(x = 1, xend = 0, y = 1, yend = 1), color=&quot;black&quot;, linetype=&quot;dashed&quot;) +
+  labs(colour = &quot;ROC curves&quot;) +
+  NULL
+
+ROC_fm_both</code></pre>
+<p><img src="/projects/lendingclub_logreg/index_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<p>The final model includes <code>annual_inc</code>, <code>loan_amnt</code>, <code>int_rate</code>, <code>term</code> and <code>grade</code> in various forms of transformations and interactions. We introduce log transformations to our model as it will effectively change a unit change to a percent change and will, therefore, make the included variables better comparable (as they don’t have the same unit scales). When considering the correlation matrix, it becomes clear that some variables are somewhat correlated with each other; to account for this effect of one variable depending on the value of another variable, we also introduce interaction effects to our model (e.g. correlation between interest rate and loan amount at 0.31).</p>
+<p>It is more complex than logistic1 and logistic2 but it yields a better goodness of fit. First and foremost, we find that the Residual Deviance is reduced to 29100 with the final model compared to a Deviance of 31005 for logistic1 and 29286 for logistic2. Moreover, the AIC of 29306 from logistic2 is further reduced to 29122 with the finalmodel. This metric (AIC) is more appropriate here as we deal with several model features. Lastly, logistic2 was able to yield an AUC of 68.01%, followed by an in-sample AUC of 68.13% and an out-of-sample AUC of 67.51%. Our final model also improves these as it yields an overall AUC of 68.44%, followed by an in-sample AUC of 68.28% and an out-of sample AUC (best among all of these) of 69.11%. Consequently, we were able to improve our out-of-sample AUC by 1.6 percentage points. Considering the in- and out-of-sample ROC curves of the final model, we can also see that our model does not suffer from overfitting.</p>
+<p>Overall, we could have increased the general AUC to 68.45% or 68.46% as well as decreased the AIC further to 29121 by including dti and/or an interaction term between dti and annual income in our model. These are only slight improvements and the in-sample AUCs of these models would also online slightly increase; the out-of-sample AUCs of these models were however smaller than that of our final model. Considering these statistics as well as the fact that a simpler model is always better than a complex model, we conclude that our final model performs best for our purposes. While this final model is already quite complex itself, we did find that less complex models also work; their performance and especially their out-of-sample AUC is, however, far lower than that of our final model so that we stick to our final model. Using regularization through LASSO only decreased our models’ performances so that we disregard it completely.</p>
+<pre class="r"><code>#finalmodel_train &lt;- glm(default ~ log(annual_inc) + loan_amnt:int_rate + term + log(int_rate):grade, family= &quot;binomial&quot;, training)
+#p_fm_out &lt;- predict(finalmodel_train, testing, type = &quot;response&quot;) 
+
+testing_fm &lt;- cbind(testing, p_fm_out)
+
+returns_fm &lt;- testing_fm %&gt;% 
+  mutate(
+    #return if not default
+    profit = installment*term_months/loan_amnt-1,
+    #return if default
+    loss = -0.6,
+    #probability of not default
+    profit_prob = 1-p_fm_out,
+    #probability of default
+    loss_prob = p_fm_out,
+    #expected return
+    expected_return = profit * profit_prob + loss * loss_prob,
+    ) 
+
+#for n = 800
+returns_fm %&gt;% 
+  arrange(desc(expected_return)) %&gt;% 
+  top_n(800) %&gt;% 
+  mutate(real_return = ifelse(default == &quot;0&quot;, (installment*term_months/loan_amnt-1),-0.6)) %&gt;%
+  summarize(
+  total_exp_return = sum(expected_return),
+  total_real_return = sum(real_return),
+  exp_return_on_invest = (total_exp_return/800*100),
+  real_return_on_invest = (total_real_return/800*100)
+  )</code></pre>
+<pre><code>## Selecting by expected_return</code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-9">
+<col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_exp_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">total_real_return</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">exp_return_on_invest</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">real_return_on_invest</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">188</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">179</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">23.4</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">22.3</td></tr>
+</table>
+
+<pre class="r"><code>  #total_exp_return = 187.5981          
+  #total_real_return = 178.7685 
+  #exp_return_on_invest = 23.44976  
+  #real_return_on_invest = 22.34606</code></pre>
+<p>Comparing the final model against logistic2 on the realized return of 800 loans chosen out-of-sample, we find that logistic2 finds a realized return of $186.50 whereas our final model finds a slightly lower realized return of $178.77.</p>
+<blockquote>
+<p>The file “Assessment Data_2020.csv” contains information on almost 1800 new loans. We use our best model (see previous question) to choose 200 loans to invest. For this question, we assume that the loss proportion is 60%.</p>
+</blockquote>
+<pre class="r"><code>lc_assessment&lt;- read_csv(here::here(&quot;data&quot;, &quot;Assessment Data_2020.csv&quot;)) %&gt;%  #load the data 
+  clean_names() %&gt;% # use janitor::clean_names() 
+  mutate(
+    issue_d = mdy(issue_d),  # lubridate::mdy() to fix date format
+    term = factor(term_months),     # turn &#39;term&#39; into a categorical variable
+    delinq_2yrs = factor(delinq_2yrs)) # turn &#39;delinq_2yrs&#39; into a categorical variable</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   `Loan number` = col_double(),
+##   int_rate = col_double(),
+##   loan_amnt = col_double(),
+##   `term (months)` = col_double(),
+##   installment = col_number(),
+##   dti = col_double(),
+##   delinq_2yrs = col_double(),
+##   annual_inc = col_double(),
+##   grade = col_character(),
+##   emp_title = col_logical(),
+##   emp_length = col_character(),
+##   home_ownership = col_character(),
+##   verification_status = col_character(),
+##   issue_d = col_character()
+## )</code></pre>
+<pre class="r"><code>#use trained final model for predictions on lc_assessment
+
+#finalmodel_train &lt;- glm(default ~ log(annual_inc) + loan_amnt:int_rate + term + log(int_rate):grade, family= &quot;binomial&quot;, training)
+
+#predict probability of default on assessment data set
+p_assess &lt;- predict(finalmodel_train, lc_assessment, type = &quot;response&quot;) 
+
+lc_assessment_new &lt;- cbind(lc_assessment, p_assess)
+
+lc_assessment_returns &lt;- lc_assessment_new %&gt;% 
+  mutate(
+    #return if not default
+    profit = installment*term_months/loan_amnt-1,
+    #return if default
+    loss = -0.6,
+    #probability of not default
+    profit_prob = 1-p_assess,
+    #probability of default
+    loss_prob = p_assess,
+    #expected return
+    expected_return = profit * profit_prob + loss * loss_prob
+    ) 
+
+#top 200
+#lc_assessment_returns %&gt;% 
+#  arrange(desc(expected_return)) %&gt;% 
+#  top_n(200) 
+
+#calculate the minimum expected return of our top 200 loans
+min_return &lt;- lc_assessment_returns %&gt;% 
+  arrange(desc(expected_return)) %&gt;% 
+  top_n(200) %&gt;% 
+  summarize(min_return_value = min(expected_return))</code></pre>
+<pre><code>## Selecting by expected_return</code></pre>
+<pre class="r"><code>min_return # = 0.1906794    </code></pre>
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-10">
+<col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">min_return_value</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">0.191</td></tr>
+</table>
+
+<pre class="r"><code>#create excel input
+excel_input &lt;- lc_assessment_returns %&gt;% 
+  summarize(loan_number = loan_number,
+            marie_cordes = ifelse(expected_return &gt;= as.numeric(min_return), 1, 0))
+
+#create excel
+write.csv(excel_input, &quot;marie_cordes.csv&quot;, row.names = FALSE)</code></pre>
+</div>
+<div id="critique" class="section level1">
+<h1>Critique</h1>
+<p>No data science engagement is perfect. Before finishing a project is always important to reflect on the limitations of the analysis and suggest ways for future improvement.</p>
+<blockquote>
+<p>We provide a critique of our work. What would we want to add to this analysis before we use it in practice?</p>
+</blockquote>
+<p>Generally, the final model chosen is rather complicated. While its goodness of fit increases compared to the previous models (logistic1 and logistic2), its complexity also increases significantly. Therefore, it would be helpful to find either a model that may be complex but increases the performance by a much more significant share than the final model does now (e.g. AUC of 75% and above) or a model that is very simple but still reaches a similar out-of-sample AUC of around 69%.
+Potential additions/changes to the model are:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Different features:</strong> Adding or changing the features used. While exploring models, we found that <code>dti</code> can also help to improve the model’s performance. Further variables that may improve the model could be <code>installment</code> or perhaps <code>home_ownership</code> or <code>verification_status</code>. Playing around with additional features and different feature combinations from the lc_clean data set as well as introducing/changing further transformations and interaction terms for these variables may further improve the model’s performance.</li>
+<li><strong>Additional data</strong>: This analysis is only focused on the internal Lending Club data. It may, however, be helpful to take external factors of the macroeconomic environment into account. When exploring different models, we found that both consumer index prices as well as inflation data does not contribute to our model. Nevertheless, other information such as, for example, data on the S&amp;P 500 returns may improve the model’s predictions as it includes external factors from the economy that influence a loan-taker’s ability to fully pay back a loan or not (default or not).</li>
+<li><strong>Different methods</strong>: Perhaps, using a regularization or using different split shares for our in and out of sample regressions could improve our model further if done correctly.</li>
+<li><strong>Standardization</strong>: As we use different variables with very different unit scales, we may find that a particular feature dominates the others in the logistic regression as its unit scale is the largest. As an improvement to our model, we could normalize/standardize all variables to the same scale to make them more comparable and use them as equally weighted features in the model.</li>
+</ol>
+<blockquote>
+<p>In our analysis we did not use information about the applicants race or gender. Why is that the case? Should we have done?</p>
+</blockquote>
+<p>We don’t use information on loan applicants race or gender to ensure that our predictions are fair and non-discriminatory. While algorithms like our model here are increasingly used and helpful to make decisions on e.g. how to reduce costs, improve efficiency or enhance customer personalization, they still pose a risk of reinforcing discriminatory behaviour in which certain groups are preferred over other groups based on their race or gender. To not accentuate possible inequalities in a society, we ensure that our model does not reinforce such discriminatory biases but rather provides financial inclusion. Therefore, and to maintain fairness in our predictions, we do not include information on race or gender. This way, our predictions of loan default are not subject to aloan holders’ race or gender, eliminating (illegal) discriminatory biases and providing inclusive and fair results.</p>
+</div>

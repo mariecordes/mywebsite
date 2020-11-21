@@ -1,0 +1,825 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="Curious, enthusiastic and open-minded. Business &amp; Management undergrad. Analytics &amp; Management masters in 2021. Born and raised in Germany. Lived in Germany, the UK, Hong Kong &amp; the US. Enjoy practicing yoga, making banana bread and wearing striped clothes. Food lover, world traveler and London explorer.">
+	<meta name="author" content="Marie Cordes">
+	<meta name="generator" content="Hugo 0.74.3" />
+	<title>Stop &amp; Search - Data Visualisation Pt 2 &middot; Marie Cordes&#39;s Portfolio Website</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Marie Cordes&#39;s Portfolio Website</strong> <span></span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/aboutme">About me</a></li>
+            
+                <li><a href="/projects">All projects</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+                <li><a href="/docs/Marie_Cordes_CV_Nov2020.pdf" class="button special fit">Download my CV</a></li>
+            
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>Stop &amp; Search - Data Visualisation Pt 2</h1>
+                            </header>
+                            
+                                <span class="image main"><img src="/img/projects/pic11.jpg" alt="" /></span>
+                            
+                            
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/plotly-binding/plotly.js"></script>
+<script src="/rmarkdown-libs/typedarray/typedarray.min.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="/rmarkdown-libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/plotly-main/plotly-latest.min.js"></script>
+
+
+<div id="stop-and-search-in-london" class="section level1">
+<h1>Stop and Search in London</h1>
+<p>Stop and search powers help the police to tackle crime. Without the power of being able to stop and search individuals we suspect of having participated in or are about to commit a crime, the Met would be faced with a much tougher challenge on the streets of London. It’s targeted and intelligence-led and practised on people who are suspected of being involved in crime. Find out how it helps to keep our streets safe and what to expect if you are stopped <a href="https://www.met.police.uk/advice/advice-and-information/st-s/stop-and-search/">here</a>.</p>
+<p>According to an <a href="https://www.theguardian.com/law/2019/jan/26/met-police-disproportionately-use-stop-and-search-powers-on-black-people">article</a> in The Guardian from January 2019, written by Vikram Dodd, the London Police “disproportionately use[s] stop and search powers on black people.” The following data analysis and visualisations deal with verifying and further investigating these claims as well as exploring what has changed since then.</p>
+<p>The analysis entails Stop&amp;Search data from October 2017 to September 2020. As the data for the last months of 2017 and some of the first months in 2018 is not fully representative, we often filter these months, if looked at in detail, out.</p>
+<p>After inspecting the initial data available, it is cleaned and processed so that the data set is ready for further exploration and visualisation.</p>
+<div id="loading-data" class="section level2">
+<h2>Loading data</h2>
+<pre class="r"><code># load data from multiple csvs
+data_dir &lt;- here::here(&quot;data&quot;, &quot;sasdata&quot;)
+
+files &lt;- fs::dir_ls(path = data_dir, regexp = &quot;\\.csv$&quot;, recurse = TRUE) 
+#recurse=TRUE will recursively look for files further down into any folde
+
+#read them all in using vroom::vroom()
+stop_search_data &lt;- vroom(files, id = &quot;source&quot;)</code></pre>
+</div>
+<div id="inspecting-data" class="section level2">
+<h2>Inspecting data</h2>
+<pre class="r"><code>head(stop_search_data, 10)
+glimpse(stop_search_data)
+skim(stop_search_data)</code></pre>
+</div>
+<div id="data-cleaning-processing-preparation-exploration" class="section level2">
+<h2>Data cleaning, processing, preparation &amp; exploration</h2>
+<pre class="r"><code>  # combine no action outcomes
+stop_search_data1 &lt;- data.frame(lapply(stop_search_data, function(x) {
+                  gsub(&quot;A no further action disposal&quot;, &quot;No further action&quot;, x)
+              }))
+
+stop_search_data2 &lt;- data.frame(lapply(stop_search_data1, function(x) {
+                  gsub(&quot;Nothing found - no further action&quot;, &quot;No further action&quot;, x)
+              }))
+
+# clean &amp; prepare data
+sasldn &lt;- stop_search_data2 %&gt;%
+  janitor::clean_names() %&gt;% 
+   # delete irrelevant columns
+    dplyr::select(-source,
+                  -policing_operation,
+                  -part_of_a_policing_operation,
+                  -outcome_linked_to_object_of_search, 
+                  -removal_of_more_than_just_outer_clothing) %&gt;%
+  # delete NAs
+  #na.omit() %&gt;% 
+  
+  mutate(month = month(date),
+         month_name = month(date, label=TRUE, abbr = TRUE),
+         year= year(date),
+         month_year = paste0(year, &quot;-&quot;,month_name),
+         #convert latitude &amp; longitude from characters into numerics
+         latitude = as.numeric(latitude),
+         longitude = as.numeric(longitude)) %&gt;% 
+  filter(month_year != &quot;2017-Sep&quot;) %&gt;% 
+  #remove location outliers
+  filter(longitude &lt; 0.4) %&gt;% 
+  filter(longitude &gt; -0.6) %&gt;% 
+  filter(latitude &gt; 50) %&gt;% 
+  filter(latitude &lt; 52) 
+  
+# order month_year
+sasldn$month_year = factor(sasldn$month_year, levels = c(&quot;2017-Oct&quot;,&quot;2017-Nov&quot;,&quot;2017-Dec&quot;,
+                               &quot;2018-Jan&quot;,&quot;2018-Feb&quot;,&quot;2018-Mar&quot;,&quot;2018-Apr&quot;,&quot;2018-May&quot;,&quot;2018-Jun&quot;,&quot;2018-Jul&quot;,&quot;2018-Aug&quot;,&quot;2018-Sep&quot;,&quot;2018-Oct&quot;,&quot;2018-Nov&quot;,&quot;2018-Dec&quot;,
+                               &quot;2019-Jan&quot;,&quot;2019-Feb&quot;,&quot;2019-Mar&quot;,&quot;2019-Apr&quot;,&quot;2019-May&quot;,&quot;2019-Jun&quot;,&quot;2019-Jul&quot;,&quot;2019-Aug&quot;,&quot;2019-Sep&quot;,&quot;2019-Oct&quot;,&quot;2019-Nov&quot;,&quot;2019-Dec&quot;,
+                               &quot;2020-Jan&quot;,&quot;2020-Feb&quot;,&quot;2020-Mar&quot;,&quot;2020-Apr&quot;,&quot;2020-May&quot;,&quot;2020-Jun&quot;,&quot;2020-Jul&quot;,&quot;2020-Aug&quot;,&quot;2020-Sep&quot;))</code></pre>
+<pre class="r"><code># inspect again
+glimpse(sasldn)</code></pre>
+<pre><code>## Rows: 604,928
+## Columns: 15
+## $ type                      &lt;chr&gt; &quot;Person search&quot;, &quot;Person search&quot;, &quot;Person s…
+## $ date                      &lt;chr&gt; &quot;2017-10-01 00:00:00&quot;, &quot;2017-10-01 00:00:00…
+## $ latitude                  &lt;dbl&gt; 51.59125, 51.54662, 51.52712, 51.51429, 51.…
+## $ longitude                 &lt;dbl&gt; -0.069101, -0.147042, -0.076155, -0.038099,…
+## $ gender                    &lt;chr&gt; &quot;Male&quot;, &quot;Male&quot;, &quot;Male&quot;, &quot;Male&quot;, &quot;Male&quot;, &quot;Ma…
+## $ age_range                 &lt;chr&gt; &quot;18-24&quot;, &quot;25-34&quot;, &quot;25-34&quot;, NA, &quot;25-34&quot;, &quot;25…
+## $ self_defined_ethnicity    &lt;chr&gt; &quot;Black/African/Caribbean/Black British - Ca…
+## $ officer_defined_ethnicity &lt;chr&gt; &quot;Black&quot;, &quot;White&quot;, &quot;Black&quot;, NA, &quot;White&quot;, &quot;Wh…
+## $ legislation               &lt;chr&gt; &quot;Police and Criminal Evidence Act 1984 (sec…
+## $ object_of_search          &lt;chr&gt; &quot;Articles for use in criminal damage&quot;, &quot;Con…
+## $ outcome                   &lt;chr&gt; &quot;No further action&quot;, &quot;Offender given drugs …
+## $ month                     &lt;dbl&gt; 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,…
+## $ month_name                &lt;ord&gt; Oct, Oct, Oct, Oct, Oct, Oct, Oct, Oct, Oct…
+## $ year                      &lt;dbl&gt; 2017, 2017, 2017, 2017, 2017, 2017, 2017, 2…
+## $ month_year                &lt;fct&gt; 2017-Oct, 2017-Oct, 2017-Oct, 2017-Oct, 201…</code></pre>
+<pre class="r"><code># some quick counts...
+sasldn %&gt;% 
+  dplyr::count(gender, sort=TRUE)</code></pre>
+<pre><code>##   gender      n
+## 1   Male 556975
+## 2 Female  39323
+## 3   &lt;NA&gt;   8307
+## 4  Other    323</code></pre>
+<pre class="r"><code>sasldn %&gt;% 
+  dplyr::count(object_of_search, sort=TRUE)</code></pre>
+<pre><code>##                      object_of_search      n
+## 1                    Controlled drugs 364308
+## 2                   Offensive weapons 104989
+## 3                        Stolen goods  65032
+## 4  Evidence of offences under the Act  28519
+## 5 Anything to threaten or harm anyone  22106
+## 6 Articles for use in criminal damage  13116
+## 7                            Firearms   3857
+## 8                                &lt;NA&gt;   1503
+## 9                           Fireworks   1498</code></pre>
+<pre class="r"><code>sasldn %&gt;% 
+  dplyr::count(officer_defined_ethnicity, sort=TRUE)</code></pre>
+<pre><code>##   officer_defined_ethnicity      n
+## 1                     Black 240100
+## 2                     White 223869
+## 3                     Asian 104064
+## 4                     Other  24807
+## 5                      &lt;NA&gt;  12088</code></pre>
+<pre class="r"><code>sasldn %&gt;% 
+  dplyr::count(age_range, sort = TRUE)</code></pre>
+<pre><code>##   age_range      n
+## 1     18-24 212074
+## 2     25-34 130536
+## 3     10-17 104521
+## 4   over 34  94939
+## 5      &lt;NA&gt;  62749
+## 6  under 10    109</code></pre>
+<pre class="r"><code>sasldn %&gt;% 
+  dplyr::count(outcome, sort = TRUE)</code></pre>
+<pre><code>##                                    outcome      n
+## 1                        No further action 456532
+## 2                                   Arrest  73635
+## 3                     Community resolution  43506
+## 4              Penalty Notice for Disorder  13195
+## 5                Summons / charged by post   6799
+## 6                         Suspect arrested   5169
+## 7  Offender given drugs possession warning   2393
+## 8                 Khat or Cannabis warning   1957
+## 9            Offender given penalty notice    646
+## 10         Caution (simple or conditional)    396
+## 11                        Local resolution    345
+## 12              Suspect summonsed to court    330
+## 13                      Offender cautioned     25</code></pre>
+<pre class="r"><code># concentrate in top  searches, age_ranges, and officer defined ethnicities
+which_searches &lt;- c(&quot;Controlled drugs&quot;, &quot;Offensive weapons&quot;,&quot;Stolen goods&quot; )
+which_ages &lt;- c(&quot;10-17&quot;, &quot;18-24&quot;,&quot;25-34&quot;, &quot;over 34&quot;)
+which_ethnicity &lt;- c(&quot;White&quot;, &quot;Black&quot;, &quot;Asian&quot;)
+which_gender &lt;- c(&quot;Male&quot;, &quot;Female&quot;)
+
+sasldn &lt;- sasldn %&gt;% 
+  # concentrate in top searches, age_ranges, and officer defined ethnicities &amp; gender
+  filter(object_of_search %in% which_searches) %&gt;% 
+  filter(age_range %in% which_ages) %&gt;% 
+  filter(officer_defined_ethnicity %in% which_ethnicity) %&gt;% 
+  filter(gender %in% which_gender)
+  
+# check
+# sasldn %&gt;% 
+#  dplyr::count(outcome, sort = TRUE)</code></pre>
+<pre class="r"><code># prep london map
+london_wards &lt;- sf::read_sf(here::here(&quot;data/London-wards-2018_ESRI/London_Ward.shp&quot;))
+
+st_geometry(london_wards)</code></pre>
+<pre><code>## Geometry set for 657 features 
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: 503568.2 ymin: 155850.8 xmax: 561957.5 ymax: 200933.9
+## projected CRS:  OSGB 1936 / British National Grid
+## First 5 geometries:</code></pre>
+<pre class="r"><code># transfrom CRS to 4326, or pairs of latitude/longitude numbers
+london_wards2 &lt;-  london_wards %&gt;% 
+  st_transform(4326) 
+
+london_wards2$geometry</code></pre>
+<pre><code>## Geometry set for 657 features 
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: -0.5103751 ymin: 51.28676 xmax: 0.3340155 ymax: 51.69187
+## geographic CRS: WGS 84
+## First 5 geometries:</code></pre>
+<pre class="r"><code># transform sasldn to a  common CRS. 
+sasldn_map &lt;-  st_as_sf(sasldn, 
+                              coords=c(&#39;longitude&#39;, &#39;latitude&#39;), 
+                              crs=4326)
+
+sasldn_wo17 &lt;- sasldn %&gt;% filter(year != 2017)
+
+sasldn_wo17_map &lt;-  st_as_sf(sasldn_wo17, 
+                              coords=c(&#39;longitude&#39;, &#39;latitude&#39;), 
+                              crs=4326)</code></pre>
+<pre class="r"><code>sasldn_wo17 %&gt;% 
+  dplyr::group_by(object_of_search) %&gt;% 
+  dplyr::summarise(n = n()) %&gt;% 
+  mutate(freq = n / sum(n))</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##   object_of_search       n  freq
+##   &lt;chr&gt;              &lt;int&gt; &lt;dbl&gt;
+## 1 Controlled drugs  296632 0.673
+## 2 Offensive weapons  88210 0.200
+## 3 Stolen goods       55996 0.127</code></pre>
+<pre class="r"><code>#Controlled drugs   296604  0.6728812       
+#Offensive weapons  88203   0.2000989       
+#Stolen goods   55990   0.1270199
+
+sasldn %&gt;% 
+  dplyr::group_by(gender) %&gt;% 
+  dplyr::summarise(n = n()) %&gt;% 
+  mutate(freq = n / sum(n))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   gender      n   freq
+##   &lt;chr&gt;   &lt;int&gt;  &lt;dbl&gt;
+## 1 Female  32567 0.0714
+## 2 Male   423662 0.929</code></pre>
+</div>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<div id="stopped-and-searched---where" class="section level3">
+<h3>Stopped and Searched - Where?</h3>
+<pre class="r"><code># coordinates for London
+londonOSM &lt;- c(left = -0.5, bottom = 51.28, right = 0.31, top = 51.7) 
+
+# map for London
+ldn &lt;- get_stamenmap(londonOSM,  maptype = &quot;terrain-lines&quot;)
+
+# creating filtered data sets
+sasldn_asian &lt;- sasldn %&gt;% 
+  filter(officer_defined_ethnicity == &quot;Asian&quot;)
+
+sasldn_black &lt;- sasldn %&gt;% 
+  filter(officer_defined_ethnicity == &quot;Black&quot;)
+
+sasldn_white &lt;- sasldn %&gt;% 
+  filter(officer_defined_ethnicity == &quot;White&quot;)
+
+# plotting maps 
+# Asian
+p_Asian &lt;- ggmap(ldn, extent = &quot;device&quot;)+
+  geom_bin2d(data = sasldn_asian, 
+             aes(x = longitude, y = latitude), 
+             bins = 75,
+             alpha = 0.9)+
+  scale_fill_gradient(low = &quot;#c4d9a5&quot;, high = &quot;#293617&quot;)+
+  scale_x_continuous(limits = c(-0.5, 0.3))+
+  scale_y_continuous(limits = c(51.3, 51.7))+
+  theme(aspect.ratio = 10/10,
+    # edit text size and font
+    text = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot caption size and font
+    plot.caption = element_text(size = 6, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot title size and font
+    plot.title = element_text(size = 16, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;),
+    plot.subtitle = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Medium&quot;, hjust = 0.5),
+     # design plot and panel background
+    plot.background = element_rect(fill = &quot;white&quot;),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = &quot;white&quot;),
+    axis.text.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank(),
+    # remove legend
+    legend.position = &quot;none&quot;,
+    # adding margins around the plot
+    plot.margin = unit(c(0.4,0.4,0.4,0.4), &quot;lines&quot;)
+    ) +
+  # add labels
+  labs(subtitle = &quot;Asian&quot;,
+       caption = &quot; \n &quot;,
+       y = &quot;&quot;,
+       x = &quot;&quot;)+
+  NULL
+
+# black
+p_Black &lt;- ggmap(ldn, extent = &quot;device&quot;)+
+  geom_bin2d(data = sasldn_black, 
+             aes(x = longitude, y = latitude), 
+             bins = 75,
+             alpha = 0.9)+
+  scale_fill_gradient(low = &quot;#ddaca1&quot;, high = &quot;#381b14&quot;)+
+  scale_x_continuous(limits = c(-0.5, 0.3))+
+  scale_y_continuous(limits = c(51.3, 51.7))+
+  theme(aspect.ratio = 10/10,
+    # edit text size and font
+    text = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot caption size and font
+    plot.caption = element_text(size = 6, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot title size and font
+    plot.title = element_text(size = 16, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;),
+    plot.subtitle = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Medium&quot;, hjust = 0.5),
+     # design plot and panel background
+    plot.background = element_rect(fill = &quot;white&quot;),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = &quot;white&quot;),
+    axis.text.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank(),
+    # remove legend
+    legend.position = &quot;none&quot;,
+    # adding margins around the plot
+    plot.margin = unit(c(0.4,0.4,0.4,0.4), &quot;lines&quot;)
+    ) +
+  # add labels
+  labs(subtitle = &quot;Black&quot;,
+       caption = &quot; \n &quot;,
+       y = &quot;&quot;,
+       x = &quot;&quot;)+
+  NULL
+
+# white
+p_White &lt;- ggmap(ldn, extent = &quot;device&quot;)+
+  geom_bin2d(data = sasldn_white, 
+             aes(x = longitude, y = latitude), 
+             bins = 75,
+             alpha = 0.9)+
+  scale_fill_gradient(low = &quot;#9fbfdf&quot;, high = &quot;#132639&quot;)+
+  scale_x_continuous(limits = c(-0.5, 0.3))+
+  scale_y_continuous(limits = c(51.3, 51.7))+
+  theme(aspect.ratio = 10/10,
+    # edit text size and font
+    text = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot caption size and font
+    plot.caption = element_text(size = 6, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot title size and font
+    plot.title = element_text(size = 16, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;),
+    plot.subtitle = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Medium&quot;, hjust = 0.5),
+     # design plot and panel background
+    plot.background = element_rect(fill = &quot;white&quot;),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = &quot;white&quot;),
+    axis.text.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank(),
+    # remove legend
+    legend.position = &quot;none&quot;,
+    # adding margins around the plot
+    plot.margin = unit(c(1,1,1,1), &quot;lines&quot;)
+    ) +
+  # add labels
+  labs(subtitle = &quot;White&quot;,
+       caption = &quot;&quot;,
+       y = &quot;&quot;,
+       x = &quot;&quot;)+
+  NULL
+
+p_Asian + p_Black + p_White +
+  plot_annotation(title = &quot;In the East, Asian ethnicities are mostly stopped;\nin the South, mostly Black&quot;,
+                  subtitle = &quot;Where different ethnicities* are stopped and searched in London&quot;,
+                  caption = &quot;*Note: Officer-defined ethnicity\nSource: https://data.police.uk/data/ (10/2017-09/2020)&quot;,
+                  theme = theme(plot.title = element_text(size = 16, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;),
+                                plot.subtitle = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+                                plot.caption = element_text(size = 6, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+                                plot.background = element_rect(fill = &quot;#deeaee&quot;)))</code></pre>
+<p><img src="/projects/stopandsearch2/index_files/figure-html/plot2-1.png" width="672" /></p>
+<p>Looking at the density of where which ethnicities are mostly stopped, it is visible that Asian ethnicities are mainly stopped in East and North-East London. Black ethnicities are widely stopped throughout London but compared to White ethnicities that are also stopped throughout the city, Black ethnicities seem to be the only ones frequently stopped in South London.</p>
+<p>But does the location of stops and searches already determine a racial bias?</p>
+<p>###Stopped and Searched - with racial bias?</p>
+<p>Comparing the share of people of different ethnicities that were stopped throughout the last three years, the following picture emerges:</p>
+<pre class="r"><code>sasldn %&gt;% 
+  dplyr::group_by(officer_defined_ethnicity) %&gt;% 
+  dplyr::summarise(n = n()) %&gt;% 
+  mutate(freq = n / sum(n))</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##   officer_defined_ethnicity      n  freq
+##   &lt;chr&gt;                      &lt;int&gt; &lt;dbl&gt;
+## 1 Asian                      87546 0.192
+## 2 Black                     188092 0.412
+## 3 White                     180591 0.396</code></pre>
+<pre class="r"><code>ethnicity_colours &lt;- c(&#39;#8ab44b&#39;, &#39;#d9c4bf&#39;, &#39;#bfccd9&#39;)
+
+plot3 &lt;-  sasldn %&gt;% 
+  group_by(month_year, officer_defined_ethnicity) %&gt;% 
+  dplyr::summarise(n = n()) %&gt;% 
+  mutate(pct = n / sum(n)) %&gt;% 
+  ggplot(aes(x = month_year, y = pct, fill = officer_defined_ethnicity))+
+  geom_col(colour = &quot;#deeaee&quot;, 
+           position = position_fill(reverse = TRUE),
+           aes(
+           text  = paste0(&quot;\nTime period: &quot;, month_year,
+                          &quot;\nEthnicity: &quot;, officer_defined_ethnicity,
+                          &quot;\n% of total: &quot;, round(pct*100, digits = 1))))+
+  scale_fill_manual(values = ethnicity_colours)+
+  theme(
+    # edit text size and font
+    text = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot caption size and font
+    plot.caption = element_text(size = 6, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot title size and font
+    plot.title = element_text(size = 16, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;),
+    plot.subtitle = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+     # design plot and panel background
+    plot.background = element_rect(fill = &quot;#deeaee&quot;),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = &quot;#deeaee&quot;),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 8, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;),
+    axis.ticks = element_blank(),
+    strip.text = element_text(colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;, hjust = 0),
+    strip.background = element_rect(fill = &quot;#44506b&quot;),
+    # edit legend
+    legend.position = &quot;top&quot;,
+    legend.background = element_rect(fill = &quot;#deeaee&quot;),
+    legend.title = element_text(size = 8, family = &quot;Helvetica Neue Bold&quot;, colour = &quot;#333333&quot;),
+    legend.text = element_text(size = 8, family = &quot;Helvetica Neue Bold&quot;, colour = &quot;#333333&quot;),
+    legend.key = element_rect(size = 15),
+    legend.key.size = unit(6,&quot;point&quot;),
+    # add margins around the plot
+    plot.margin = unit(c(2,2,1,1), &quot;lines&quot;)
+    ) +
+  # overwriting legend aes and making points bigger and non-transparent
+  guides(colour = guide_legend
+         (override.aes = list(alpha = 1,
+                              size = 6)))+
+  # add labels
+  labs(title = &quot;No racial bias towards Asian ethnicities&quot;,
+       subtitle = &quot;Less than one fifth of all Stop&amp;Search targets in London in the last three years is Asian&quot;,
+       caption = &quot;*Note: Officer-defined ethnicity\nSource: https://data.police.uk/data/ (10/2017-09/2020)&quot;,
+       fill = &quot;Ethnicity*&quot;,
+       y = &quot;Share of total&quot;,
+       x = &quot;&quot;)+
+    scale_x_discrete(breaks = c(&quot;2017-Oct&quot;, &quot;2018-Jan&quot;, &quot;2019-Jan&quot;, &quot;2020-Jan&quot;,&quot;2020-Sep&quot;),
+                     labels = c(&quot;Oct 2017&quot;, &quot;2018&quot;, &quot;2019&quot;, &quot;2020&quot;, &quot;Sep 2020&quot;))
+
+plot3</code></pre>
+<p><img src="/projects/stopandsearch2/index_files/figure-html/plot3-1.png" width="672" /></p>
+<p>For a more detailed look into the data, hover over this chart…</p>
+<pre class="r"><code>ggplotly(
+  p = plot3, tooltip = &quot;text&quot;,
+  dynamicTicks = FALSE,
+  layerData = 1,
+  originalData = TRUE,
+  source = &quot;A&quot;)</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"data":[{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.900000000000002,0.900000000000006,0.900000000000006,0.900000000000006],"base":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35],"y":[0.193190815518606,0.21346119694548,0.220475785896347,0.18580897533413,0.117647058823529,0.185213835782959,0.167281260476031,0.190268886043534,0.194385964912281,0.178584261588214,0.192604006163328,0.204218389541909,0.206435319427556,0.206576576576577,0.190243524119746,0.18504087401635,0.196562482894521,0.191393214682981,0.18269356740469,0.196282390595187,0.19783213211509,0.183525064075818,0.204163647144081,0.193352249695987,0.187135296512417,0.174355856198221,0.187282817281261,0.183419110807962,0.189095843098557,0.18703207949544,0.189443167049885,0.207393206508381,0.199430361720308,0.188086615919001,0.194192781820882],"text":["<br />Time period: 2017-Oct<br />Ethnicity: Asian<br />% of total: 19.3","<br />Time period: 2017-Nov<br />Ethnicity: Asian<br />% of total: 21.3","<br />Time period: 2017-Dec<br />Ethnicity: Asian<br />% of total: 22","<br />Time period: 2018-Jan<br />Ethnicity: Asian<br />% of total: 18.6","<br />Time period: 2018-Mar<br />Ethnicity: Asian<br />% of total: 11.8","<br />Time period: 2018-Apr<br />Ethnicity: Asian<br />% of total: 18.5","<br />Time period: 2018-May<br />Ethnicity: Asian<br />% of total: 16.7","<br />Time period: 2018-Jun<br />Ethnicity: Asian<br />% of total: 19","<br />Time period: 2018-Jul<br />Ethnicity: Asian<br />% of total: 19.4","<br />Time period: 2018-Aug<br />Ethnicity: Asian<br />% of total: 17.9","<br />Time period: 2018-Sep<br />Ethnicity: Asian<br />% of total: 19.3","<br />Time period: 2018-Oct<br />Ethnicity: Asian<br />% of total: 20.4","<br />Time period: 2018-Nov<br />Ethnicity: Asian<br />% of total: 20.6","<br />Time period: 2018-Dec<br />Ethnicity: Asian<br />% of total: 20.7","<br />Time period: 2019-Jan<br />Ethnicity: Asian<br />% of total: 19","<br />Time period: 2019-Feb<br />Ethnicity: Asian<br />% of total: 18.5","<br />Time period: 2019-Mar<br />Ethnicity: Asian<br />% of total: 19.7","<br />Time period: 2019-Apr<br />Ethnicity: Asian<br />% of total: 19.1","<br />Time period: 2019-May<br />Ethnicity: Asian<br />% of total: 18.3","<br />Time period: 2019-Jun<br />Ethnicity: Asian<br />% of total: 19.6","<br />Time period: 2019-Jul<br />Ethnicity: Asian<br />% of total: 19.8","<br />Time period: 2019-Aug<br />Ethnicity: Asian<br />% of total: 18.4","<br />Time period: 2019-Sep<br />Ethnicity: Asian<br />% of total: 20.4","<br />Time period: 2019-Oct<br />Ethnicity: Asian<br />% of total: 19.3","<br />Time period: 2019-Nov<br />Ethnicity: Asian<br />% of total: 18.7","<br />Time period: 2019-Dec<br />Ethnicity: Asian<br />% of total: 17.4","<br />Time period: 2020-Jan<br />Ethnicity: Asian<br />% of total: 18.7","<br />Time period: 2020-Feb<br />Ethnicity: Asian<br />% of total: 18.3","<br />Time period: 2020-Mar<br />Ethnicity: Asian<br />% of total: 18.9","<br />Time period: 2020-Apr<br />Ethnicity: Asian<br />% of total: 18.7","<br />Time period: 2020-May<br />Ethnicity: Asian<br />% of total: 18.9","<br />Time period: 2020-Jun<br />Ethnicity: Asian<br />% of total: 20.7","<br />Time period: 2020-Jul<br />Ethnicity: Asian<br />% of total: 19.9","<br />Time period: 2020-Aug<br />Ethnicity: Asian<br />% of total: 18.8","<br />Time period: 2020-Sep<br />Ethnicity: Asian<br />% of total: 19.4"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(138,180,75,1)","line":{"width":1.88976377952756,"color":"rgba(222,234,238,1)"}},"name":"Asian","legendgroup":"Asian","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.900000000000002,0.900000000000006,0.900000000000006,0.900000000000006],"base":[0.193190815518606,0.21346119694548,0.220475785896347,0.18580897533413,0.117647058823529,0.185213835782959,0.167281260476031,0.190268886043534,0.194385964912281,0.178584261588214,0.192604006163328,0.204218389541909,0.206435319427556,0.206576576576577,0.190243524119746,0.18504087401635,0.196562482894521,0.191393214682981,0.18269356740469,0.196282390595187,0.19783213211509,0.183525064075818,0.204163647144081,0.193352249695987,0.187135296512417,0.174355856198221,0.187282817281261,0.183419110807962,0.189095843098557,0.18703207949544,0.189443167049885,0.207393206508381,0.199430361720308,0.188086615919001,0.194192781820882],"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35],"y":[0.407363420427553,0.387852956846031,0.39910790144435,0.434640877974574,0.558823529411765,0.452315172947287,0.477036540395575,0.453137003841229,0.467929824561404,0.471793029105282,0.442574374777765,0.428979457321762,0.42764942474979,0.407207207207207,0.416860555297037,0.396668958667583,0.395642892331272,0.41003893214683,0.413271321891786,0.414968917338586,0.429601044208615,0.434583060141861,0.394426510310297,0.403188758275909,0.400189985072601,0.411263965949685,0.414708780664903,0.404724995349414,0.40976933514247,0.419347520304914,0.41640841081009,0.363614019564469,0.374992879521504,0.385559086542015,0.376949353928412],"text":["<br />Time period: 2017-Oct<br />Ethnicity: Black<br />% of total: 40.7","<br />Time period: 2017-Nov<br />Ethnicity: Black<br />% of total: 38.8","<br />Time period: 2017-Dec<br />Ethnicity: Black<br />% of total: 39.9","<br />Time period: 2018-Jan<br />Ethnicity: Black<br />% of total: 43.5","<br />Time period: 2018-Mar<br />Ethnicity: Black<br />% of total: 55.9","<br />Time period: 2018-Apr<br />Ethnicity: Black<br />% of total: 45.2","<br />Time period: 2018-May<br />Ethnicity: Black<br />% of total: 47.7","<br />Time period: 2018-Jun<br />Ethnicity: Black<br />% of total: 45.3","<br />Time period: 2018-Jul<br />Ethnicity: Black<br />% of total: 46.8","<br />Time period: 2018-Aug<br />Ethnicity: Black<br />% of total: 47.2","<br />Time period: 2018-Sep<br />Ethnicity: Black<br />% of total: 44.3","<br />Time period: 2018-Oct<br />Ethnicity: Black<br />% of total: 42.9","<br />Time period: 2018-Nov<br />Ethnicity: Black<br />% of total: 42.8","<br />Time period: 2018-Dec<br />Ethnicity: Black<br />% of total: 40.7","<br />Time period: 2019-Jan<br />Ethnicity: Black<br />% of total: 41.7","<br />Time period: 2019-Feb<br />Ethnicity: Black<br />% of total: 39.7","<br />Time period: 2019-Mar<br />Ethnicity: Black<br />% of total: 39.6","<br />Time period: 2019-Apr<br />Ethnicity: Black<br />% of total: 41","<br />Time period: 2019-May<br />Ethnicity: Black<br />% of total: 41.3","<br />Time period: 2019-Jun<br />Ethnicity: Black<br />% of total: 41.5","<br />Time period: 2019-Jul<br />Ethnicity: Black<br />% of total: 43","<br />Time period: 2019-Aug<br />Ethnicity: Black<br />% of total: 43.5","<br />Time period: 2019-Sep<br />Ethnicity: Black<br />% of total: 39.4","<br />Time period: 2019-Oct<br />Ethnicity: Black<br />% of total: 40.3","<br />Time period: 2019-Nov<br />Ethnicity: Black<br />% of total: 40","<br />Time period: 2019-Dec<br />Ethnicity: Black<br />% of total: 41.1","<br />Time period: 2020-Jan<br />Ethnicity: Black<br />% of total: 41.5","<br />Time period: 2020-Feb<br />Ethnicity: Black<br />% of total: 40.5","<br />Time period: 2020-Mar<br />Ethnicity: Black<br />% of total: 41","<br />Time period: 2020-Apr<br />Ethnicity: Black<br />% of total: 41.9","<br />Time period: 2020-May<br />Ethnicity: Black<br />% of total: 41.6","<br />Time period: 2020-Jun<br />Ethnicity: Black<br />% of total: 36.4","<br />Time period: 2020-Jul<br />Ethnicity: Black<br />% of total: 37.5","<br />Time period: 2020-Aug<br />Ethnicity: Black<br />% of total: 38.6","<br />Time period: 2020-Sep<br />Ethnicity: Black<br />% of total: 37.7"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(217,196,191,1)","line":{"width":1.88976377952756,"color":"rgba(222,234,238,1)"}},"name":"Black","legendgroup":"Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.899999999999999,0.900000000000002,0.900000000000006,0.900000000000006,0.900000000000006],"base":[0.60055423594616,0.601314153791511,0.619583687340697,0.620449853308704,0.676470588235294,0.637529008730246,0.644317800871606,0.643405889884763,0.662315789473684,0.650377290693496,0.635178380941093,0.633197846863671,0.634084744177345,0.613783783783784,0.607104079416783,0.581709832683933,0.592205375225792,0.601432146829811,0.595964889296476,0.611251307933772,0.627433176323705,0.618108124217679,0.598590157454378,0.596541007971896,0.587325281585018,0.585619822147906,0.601991597946165,0.588144106157376,0.598865178241026,0.606379599800354,0.605851577859975,0.571007226072851,0.574423241241811,0.573645702461015,0.571142135749295],"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35],"y":[0.39944576405384,0.398685846208489,0.380416312659303,0.379550146691296,0.323529411764706,0.362470991269754,0.355682199128394,0.356594110115237,0.337684210526316,0.349622709306504,0.364821619058907,0.366802153136329,0.365915255822655,0.386216216216216,0.392895920583217,0.418290167316067,0.407794624774208,0.398567853170189,0.404035110703524,0.388748692066228,0.372566823676295,0.381891875782321,0.401409842545622,0.403458992028104,0.412674718414982,0.414380177852094,0.398008402053835,0.411855893842624,0.401134821758974,0.393620400199646,0.394148422140025,0.428992773927149,0.425576758758189,0.426354297538985,0.428857864250705],"text":["<br />Time period: 2017-Oct<br />Ethnicity: White<br />% of total: 39.9","<br />Time period: 2017-Nov<br />Ethnicity: White<br />% of total: 39.9","<br />Time period: 2017-Dec<br />Ethnicity: White<br />% of total: 38","<br />Time period: 2018-Jan<br />Ethnicity: White<br />% of total: 38","<br />Time period: 2018-Mar<br />Ethnicity: White<br />% of total: 32.4","<br />Time period: 2018-Apr<br />Ethnicity: White<br />% of total: 36.2","<br />Time period: 2018-May<br />Ethnicity: White<br />% of total: 35.6","<br />Time period: 2018-Jun<br />Ethnicity: White<br />% of total: 35.7","<br />Time period: 2018-Jul<br />Ethnicity: White<br />% of total: 33.8","<br />Time period: 2018-Aug<br />Ethnicity: White<br />% of total: 35","<br />Time period: 2018-Sep<br />Ethnicity: White<br />% of total: 36.5","<br />Time period: 2018-Oct<br />Ethnicity: White<br />% of total: 36.7","<br />Time period: 2018-Nov<br />Ethnicity: White<br />% of total: 36.6","<br />Time period: 2018-Dec<br />Ethnicity: White<br />% of total: 38.6","<br />Time period: 2019-Jan<br />Ethnicity: White<br />% of total: 39.3","<br />Time period: 2019-Feb<br />Ethnicity: White<br />% of total: 41.8","<br />Time period: 2019-Mar<br />Ethnicity: White<br />% of total: 40.8","<br />Time period: 2019-Apr<br />Ethnicity: White<br />% of total: 39.9","<br />Time period: 2019-May<br />Ethnicity: White<br />% of total: 40.4","<br />Time period: 2019-Jun<br />Ethnicity: White<br />% of total: 38.9","<br />Time period: 2019-Jul<br />Ethnicity: White<br />% of total: 37.3","<br />Time period: 2019-Aug<br />Ethnicity: White<br />% of total: 38.2","<br />Time period: 2019-Sep<br />Ethnicity: White<br />% of total: 40.1","<br />Time period: 2019-Oct<br />Ethnicity: White<br />% of total: 40.3","<br />Time period: 2019-Nov<br />Ethnicity: White<br />% of total: 41.3","<br />Time period: 2019-Dec<br />Ethnicity: White<br />% of total: 41.4","<br />Time period: 2020-Jan<br />Ethnicity: White<br />% of total: 39.8","<br />Time period: 2020-Feb<br />Ethnicity: White<br />% of total: 41.2","<br />Time period: 2020-Mar<br />Ethnicity: White<br />% of total: 40.1","<br />Time period: 2020-Apr<br />Ethnicity: White<br />% of total: 39.4","<br />Time period: 2020-May<br />Ethnicity: White<br />% of total: 39.4","<br />Time period: 2020-Jun<br />Ethnicity: White<br />% of total: 42.9","<br />Time period: 2020-Jul<br />Ethnicity: White<br />% of total: 42.6","<br />Time period: 2020-Aug<br />Ethnicity: White<br />% of total: 42.6","<br />Time period: 2020-Sep<br />Ethnicity: White<br />% of total: 42.9"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(191,204,217,1)","line":{"width":1.88976377952756,"color":"rgba(222,234,238,1)"}},"name":"White","legendgroup":"White","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":75.6536322125363,"r":38.4,"b":33.4797841427978,"l":36.1364881693649},"plot_bgcolor":"rgba(222,234,238,1)","paper_bgcolor":"rgba(222,234,238,1)","font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Light","size":13.2835201328352},"title":{"text":"No racial bias towards Asian ethnicities","font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Bold","size":21.2536322125363},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,35.6],"tickmode":"array","ticktext":["Oct 2017","2018","2019","2020","Sep 2020"],"tickvals":[1,4,15,27,35],"categoryorder":"array","categoryarray":["Oct 2017","2018","2019","2020","Sep 2020"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.65296803652968,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Bold","size":10.6268161062682},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Light","size":13.2835201328352}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.05,1.05],"tickmode":"array","ticktext":["0.00","0.25","0.50","0.75","1.00"],"tickvals":[0,0.25,0.5,0.75,1],"categoryorder":"array","categoryarray":["0.00","0.25","0.50","0.75","1.00"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.65296803652968,"tickwidth":0,"showticklabels":false,"tickfont":{"color":null,"family":null,"size":0},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Share of total","font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Light","size":13.2835201328352}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(222,234,238,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Bold","size":10.6268161062682},"y":0.937007874015748},"annotations":[{"text":"Ethnicity*","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Bold","size":10.6268161062682},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"ecf5ef6bf0c":{"text":{},"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"ecf5ef6bf0c","visdat":{"ecf5ef6bf0c":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>Over the last three years, less than one fifth of all stops and searches targeted people of Asian ethnicity. It becomes clear that there is – at least – no racial bias towards Asian ethnicities.</p>
+<p>But what about Black and White people? Why were there news about a racial bias unfavourable of Black people in London?</p>
+<pre class="r"><code># prepare data set
+sasldn_bw &lt;- sasldn %&gt;% 
+  filter(officer_defined_ethnicity != &quot;Asian&quot;) %&gt;% 
+  filter(month_year != &quot;2017-Oct&quot;) %&gt;% 
+  filter(month_year != &quot;2017-Nov&quot;) %&gt;%
+  filter(month_year != &quot;2017-Dec&quot;) %&gt;%
+  filter(month_year != &quot;2018-Jan&quot;) %&gt;%
+  filter(month_year != &quot;2018-Mar&quot;)
+
+# look at individual percentages
+sasldn_bw %&gt;% 
+  dplyr::group_by(month_year, officer_defined_ethnicity) %&gt;% 
+  dplyr::summarise(n = n()) %&gt;% 
+  mutate(freq = n / sum(n))</code></pre>
+<pre><code>## # A tibble: 60 x 4
+## # Groups:   month_year [30]
+##    month_year officer_defined_ethnicity     n  freq
+##    &lt;fct&gt;      &lt;chr&gt;                     &lt;int&gt; &lt;dbl&gt;
+##  1 2018-Apr   Black                      4093 0.555
+##  2 2018-Apr   White                      3280 0.445
+##  3 2018-May   Black                      4269 0.573
+##  4 2018-May   White                      3183 0.427
+##  5 2018-Jun   Black                      3539 0.560
+##  6 2018-Jun   White                      2785 0.440
+##  7 2018-Jul   Black                      3334 0.581
+##  8 2018-Jul   White                      2406 0.419
+##  9 2018-Aug   Black                      3939 0.574
+## 10 2018-Aug   White                      2919 0.426
+## # … with 50 more rows</code></pre>
+<pre class="r"><code>#set colours
+ethnicity_colours2 &lt;- c(&#39;#c26a56&#39;, &#39;#6699cc&#39;)
+
+# set labels
+label1 &lt;- &quot;In July 2018,\nAlmost 40% more Black\nthan White people\nwere stopped&quot;
+label2 &lt;- &quot;Throughout 2019\nboth ethnicities were stopped\nalmost equally often&quot;
+label3 &lt;- &quot;Today, even slightly more\nWhite people are stopped&quot;
+
+# create plot
+plot4 &lt;- sasldn_bw %&gt;% 
+  filter(officer_defined_ethnicity != &quot;Asian&quot;) %&gt;% 
+  group_by(month_year, officer_defined_ethnicity) %&gt;% 
+  dplyr::summarise(n = n()) %&gt;% 
+  mutate(pct = n / sum(n)) %&gt;% 
+  ggplot(aes(x = month_year, y = pct, colour = officer_defined_ethnicity))+
+ geom_point(size = 2.25, 
+            aes(
+           text  = paste0(&quot;\nTime period: &quot;, month_year,
+                          &quot;\nEthnicity: &quot;, officer_defined_ethnicity,
+                          &quot;\n% of total White&amp;Black: &quot;, round(pct*100, digits = 1))))+
+  geom_segment(aes(x= month_year, xend=month_year, y=0.5, yend=pct))+
+  geom_hline(yintercept=0.5, 
+                color = &quot;#333333&quot;, size=0.1)+
+  scale_colour_manual(values = ethnicity_colours2)+
+theme(
+    # edit text size and font
+    text = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot caption size and font
+    plot.caption = element_text(size = 6, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot title size and font
+    plot.title = element_text(size = 16, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;),
+    plot.subtitle = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+     # design plot and panel background
+    plot.background = element_rect(fill = &quot;#deeaee&quot;),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = &quot;#deeaee&quot;),
+    axis.text.x = element_text(size = 8, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;),
+    axis.ticks = element_blank(),
+    strip.text = element_text(colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;, hjust = 0),
+    strip.background = element_rect(fill = &quot;#44506b&quot;),
+    # edit legend
+    legend.position = &quot;top&quot;,
+    legend.background = element_rect(fill = &quot;#deeaee&quot;),
+    legend.title = element_text(size = 8, family = &quot;Helvetica Neue Bold&quot;, colour = &quot;#333333&quot;),
+    legend.text = element_text(size = 8, family = &quot;Helvetica Neue Bold&quot;, colour = &quot;#333333&quot;),
+    legend.key = element_rect(size = 1),
+    legend.key.size = unit(0.5,&quot;point&quot;),
+    # add margins around the plot
+    plot.margin = unit(c(1.5,1.5,1.5,1.5), &quot;lines&quot;)
+    ) +
+  # add labels
+  labs(title = &quot;Bias towards Black ethnicities was addressed&quot;,
+       subtitle = &quot;Significant divide between Black and White ethnicities until 2019&quot;,
+       caption = &quot;*Note: Officer-defined ethnicity\nNote: Asian and other ethnicities excluded\nSource: https://data.police.uk/data/ (10/2017-09/2020)&quot;,
+       colour = &quot;Ethnicity*&quot;,
+       y = &quot;&quot;,
+       x = &quot;&quot;)+
+  # edit axes
+    scale_x_discrete(breaks = c(&quot;2018-Apr&quot;, &quot;2019-Jan&quot;, &quot;2020-Jan&quot;,&quot;2020-Sep&quot;),
+                     labels = c(&quot;April 2018&quot;, &quot;2019&quot;, &quot;2020&quot;, &quot;Today&quot;))+
+  scale_y_continuous(limits = c(0.3, 0.7),
+                       breaks = c(0.4, 0.5, 0.6),
+                     labels = c(&quot;&lt;40%&quot;, &quot;50:50&quot;, &quot;&gt;60%&quot;))+
+  # insert labels
+   geom_text(data = data.frame(x = &quot;2018-Jul&quot;, y = 0.65, label = label1),
+          aes(x = x, y = y, label = label1),
+          colour=&quot;#333333&quot;,
+          family=&quot;Helvetica Neue Medium&quot;,
+          size = 2.5,
+          inherit.aes = FALSE)+
+  geom_text(data = data.frame(x = &quot;2019-Jun&quot;, y = 0.6, label = label2),
+          aes(x = x, y = y, label = label2),
+          colour=&quot;#333333&quot;,
+          family=&quot;Helvetica Neue Medium&quot;,
+          size = 2.5,
+          inherit.aes = FALSE)+
+  geom_text(data = data.frame(x = &quot;2020-May&quot;, y = 0.63, label = label3),
+          aes(x = x, y = y, label = label3),
+          colour=&quot;#333333&quot;,
+          family=&quot;Helvetica Neue Medium&quot;,
+          size = 2.5,
+          inherit.aes = FALSE)+
+   # insert arrows
+  geom_curve(aes(x = &quot;2018-Oct&quot;, y = 0.64, xend = &quot;2019-Mar&quot;, yend = 0.62),
+             arrow = arrow(length = unit(0.04, &quot;npc&quot;)),
+             curvature = -0.3,
+             size = 0.2,
+             colour = &quot;#333333&quot;)+
+  geom_curve(aes(x = &quot;2019-Sep&quot;, y = 0.62, xend = &quot;2020-Feb&quot;, yend = 0.65),
+             arrow = arrow(length = unit(0.04, &quot;npc&quot;)),
+             curvature = -0.4,
+             size = 0.2,
+             colour = &quot;#333333&quot;)+
+  NULL
+
+plot4</code></pre>
+<p><img src="/projects/stopandsearch2/index_files/figure-html/plot4-1.png" width="672" /></p>
+<p>For a more detailed look into the data, hover over this chart…</p>
+<pre class="r"><code>ggplotly(
+  p = plot4, tooltip = &quot;text&quot;,
+  dynamicTicks = FALSE,
+  layerData = 1,
+  originalData = TRUE,
+  source = &quot;A&quot;)</code></pre>
+<div id="htmlwidget-2" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"y":[0.555133595551336,0.572866344605475,0.559614168247944,0.580836236933798,0.574365704286964,0.548150322959483,0.539066813914964,0.538896746817539,0.513228114000227,0.514797433196054,0.486734789537827,0.492437661806786,0.50709311323188,0.505650396729983,0.516311839485373,0.535550053059781,0.532267484304278,0.495612582781457,0.499832495812395,0.492320534223706,0.498112860167541,0.510274409700064,0.495633685169717,0.505324003650745,0.515822961433276,0.513731294195034,0.458757132225254,0.468407570798349,0.474877116329874,0.467790987005806],"text":["<br />Time period: 2018-Apr<br />Ethnicity: Black<br />% of total White&Black: 55.5","<br />Time period: 2018-May<br />Ethnicity: Black<br />% of total White&Black: 57.3","<br />Time period: 2018-Jun<br />Ethnicity: Black<br />% of total White&Black: 56","<br />Time period: 2018-Jul<br />Ethnicity: Black<br />% of total White&Black: 58.1","<br />Time period: 2018-Aug<br />Ethnicity: Black<br />% of total White&Black: 57.4","<br />Time period: 2018-Sep<br />Ethnicity: Black<br />% of total White&Black: 54.8","<br />Time period: 2018-Oct<br />Ethnicity: Black<br />% of total White&Black: 53.9","<br />Time period: 2018-Nov<br />Ethnicity: Black<br />% of total White&Black: 53.9","<br />Time period: 2018-Dec<br />Ethnicity: Black<br />% of total White&Black: 51.3","<br />Time period: 2019-Jan<br />Ethnicity: Black<br />% of total White&Black: 51.5","<br />Time period: 2019-Feb<br />Ethnicity: Black<br />% of total White&Black: 48.7","<br />Time period: 2019-Mar<br />Ethnicity: Black<br />% of total White&Black: 49.2","<br />Time period: 2019-Apr<br />Ethnicity: Black<br />% of total White&Black: 50.7","<br />Time period: 2019-May<br />Ethnicity: Black<br />% of total White&Black: 50.6","<br />Time period: 2019-Jun<br />Ethnicity: Black<br />% of total White&Black: 51.6","<br />Time period: 2019-Jul<br />Ethnicity: Black<br />% of total White&Black: 53.6","<br />Time period: 2019-Aug<br />Ethnicity: Black<br />% of total White&Black: 53.2","<br />Time period: 2019-Sep<br />Ethnicity: Black<br />% of total White&Black: 49.6","<br />Time period: 2019-Oct<br />Ethnicity: Black<br />% of total White&Black: 50","<br />Time period: 2019-Nov<br />Ethnicity: Black<br />% of total White&Black: 49.2","<br />Time period: 2019-Dec<br />Ethnicity: Black<br />% of total White&Black: 49.8","<br />Time period: 2020-Jan<br />Ethnicity: Black<br />% of total White&Black: 51","<br />Time period: 2020-Feb<br />Ethnicity: Black<br />% of total White&Black: 49.6","<br />Time period: 2020-Mar<br />Ethnicity: Black<br />% of total White&Black: 50.5","<br />Time period: 2020-Apr<br />Ethnicity: Black<br />% of total White&Black: 51.6","<br />Time period: 2020-May<br />Ethnicity: Black<br />% of total White&Black: 51.4","<br />Time period: 2020-Jun<br />Ethnicity: Black<br />% of total White&Black: 45.9","<br />Time period: 2020-Jul<br />Ethnicity: Black<br />% of total White&Black: 46.8","<br />Time period: 2020-Aug<br />Ethnicity: Black<br />% of total White&Black: 47.5","<br />Time period: 2020-Sep<br />Ethnicity: Black<br />% of total White&Black: 46.8"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(194,106,86,1)","opacity":1,"size":8.50393700787402,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(194,106,86,1)"}},"hoveron":"points","name":"Black","legendgroup":"Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"y":[0.444866404448664,0.427133655394525,0.440385831752056,0.419163763066202,0.425634295713036,0.451849677040517,0.460933186085036,0.461103253182461,0.486771885999773,0.485202566803946,0.513265210462173,0.507562338193214,0.49290688676812,0.494349603270017,0.483688160514627,0.464449946940219,0.467732515695722,0.504387417218543,0.500167504187605,0.507679465776294,0.501887139832459,0.489725590299936,0.504366314830283,0.494675996349255,0.484177038566724,0.486268705804966,0.541242867774746,0.531592429201651,0.525122883670126,0.532209012994194],"text":["<br />Time period: 2018-Apr<br />Ethnicity: White<br />% of total White&Black: 44.5","<br />Time period: 2018-May<br />Ethnicity: White<br />% of total White&Black: 42.7","<br />Time period: 2018-Jun<br />Ethnicity: White<br />% of total White&Black: 44","<br />Time period: 2018-Jul<br />Ethnicity: White<br />% of total White&Black: 41.9","<br />Time period: 2018-Aug<br />Ethnicity: White<br />% of total White&Black: 42.6","<br />Time period: 2018-Sep<br />Ethnicity: White<br />% of total White&Black: 45.2","<br />Time period: 2018-Oct<br />Ethnicity: White<br />% of total White&Black: 46.1","<br />Time period: 2018-Nov<br />Ethnicity: White<br />% of total White&Black: 46.1","<br />Time period: 2018-Dec<br />Ethnicity: White<br />% of total White&Black: 48.7","<br />Time period: 2019-Jan<br />Ethnicity: White<br />% of total White&Black: 48.5","<br />Time period: 2019-Feb<br />Ethnicity: White<br />% of total White&Black: 51.3","<br />Time period: 2019-Mar<br />Ethnicity: White<br />% of total White&Black: 50.8","<br />Time period: 2019-Apr<br />Ethnicity: White<br />% of total White&Black: 49.3","<br />Time period: 2019-May<br />Ethnicity: White<br />% of total White&Black: 49.4","<br />Time period: 2019-Jun<br />Ethnicity: White<br />% of total White&Black: 48.4","<br />Time period: 2019-Jul<br />Ethnicity: White<br />% of total White&Black: 46.4","<br />Time period: 2019-Aug<br />Ethnicity: White<br />% of total White&Black: 46.8","<br />Time period: 2019-Sep<br />Ethnicity: White<br />% of total White&Black: 50.4","<br />Time period: 2019-Oct<br />Ethnicity: White<br />% of total White&Black: 50","<br />Time period: 2019-Nov<br />Ethnicity: White<br />% of total White&Black: 50.8","<br />Time period: 2019-Dec<br />Ethnicity: White<br />% of total White&Black: 50.2","<br />Time period: 2020-Jan<br />Ethnicity: White<br />% of total White&Black: 49","<br />Time period: 2020-Feb<br />Ethnicity: White<br />% of total White&Black: 50.4","<br />Time period: 2020-Mar<br />Ethnicity: White<br />% of total White&Black: 49.5","<br />Time period: 2020-Apr<br />Ethnicity: White<br />% of total White&Black: 48.4","<br />Time period: 2020-May<br />Ethnicity: White<br />% of total White&Black: 48.6","<br />Time period: 2020-Jun<br />Ethnicity: White<br />% of total White&Black: 54.1","<br />Time period: 2020-Jul<br />Ethnicity: White<br />% of total White&Black: 53.2","<br />Time period: 2020-Aug<br />Ethnicity: White<br />% of total White&Black: 52.5","<br />Time period: 2020-Sep<br />Ethnicity: White<br />% of total White&Black: 53.2"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(102,153,204,1)","opacity":1,"size":8.50393700787402,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(102,153,204,1)"}},"hoveron":"points","name":"White","legendgroup":"White","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,1,null,2,2,null,3,3,null,4,4,null,5,5,null,6,6,null,7,7,null,8,8,null,9,9,null,10,10,null,11,11,null,12,12,null,13,13,null,14,14,null,15,15,null,16,16,null,17,17,null,18,18,null,19,19,null,20,20,null,21,21,null,22,22,null,23,23,null,24,24,null,25,25,null,26,26,null,27,27,null,28,28,null,29,29,null,30,30],"y":[0.5,0.555133595551336,null,0.5,0.572866344605475,null,0.5,0.559614168247944,null,0.5,0.580836236933798,null,0.5,0.574365704286964,null,0.5,0.548150322959483,null,0.5,0.539066813914964,null,0.5,0.538896746817539,null,0.5,0.513228114000227,null,0.5,0.514797433196054,null,0.5,0.486734789537827,null,0.5,0.492437661806786,null,0.5,0.50709311323188,null,0.5,0.505650396729983,null,0.5,0.516311839485373,null,0.5,0.535550053059781,null,0.5,0.532267484304278,null,0.5,0.495612582781457,null,0.5,0.499832495812395,null,0.5,0.492320534223706,null,0.5,0.498112860167541,null,0.5,0.510274409700064,null,0.5,0.495633685169717,null,0.5,0.505324003650745,null,0.5,0.515822961433276,null,0.5,0.513731294195034,null,0.5,0.458757132225254,null,0.5,0.468407570798349,null,0.5,0.474877116329874,null,0.5,0.467790987005806],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(194,106,86,1)","dash":"solid"},"hoveron":"points","name":"Black","legendgroup":"Black","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,1,null,2,2,null,3,3,null,4,4,null,5,5,null,6,6,null,7,7,null,8,8,null,9,9,null,10,10,null,11,11,null,12,12,null,13,13,null,14,14,null,15,15,null,16,16,null,17,17,null,18,18,null,19,19,null,20,20,null,21,21,null,22,22,null,23,23,null,24,24,null,25,25,null,26,26,null,27,27,null,28,28,null,29,29,null,30,30],"y":[0.5,0.444866404448664,null,0.5,0.427133655394525,null,0.5,0.440385831752056,null,0.5,0.419163763066202,null,0.5,0.425634295713036,null,0.5,0.451849677040517,null,0.5,0.460933186085036,null,0.5,0.461103253182461,null,0.5,0.486771885999773,null,0.5,0.485202566803946,null,0.5,0.513265210462173,null,0.5,0.507562338193214,null,0.5,0.49290688676812,null,0.5,0.494349603270017,null,0.5,0.483688160514627,null,0.5,0.464449946940219,null,0.5,0.467732515695722,null,0.5,0.504387417218543,null,0.5,0.500167504187605,null,0.5,0.507679465776294,null,0.5,0.501887139832459,null,0.5,0.489725590299936,null,0.5,0.504366314830283,null,0.5,0.494675996349255,null,0.5,0.484177038566724,null,0.5,0.486268705804966,null,0.5,0.541242867774746,null,0.5,0.531592429201651,null,0.5,0.525122883670126,null,0.5,0.532209012994194],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(102,153,204,1)","dash":"solid"},"hoveron":"points","name":"White","legendgroup":"White","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[0.4,30.6],"y":[0.5,0.5],"text":"","type":"scatter","mode":"lines","line":{"width":0.377952755905512,"color":"rgba(51,51,51,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[4],"y":[0.65],"text":"In July 2018,<br />Almost 40% more Black<br />than White people<br />were stopped","hovertext":"","textfont":{"size":9.4488188976378,"color":"rgba(51,51,51,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[15],"y":[0.6],"text":"Throughout 2019<br />both ethnicities were stopped<br />almost equally often","hovertext":"","textfont":{"size":9.4488188976378,"color":"rgba(51,51,51,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[26],"y":[0.63],"text":"Today, even slightly more<br />White people are stopped","hovertext":"","textfont":{"size":9.4488188976378,"color":"rgba(51,51,51,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","mode":"","frame":null}],"layout":{"margin":{"t":66.0536322125363,"r":28.8,"b":43.0797841427978,"l":59.0200083022001},"plot_bgcolor":"rgba(222,234,238,1)","paper_bgcolor":"rgba(222,234,238,1)","font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Light","size":13.2835201328352},"title":{"text":"Bias towards Black ethnicities was addressed","font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Bold","size":21.2536322125363},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,30.6],"tickmode":"array","ticktext":["April 2018","2019","2020","Today"],"tickvals":[1,10,22,30],"categoryorder":"array","categoryarray":["April 2018","2019","2020","Today"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.65296803652968,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Bold","size":10.6268161062682},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Light","size":13.2835201328352}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.28,0.72],"tickmode":"array","ticktext":["<40%","50:50",">60%"],"tickvals":[0.4,0.5,0.6],"categoryorder":"array","categoryarray":["<40%","50:50",">60%"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.65296803652968,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"Helvetica Neue Light","size":10.6268161062682},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Light","size":13.2835201328352}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(222,234,238,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Bold","size":10.6268161062682},"y":0.937007874015748},"annotations":[{"text":"Ethnicity*","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(51,51,51,1)","family":"Helvetica Neue Bold","size":10.6268161062682},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"ecf57649ff94":{"text":{},"x":{},"y":{},"colour":{},"type":"scatter"},"ecf5742a8a37":{"x":{},"y":{},"xend":{},"yend":{},"x.1":{},"y.1":{},"colour":{}},"ecf514d85c76":{"yintercept":{}},"ecf589e51ab":{"x":{},"y":{},"label":{}},"ecf55203b5f8":{"x":{},"y":{},"label":{}},"ecf5719fd6d8":{"x":{},"y":{},"label":{}},"ecf534d2392f":{"x":{},"y":{},"xend":{},"yend":{},"x.1":{},"y.1":{},"colour":{}},"ecf555a857c0":{"x":{},"y":{},"xend":{},"yend":{},"x.1":{},"y.1":{},"colour":{}}},"cur_data":"ecf57649ff94","visdat":{"ecf57649ff94":["function (y) ","x"],"ecf5742a8a37":["function (y) ","x"],"ecf514d85c76":["function (y) ","x"],"ecf589e51ab":["function (y) ","x"],"ecf55203b5f8":["function (y) ","x"],"ecf5719fd6d8":["function (y) ","x"],"ecf534d2392f":["function (y) ","x"],"ecf555a857c0":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>Finally, we can see that until 2019, there was a large divide between Black and White ethnicities that were stopped and searched. Although, in January 2019, Black people made up 15.6% of London’s population and white people made up 59.8%, (<a href="https://www.theguardian.com/law/2019/jan/26/met-police-disproportionately-use-stop-and-search-powers-on-black-people">source</a>), in 2018, Black people were stopped up to 40% more than White people. Nevertheless, we can also see that after the word got out and the Metropolitan Police Service was accused of racial bias in early 2019, they addressed this issue and the inequality evened out. Today, we can even see that more White than Black people are stopped – in line with more White people than Black living in London.</p>
+<p>Today the Metropolitan Police says “Stop and search is never used lightly and police officers will only exercise their legal right to stop members of the public and search them when they genuinely suspect that doing so will further their investigations into criminal activity – whether that means looking for weapons, drugs or stolen property.”(<a href="https://www.met.police.uk/advice/advice-and-information/st-s/stop-and-search/why-we-use-stop-and-search/">source</a>).</p>
+<p>This seems to be indeed somewhat truer today – at least in terms of ethnicities. But this may also raise the question: Is there any bias towards what crimes are assumed per ethnicities?</p>
+<p>###Stopped and Searched - with further bias?</p>
+<pre class="r"><code>object_colours &lt;- c(&#39;#ff99ff&#39;, &#39;#00cccc&#39;, &#39;#000033&#39;)
+
+# object
+p_object &lt;- ggplot()+
+  #set background
+geom_sf(data = london_wards, fill = &quot;#fafaea&quot;, alpha = 1, size = 0.125, colour = &quot;#333333&quot;)+
+  # add data points
+  geom_sf(data = sasldn_wo17_map, 
+          aes(colour = object_of_search,
+              fill = object_of_search), 
+          size = 0.005, 
+          alpha = 0.7, 
+          shape = 21)+
+  # add ward lines on top
+  geom_sf(data = london_wards, fill = &quot;#fafaea&quot;, alpha = 0, size = 0.125, colour = &quot;#333333&quot;)+
+  #remove coordinates
+  coord_sf(datum = NA)+
+  scale_colour_manual(name = &quot;Object of search&quot;, 
+                      labels = c(&quot;Controlled drugs&quot;, &quot;Offensive weapons&quot;, &quot;Stolen goods&quot;), 
+                                 values = object_colours)+
+  scale_fill_manual(name = &quot;Object of search&quot;, 
+                      labels = c(&quot;Controlled drugs&quot;, &quot;Offensive weapons&quot;, &quot;Stolen goods&quot;), 
+                                 values = object_colours)+
+  facet_wrap(~year)+
+  theme(aspect.ratio = 4/4,
+    # edit text size and font
+    text = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot caption size and font
+    plot.caption = element_text(size = 6, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot title size and font
+    plot.title = element_text(size = 16, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Bold&quot;),
+    plot.subtitle = element_text(size = 10, colour = &quot;#333333&quot;, family = &quot;Helvetica Neue Light&quot;),
+     # design plot and panel background
+    plot.background = element_rect(fill = &quot;#deeaee&quot;),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill = &quot;#deeaee&quot;),
+    axis.text.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank(),
+    strip.text = element_text(colour = &quot;#333333&quot;, size = 10, family = &quot;Helvetica Neue Bold&quot;, hjust = 0.5),
+    strip.background = element_rect(fill = &quot;#deeaee&quot;),
+     # edit legend
+    legend.position = &quot;top&quot;,
+    legend.background = element_rect(fill = &quot;#deeaee&quot;),
+    legend.title = element_text(size = 8, family = &quot;Helvetica Neue Bold&quot;, colour = &quot;#333333&quot;),
+    legend.text = element_text(size = 8, family = &quot;Helvetica Neue Bold&quot;, colour = &quot;#333333&quot;),
+    legend.key = element_rect(size = 15),
+    legend.key.size = unit(6,&quot;point&quot;),
+    plot.margin = unit(c(1,1,1,1), &quot;lines&quot;)
+    ) +
+  # overwriting legend aes and making points bigger and non-transparent
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 3)))+
+  # add labels
+  labs(title = &quot;Theft concentrated on Central London&quot;,
+       subtitle = &quot;Distribution of top 3 Stop&amp;Search target objects in London&quot;,
+       caption = &quot;Source: https://data.police.uk/data/ (01/2018-09/2020)&quot;)
+
+p_object</code></pre>
+<p><img src="/projects/stopandsearch2/index_files/figure-html/plot1-1.png" width="672" /></p>
+<p>It is clearly visible that most stops and searches in the city centre are conducted because of stolen goods. The further into the outskirts of London you look, the more offensive weapons and drugs are targeted objects of search. While it seems like theft is a greater issue in Central London, there is no correlation between the searched objects and where the respective ethnicities are mainly targeted.</p>
+<p>Seems like the Metropolitan Police Service in London is indeed able to focus on the potential crimes at hand – slowly shedding their reputation for racial bias.</p>
+<p><em>Although – despite the population being about 50% male and 50% female, the Metropolitan Police stops about 93% male suspect. Talking about gender bias?</em></p>
+<p><em>(A visualisation on that can be found in Pt 1 ;-))</em></p>
+</div>
+</div>
+<div id="memo" class="section level2">
+<h2>Memo</h2>
+<div id="process-story" class="section level3">
+<h3>Process &amp; Story</h3>
+<p>Please find the process and story behind the visualisations between the plots above.</p>
+<p>In short:</p>
+<p><strong>Process</strong></p>
+<ul>
+<li>Data loading, inspecting, cleaning, exploring</li>
+<li>Visualising</li>
+<li>Summarising main findings &amp; building a story</li>
+</ul>
+<p><strong>Story</strong></p>
+<ul>
+<li>Investigating the racial bias the Metropolitan Police in London is supposed to have</li>
+<li>Finding that certain ethnicities are stopped more frequently in certain parts of the city</li>
+<li>Investigating the overall distribution of ethnicities over the last three years, Asian people are not disproportionately stopped; Black people are</li>
+<li>But, this was mainly the case until 2019 and seems to have been addressed since the bad press accused the Metropolitan police of racial bias</li>
+<li>Today, more White than Black people (more in line with population distribution) are stopped</li>
+</ul>
+</div>
+<div id="alberto-cairos-five-qualities-of-great-visualisations" class="section level3">
+<h3>Alberto Cairo’s five qualities of great visualisations</h3>
+<p><strong>1. Truthful</strong></p>
+<p>All visualisations above are truthful. I did not hide any data or leave any important data points out. Although the data before April 2018 showed an even bigger divide on Black vs. White ethnicities, I left all months before that out because, e.g. March 2018 considered only 19 data points for Black and 11 for White. This may have yielded an even better message but the truth is that this data is not representative as all other months have several thousand data points.</p>
+<p><strong>2. Functional</strong></p>
+<p>I used several techniques to simplify the data and make it clear as well as interesting without it being too complex. Firstly, I worked with different colours to make all plots better understandable. I used the same colours (e.g. per ethnicity) throughout all plots to make the data points easily understandable. I used maps to visualise the data in a familar format that allows an audience to easily understand the connection of the data to a location on a map. I also used plotly to make visuals simple at first sight but allow the audience to find out more about the details of a plot if they want to.</p>
+<p><strong>3. Beautiful</strong></p>
+<p>I created all plots with specific focus on the little details to make them beautiful. I used bright colours for the data that is supposed to attract attention and interest and subtle colours for all background information or data that was not relevant to attract immediate attention. I used a clear and simple but beautiful font and made sure that all elements are cohesive in size and format.</p>
+<p><strong>4. Insightful</strong></p>
+<p>I went beyond the obvious plots to show interesting patters in the data. This is especially true here: In the plot “No racial bias towards Asian ethnicities”, it seems almost as if there is an equal share of White and Black people targeted. Nevertheless, I eliminated all data points with people of Asian ethnicities to investigate this further. This enabled me to find and show the significant difference between share of Black and White people targeted throughout 2018. Further, this plot “Bias towards Black ethnicities was addressed” shows how the divide ever since evened out and today, actually slightly more White people are targeted.</p>
+<p><strong>5. Enlightening</strong></p>
+<p>I believe that, although the article from The Guardian <a href="https://www.theguardian.com/law/2019/jan/26/met-police-disproportionately-use-stop-and-search-powers-on-black-people">“Met police ‘disproportionately’ use stop and search powers on black people”</a> is from 2019, it is still commonly believed that the police stopps more Black than White people - at least so did I. I am certain that a lot of people do not know that this issue has been addressed and is slowly being improved over time. This is an enlightening insight that helps people understand and change their mind about expectations that were formed at the beginning of this analysis when the The Guardian article was introduced.</p>
+</div>
+<div id="c.r.a.p.-principles" class="section level3">
+<h3>C.R.A.P. principles</h3>
+<p><strong>1. Contrast</strong></p>
+<p>I used several contrasting colours to distinguish and highlight different items. For example, I used green for Asian ethnicities, red for Black and blue for White throughout the analysis. This shows that these are different items (ethnicities) within a plot. The three objects of search in the last plot are also contrastingly coloured to show their difference. Further, in the “No racial bias towards Asian ethnicities” plot, I faded out the Black and White ethnicity bar stacks because the attention is supposed to be driven to the Asian ethnicity bars.</p>
+<p><strong>2. Repetition</strong></p>
+<p>I used a repetitive plot design and format throughout the entire analysis, enabling visual recognition of these visualisations as part of a whole. I used the same font in all plots, repeating the same boldness and lightness for each plot element. I used the same colour scheme for all elements in each plot, most importantly, always using green for Asian ethnicities, red for Black and blue for White.</p>
+<p><strong>3. Alignment</strong></p>
+<p>All elements within the plots and all plots among each other (when several plots are in one visualisation) are aligned to show their visual connection.</p>
+<p><strong>4. Proximity</strong></p>
+<p>I designed all plots in a way that elements that are associated with each other are placed closely together. For example, in the “Bias towards Black ethnicities plot”, each text field is close to the month/time period it describes.</p>
+</div>
+</div>
+</div>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://www.linkedin.com/in/mariecordes/" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+                    <li><a href="https://github.com/mariecordes" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+                    <li><a href="https://www.facebook.com/mariecordes6/" class="icon alt fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+                
+                    <li><a href="https://www.instagram.com/schokomarie/" class="icon alt fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Content and pictures by Marie Cordes </li>
+                
+                <li>Design:  <a href="https://www.html5up.net">HTML5 UP</a></li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>

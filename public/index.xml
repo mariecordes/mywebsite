@@ -69,6 +69,16 @@ I am an open-minded, curious and enthusiastic person. I love to smile and I love
     </item>
     
     <item>
+      <title>BBC iPlayer - Clustering Analysis</title>
+      <link>/projects/bbciplayer/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/bbciplayer/</guid>
+      <description>body { text-align: justify}   img { border-radius: 15px; }
+ div.grey { background-color:#808080; border-radius: 5px; padding: 20px; border-style: groove;}   div.font {color=&#34;red&#34;}   div.navy1 { background-color:#686868; border-radius: 5px; padding: 20px; border-style: groove; color: #ffffff;}   div.navy { background-color:#A2A2B6; border-radius: 5px; padding: 20px; border-style: groove; color: #ffffff;}     .bottom-three { margin-bottom: 3cm; }  Introduction and BBC iPlayer streaming data The BBC is one of the oldest broadcasting organisations of the world.</description>
+    </item>
+    
+    <item>
       <title>Brexit Voting Analysis</title>
       <link>/projects/brexitvoting/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -76,6 +86,16 @@ I am an open-minded, curious and enthusiastic person. I love to smile and I love
       <guid>/projects/brexitvoting/</guid>
       <description>In this project, we will conduct an Exploratory Data Analysis of the data set concerning the results of the 2016 Brexit vote in the UK. We ill begin by investigating the raw data, then look at the summary statistics and finally create some informative visualizations. Let’s dive right in!
 Exploratory Data Analysis Raw Data We will have a quick look at the results of the 2016 Brexit vote in the UK.</description>
+    </item>
+    
+    <item>
+      <title>Classification with Logistic Regression for the Lending Club</title>
+      <link>/projects/lendingclub_logreg/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/lendingclub_logreg/</guid>
+      <description>Introduction Welcome to the second Lending Club data analysis. Now, we will take the perspective of an investor to the lending club. Our goal is to select a subset of the most promising loans to invest. We will do so using the method of logistic regression. Feel free to consult the R markdown file of session 4.
+Load the data First we need to start by loading the data.</description>
     </item>
     
     <item>
@@ -106,6 +126,43 @@ We start by loading and having a first look at the data, then cleaning the data,
       <guid>/projects/furtherprojects/</guid>
       <description>In the following, you can have a quick look at some projects that I am currently working on. As these are not yet finished, you may find missing explanations, interpretations or planned but not yet executed analyses.
 I know you’re excited to see more of my work but please bear with me! These are works in progress and once I was able to continue, refine, finish and polish these, they will appear as individual projects in my portfolio for you to inspect.</description>
+    </item>
+    
+    <item>
+      <title>Predicting interest rates at the Lending Club</title>
+      <link>/projects/lendingclub_linreg/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/lendingclub_linreg/</guid>
+      <description>Introduction The goal of this analysis is to walk through the mechanics of designing a predictive model using linear regression. The example we will use is Lending Club, a peer-to-peer lender. The goal is to come up with an algorithm that recommends the interest rate to charge to new loans. The lending club has made historical data publicly available and we will use it for this exercise.
+ Load and prepare the data We start by loading the data to R in a dataframe.</description>
+    </item>
+    
+    <item>
+      <title>Stop &amp; Search - Data Visualisation Pt 1</title>
+      <link>/projects/stopandsearch1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/stopandsearch1/</guid>
+      <description>Stop and Search in London Stop and search powers help the police to tackle crime. Without the power of being able to stop and search individuals we suspect of having participated in or are about to commit a crime, the Met would be faced with a much tougher challenge on the streets of London. It’s targeted and intelligence-led and practised on people who are suspected of being involved in crime.</description>
+    </item>
+    
+    <item>
+      <title>Stop &amp; Search - Data Visualisation Pt 2</title>
+      <link>/projects/stopandsearch2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/stopandsearch2/</guid>
+      <description>Stop and Search in London Stop and search powers help the police to tackle crime. Without the power of being able to stop and search individuals we suspect of having participated in or are about to commit a crime, the Met would be faced with a much tougher challenge on the streets of London. It’s targeted and intelligence-led and practised on people who are suspected of being involved in crime.</description>
+    </item>
+    
+    <item>
+      <title>Wort visualisation ever!!!</title>
+      <link>/projects/worstviz/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/worstviz/</guid>
+      <description>Creating the worst possible visualisation # load data from csv df &amp;lt;- read_csv(here::here(&amp;quot;data&amp;quot;, &amp;quot;world_happiness_2015.csv&amp;quot;)) # rename columns names(df)[1] &amp;lt;- &amp;quot;country&amp;quot; names(df)[2] &amp;lt;- &amp;quot;region&amp;quot; names(df)[3] &amp;lt;- &amp;quot;happiness_rank&amp;quot; names(df)[4] &amp;lt;- &amp;quot;happiness_score&amp;quot; names(df)[5] &amp;lt;- &amp;quot;std_error&amp;quot; names(df)[6] &amp;lt;- &amp;quot;gdp_per_cap&amp;quot; names(df)[7] &amp;lt;- &amp;quot;family&amp;quot; names(df)[8] &amp;lt;- &amp;quot;life_exp&amp;quot; names(df)[9] &amp;lt;- &amp;quot;freedom&amp;quot; names(df)[10] &amp;lt;- &amp;quot;govnm_corruption&amp;quot; names(df)[11] &amp;lt;- &amp;quot;generosity&amp;quot; names(df)[12] &amp;lt;- &amp;quot;dystopia_residual&amp;quot; # define colours vector colors &amp;lt;- c(&amp;#39;#996600&amp;#39;, &amp;#39;#4d3300&amp;#39;, &amp;#39;#446600&amp;#39;, &amp;#39;#806000&amp;#39;, &amp;#39;#994d00&amp;#39;, &amp;#39;#5c5c3d&amp;#39;,&amp;#39;#999966&amp;#39;,&amp;#39;#808000&amp;#39;,&amp;#39;#223300&amp;#39;,&amp;#39;#999900&amp;#39;) # load background picture sky &amp;lt;- png::readPNG(here::here(&amp;quot;data&amp;quot;, &amp;quot;images&amp;quot;, &amp;quot;sky.</description>
     </item>
     
   </channel>

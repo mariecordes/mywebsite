@@ -77,7 +77,15 @@
   </url>
   
   <url>
+    <loc>/projects/bbciplayer/</loc>
+  </url>
+  
+  <url>
     <loc>/projects/brexitvoting/</loc>
+  </url>
+  
+  <url>
+    <loc>/projects/lendingclub_logreg/</loc>
   </url>
   
   <url>
@@ -93,7 +101,23 @@
   </url>
   
   <url>
+    <loc>/projects/lendingclub_linreg/</loc>
+  </url>
+  
+  <url>
     <loc>/projects/</loc>
+  </url>
+  
+  <url>
+    <loc>/projects/stopandsearch1/</loc>
+  </url>
+  
+  <url>
+    <loc>/projects/stopandsearch2/</loc>
+  </url>
+  
+  <url>
+    <loc>/projects/worstviz/</loc>
   </url>
   
 </urlset>

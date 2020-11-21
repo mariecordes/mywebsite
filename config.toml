@@ -118,37 +118,37 @@ disqusShortname = ""
 
 [[params.tiles.showcase]]
       title = "BBC iPlayer - Cluster Analysis Report"
-      subtitle = "Read the report on my cluster analysis of the BBC iPlayer's customer segments\n(Please find the code to the right)"
+      subtitle = "Read the report on my cluster analysis of the BBC iPlayer's customer segments (Please find the code to the right)"
       image = "pic07.jpg"
       url = "docs/bbciplayer_clusteranalysis.pdf"
 
 [[params.tiles.showcase]]
-      title = "Cluster Analysis - BBC iPlayer"
+      title = "BBC iPlayer - Cluster Analysis"
       subtitle = "Learn more about my cluster analysis of the BBC iPlayer's customer segments using data mining techniques (Tools: k-means, k-medoid, hierarchical clustering, elobow analysis, silhouette analysis, PCA, dendograms)"
       image = "pic08.jpg"
       url = "projects/bbciplayer"
       
 [[params.tiles.showcase]]
-      title = "Linear regression & prediction - The Lending Club"
+      title = "The Lending Club Pt 1 - Linear regression & prediction"
       subtitle = "Learn more about my linear regression analysis of the Lending Club's interest rates (Tools: Out-of-sample testing, Ordinary Least Squares, k-fold cross validation, learning curves, LASSO)"
-      image = "pic09.jpg"
+      image = "pic10.jpg"
       url = "projects/lendingclub_linreg"
       
 [[params.tiles.showcase]]
-      title = "Logistic regression & classification - The Lending Club"
-      subtitle = "Learn more about my logistic regression analysis of the Lending Club's default probabilities"
-      image = "pic10.jpg"
+      title = "The Lending Club Pt 2 - Logistic regression & classification"
+      subtitle = "Learn more about my logistic regression analysis of the Lending Club's default probabilities (Tools:  Multivariate log regression, ROC curves, AUC, cofusion matrix)"
+      image = "pic09.jpg"
       url = "projects/lendingclub_logreg"
       
 [[params.tiles.showcase]]
-      title = "Data Visualization Pt. 1 - London's Stop&Search"
-      subtitle = "Learn more about data visualizations of the London Metropolitan Police's Stop&Search Service 09/2020"
+      title = "London's Stop&Search Pt 1 - Data Visualization"
+      subtitle = "Look at my data visualizations of the London Metropolitan Police's Stop&Search Service 09/2020"
       image = "pic04.jpg"
       url = "projects/stopandsearch1"
       
 [[params.tiles.showcase]]
-      title = "Data Visualization Pt. 2 - London's Stop&Search"
-      subtitle = "Learn more about data visualizations of the London Metropolitan Police's Stop&Search Service 2017-2020"
+      title = "London's Stop&Search Pt 2 - Data Visualization"
+      subtitle = "Look at my data visualizations of the London Metropolitan Police's Stop&Search Service 2017-2020"
       image = "pic11.jpg"
       url = "projects/stopandsearch2"
       

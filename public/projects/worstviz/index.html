@@ -1,0 +1,276 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="Curious, enthusiastic and open-minded. Business &amp; Management undergrad. Analytics &amp; Management masters in 2021. Born and raised in Germany. Lived in Germany, the UK, Hong Kong &amp; the US. Enjoy practicing yoga, making banana bread and wearing striped clothes. Food lover, world traveler and London explorer.">
+	<meta name="author" content="Marie Cordes">
+	<meta name="generator" content="Hugo 0.74.3" />
+	<title>Wort visualisation ever!!! &middot; Marie Cordes&#39;s Portfolio Website</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Marie Cordes&#39;s Portfolio Website</strong> <span></span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/aboutme">About me</a></li>
+            
+                <li><a href="/projects">All projects</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+                <li><a href="/docs/Marie_Cordes_CV_Nov2020.pdf" class="button special fit">Download my CV</a></li>
+            
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>Wort visualisation ever!!!</h1>
+                            </header>
+                            
+                                <span class="image main"><img src="/img/projects/pic12.jpg" alt="" /></span>
+                            
+                            
+
+
+<div id="creating-the-worst-possible-visualisation" class="section level1">
+<h1>Creating the <em>worst</em> possible visualisation</h1>
+<pre class="r"><code># load data from csv
+df &lt;- read_csv(here::here(&quot;data&quot;, &quot;world_happiness_2015.csv&quot;))
+
+# rename columns
+names(df)[1] &lt;- &quot;country&quot;
+names(df)[2] &lt;- &quot;region&quot;
+names(df)[3] &lt;- &quot;happiness_rank&quot;
+names(df)[4] &lt;- &quot;happiness_score&quot;
+names(df)[5] &lt;- &quot;std_error&quot;
+names(df)[6] &lt;- &quot;gdp_per_cap&quot;
+names(df)[7] &lt;- &quot;family&quot;
+names(df)[8] &lt;- &quot;life_exp&quot;
+names(df)[9] &lt;- &quot;freedom&quot;
+names(df)[10] &lt;- &quot;govnm_corruption&quot;
+names(df)[11] &lt;- &quot;generosity&quot;
+names(df)[12] &lt;- &quot;dystopia_residual&quot;</code></pre>
+<pre class="r"><code># define colours vector
+colors &lt;- c(&#39;#996600&#39;, &#39;#4d3300&#39;, &#39;#446600&#39;, &#39;#806000&#39;, &#39;#994d00&#39;, &#39;#5c5c3d&#39;,&#39;#999966&#39;,&#39;#808000&#39;,&#39;#223300&#39;,&#39;#999900&#39;)
+
+# load background picture
+sky &lt;- png::readPNG(here::here(&quot;data&quot;, &quot;images&quot;, &quot;sky.png&quot;))
+
+# define credits
+label &lt;- &quot;pls reach out to\nMARIE CORDES\nif u want beautiful\nplots like this 2&quot;</code></pre>
+<pre class="r"><code># create plot
+p &lt;- ggplot(df, 
+            aes(x = happiness_score, 
+                color = region, 
+                size = gdp_per_cap)) +
+  # first y axis with data on freedom
+        geom_point(aes(y=freedom)) +
+  # set color scale to the one defined before
+        scale_color_manual(values=colors)+
+
+  #     theme_bw()+
+  # add theme elements
+        theme(
+          # define general text size and font
+          text = element_text(size=16, family=&quot;Piedmont&quot;),
+          
+          # design titles
+          title = element_text(angle = 180, 
+                               color = &quot;#ff3300&quot;, 
+                               size = 8, 
+                               family = &quot;Zapfino&quot;),
+          # design axes titles
+          axis.title.x = element_text(angle = 34, 
+                                      color = &quot;#ff33cc&quot;, 
+                                      size=25, 
+                                      family = &quot;Typo Draft Demo&quot;),
+          axis.title.y = element_text(angle = 90, 
+                                      color = &quot;#00ff00&quot;, 
+                                      size=18, 
+                                      family = &quot;BadaBoom BB&quot;),
+          # design axes text
+          axis.text.x = element_text(angle = 77, 
+                                     color=&quot;#00ff00&quot;, 
+                                     size=15),
+          axis.text.y = element_text(angle = 90, 
+                                     color=&quot;#ff33cc&quot;, 
+                                     size=15),
+          # design axes lines and ticks
+          axis.line = element_line(size = 1, 
+                                   colour = &quot;#bf00ff&quot;, 
+                                   linetype = 1),
+          axis.ticks = element_line(size = 1, 
+                                    color = &quot;#00ff00&quot;) , 
+          axis.ticks.length = unit(.5, &quot;cm&quot;),
+          # design grid lines
+          panel.grid.major = element_line(size = 0.15, 
+                                          linetype = 2,
+                                          colour = &quot;#ffff00&quot;), 
+          panel.grid.minor = element_line(size = 1, 
+                                          linetype = 2,
+                                          colour = &quot;#ffff00&quot;),
+          # design plot and panel background
+          plot.background = element_rect(fill = NA),
+          panel.background = element_rect(fill = &quot;#0000ff&quot;),
+          # design legend
+          legend.position = &quot;left&quot;,
+          legend.title = element_text(size = 20),
+          legend.background = element_rect(fill = &quot;#ffff00&quot;)
+          )+
+        
+  # add credits
+        # add and design background rectangle
+        geom_rect(aes(xmin = -1, xmax = 3, 
+                      ymin = 0.9, ymax = 1.1), 
+                  fill = &quot;#ff33cc&quot;) +
+        # add and design text
+        geom_text(
+          data = data.frame(
+            x = 1, y = 1, 
+            label = label),
+          aes(x = x, y = y, 
+              label = label),
+          colour=&quot;#ffff00&quot;,
+          family=&quot;BadaBoom BB&quot;,
+          hjust = 0.5,
+          lineheight = .8,
+          inherit.aes = FALSE
+          )+
+        
+  # add second y axis with data on generosity
+        geom_point(aes(y = generosity, 
+                       shape = region))+
+  # add regression lines with data on life_exp
+        geom_line(aes(y = life_exp, 
+                      size = 0.1, 
+                      alpha = 0.5))+
+  # add axes limits
+        scale_x_continuous(limits = c(-1,8))+
+        scale_y_continuous(limits = c(-0.1,1.1),
+                           # add left y axis name
+                           name = &quot;FREDOM&quot;,
+                           # add second axis + name
+                           sec.axis = sec_axis(~.*2, name = &quot;generositi&quot;)) +
+  # add title and subtitle
+        labs(title = &quot;HAPPY PEOPLE&quot;,
+             subtitle = &quot;everyone is geneouurs, everyone si free, everybody happi&quot;)+
+NULL</code></pre>
+<p>Next we add a pretty background picture and, then, want to have a look at the final plot:</p>
+<p><em>Unfortunately, simply printing it, scales the picture very weirdly (probably even worse (=better) though)…</em></p>
+<pre class="r"><code># add background image
+world_happiness_2015 &lt;- grid.draw(gList(rasterGrob(sky, 
+                                                   width = unit(1,&quot;npc&quot;), 
+                                                   height = unit(1,&quot;npc&quot;)), 
+                                        ggplotGrob(p))) </code></pre>
+<p><img src="/projects/worstviz/index_files/figure-html/background-1.png" width="672" /></p>
+<pre class="r"><code># save plot
+world_happiness_2015 +
+ggsave(&#39;worst_viz.png&#39;, height=28, width = 35, units = &#39;cm&#39;)</code></pre>
+<pre><code>## integer(0)</code></pre>
+<p>…therefore, we show it here, <strong>in all its glory</strong>!</p>
+<p><img src="worst_viz_2.png" /></p>
+</div>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://www.linkedin.com/in/mariecordes/" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+                    <li><a href="https://github.com/mariecordes" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+                    <li><a href="https://www.facebook.com/mariecordes6/" class="icon alt fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+                
+                    <li><a href="https://www.instagram.com/schokomarie/" class="icon alt fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Content and pictures by Marie Cordes </li>
+                
+                <li>Design:  <a href="https://www.html5up.net">HTML5 UP</a></li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>

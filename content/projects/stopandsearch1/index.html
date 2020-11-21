@@ -1,0 +1,850 @@
+---
+title: "Stop & Search - Data Visualisation Pt 1"
+author: "Marie Cordes"
+date: 11.09.2020
+image: pic04.jpg
+output: html_document
+---
+
+
+
+<div id="stop-and-search-in-london" class="section level1">
+<h1>Stop and Search in London</h1>
+<p>Stop and search powers help the police to tackle crime. Without the power of being able to stop and search individuals we suspect of having participated in or are about to commit a crime, the Met would be faced with a much tougher challenge on the streets of London. It’s targeted and intelligence-led and practised on people who are suspected of being involved in crime. Find out how it helps to keep our streets safe and what to expect if you are stopped <a href="https://www.met.police.uk/advice/advice-and-information/st-s/stop-and-search/">here</a>.</p>
+<p>We investigate the claims of <a href="https://www.theguardian.com/law/2019/jan/26/met-police-disproportionately-use-stop-and-search-powers-on-black-people">The Guardian</a> in January 2019, calling out Stop and Search on racial bias as the “Met police ‘disproportionately’ use[s] stop and search powers on black people.”</p>
+<p>This analysis focuses on Stop and Search data of the Metropolitan Police in London from September 2020. This data can be extracted <a href="https://data.police.uk/data/">here</a>.</p>
+<div id="loading-data" class="section level2">
+<h2>Loading data</h2>
+<pre class="r"><code># load data from csv
+data &lt;- read_csv(here::here(&quot;data&quot;, &quot;stopandsearchlondon.csv&quot;))</code></pre>
+</div>
+<div id="inspecting-data" class="section level2">
+<h2>Inspecting data</h2>
+<pre class="r"><code>head(data, 10)
+glimpse(data)
+skim(data)</code></pre>
+</div>
+<div id="cleaning-data" class="section level2">
+<h2>Cleaning data</h2>
+<pre class="r"><code>sasldn &lt;- data %&gt;% 
+            clean_names() %&gt;% 
+            # delete empty columns
+            dplyr::select(-policing_operation,
+                          -part_of_a_policing_operation,
+                          -outcome_linked_to_object_of_search, 
+                          -removal_of_more_than_just_outer_clothing) %&gt;%
+            # delete empty rows
+            na.omit() %&gt;% 
+            # remove one outlier value
+            filter(latitude &lt; 52)</code></pre>
+</div>
+<div id="plotting-data" class="section level2">
+<h2>Plotting data</h2>
+<p>Let’s visualize!</p>
+<div id="analysis-on-the-map" class="section level3">
+<h3>Analysis on the map</h3>
+<p>Let’s get a better understanding of where people are stopped and searched. We’ll look at the data on the map.</p>
+<pre class="r"><code># coordinates for London
+londonOSM &lt;- c(left = -0.5, bottom = 51.28, right = 0.31, top = 51.7) 
+
+# map for London
+ldn &lt;- get_stamenmap(londonOSM,  maptype = &quot;toner-lite&quot;)
+ 
+# plot data on London map
+mapldn &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn, 
+                       aes(x = longitude,
+                           y = latitude, 
+                           # colour points red 
+                           colour = &quot;#cc0000&quot;),
+                       # adjust size and transparency of the points
+                        size = 0.5, 
+                        alpha = 0.5)+
+  
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # remove legend                       
+                legend.position = &quot;none&quot;,
+                # add margins around the plot
+                plot.margin = unit(c(0.4,0.4,0.4,0.4), &quot;lines&quot;)
+                ) +
+  
+              # overwrite London as it is not visible otherwise
+              geom_text(
+                data = data.frame(
+                  x = -0.123, y = 51.507, 
+                  label = &quot;London&quot;),
+                aes(x = x, y = y, 
+                 label = label),
+                colour=&quot;black&quot;,
+                family=&quot;Helvetica Neue Bold&quot;,
+                hjust = 0.5,
+                lineheight = .8,
+                inherit.aes = FALSE
+              )+
+  
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;More than 15,000 people stopped and searched by London Police&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+# I wanted to use the title below but the styles didn&#39;t work in my plots
+
+#title = &quot;**Stop&amp;Search London September 2020**&quot;,
+ #                  subtitle = &quot;More than &lt;span style=&#39;color:#cc0000;&#39;&gt;15,000&lt;/span&gt; people stopped and searched by London Police &lt;/span&gt;&quot;)</code></pre>
+<pre class="r"><code>mapldn +
+ggsave(&#39;mapldn.png&#39;, height=15, width = 25, units = &#39;cm&#39;)</code></pre>
+<p><img src="/projects/stopandsearch1/index_files/figure-html/save2-1.png" width="672" /></p>
+<p>Now we know where the potential criminals were stopped and searched in London in September 2020. It is visible that there were more stops (maybe also more crimes?) in central London compared to the outskirts of the city.</p>
+<p>Are there any other trends based on location that we can see?</p>
+<p>Let’s plot the targets’ ethnicities first.</p>
+<pre class="r"><code># filter out &quot;Other&quot; from officer_defined_ethnicity
+sasldn_2 &lt;- sasldn %&gt;% 
+              filter(officer_defined_ethnicity != &quot;Other&quot;)
+
+# define color scale
+ethnicity_colours &lt;- c(&#39;#dd9b01&#39;, &#39;#006600&#39;, &#39;#b2b2b2&#39;)
+
+# create plot with ggmap
+mapldn2 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_2, 
+                       aes(x = longitude,
+                           y = latitude, 
+                           # colour by ethnicity 
+                           colour = officer_defined_ethnicity),
+                       # adjust size and transparency of the points
+                        size = 0.5, 
+                        alpha = 0.5)+
+              # include set colours for the colour-grouping of ethnicities
+              scale_color_manual(values=ethnicity_colours)+
+  
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # edit legend                       
+                legend.position = &quot;top&quot;,
+                legend.background = element_rect(fill = &quot;#f0f0f0&quot;),
+                legend.title = element_text(size = 8, family=&quot;Helvetica Neue Light&quot;),
+                legend.key = element_rect(size = 20),
+                legend.key.size = unit(10,&quot;point&quot;),
+                #plot.background = element_rect(fill = &quot;white&quot;),
+                #panel.background = element_rect(fill = &quot;white&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.4,1,0.4,0.4), &quot;lines&quot;)
+                ) +
+  
+              # overwrite London as it is not visible otherwise
+              geom_text(
+                data = data.frame(
+                  x = -0.115, y = 51.509, 
+                  label = &quot;London&quot;),
+                aes(x = x, y = y, 
+                 label = label),
+                colour=&quot;black&quot;,
+                family=&quot;Helvetica Neue Bold&quot;,
+                hjust = 0.5,
+                lineheight = .8,
+                inherit.aes = FALSE
+              )+
+  
+              # overwriting legend aes and making points bigger and non-transparent
+              guides(
+                colour = guide_legend
+                (override.aes = list(alpha = 1, 
+                                     size = 2)))+
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;High concentration on Asian- and Black\nethnicities in South and East London&quot;,
+                   colour = &quot;Ethnicity*&quot;,
+                   caption = &quot;*Ethnicity defined by police officer\nSource: https://data.police.uk/data/&quot;)+
+  NULL</code></pre>
+<p>Let’s plot the targets’ genders next.</p>
+<pre class="r"><code># filter out &quot;Other&quot; from gender
+sasldn_3 &lt;- sasldn %&gt;% 
+              filter(gender != &quot;Other&quot;)
+
+# define color scale
+gender_colours &lt;- c(&#39;#bc5a45&#39;, &#39;#034f84&#39;)
+
+# create plot with ggmap
+mapldn3 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_3, 
+                       aes(x = longitude,
+                           y = latitude, 
+                           # colour by gender
+                           colour = gender),
+                       # adjust size and transparency of the points
+                        size = 0.5, 
+                        alpha = 0.5)+
+              # include set colours for the colour-grouping of ethnicities
+              scale_color_manual(values=gender_colours)+
+  
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # edit legend                       
+                legend.position = &quot;top&quot;,
+                legend.background = element_rect(fill = &quot;#f0f0f0&quot;),
+                legend.title = element_text(size = 8, family=&quot;Helvetica Neue Light&quot;),
+                legend.key = element_rect(size = 20),
+                legend.key.size = unit(10,&quot;point&quot;),
+                #plot.background = element_rect(fill = &quot;white&quot;),
+                #panel.background = element_rect(fill = &quot;white&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.4,0.4,0.4,1), &quot;lines&quot;)
+                ) +
+  
+              # overwrite London as it is not visible otherwise
+              geom_text(
+                data = data.frame(
+                  x = -0.115, y = 51.509, 
+                  label = &quot;London&quot;),
+                aes(x = x, y = y, 
+                 label = label),
+                colour=&quot;black&quot;,
+                family=&quot;Helvetica Neue Bold&quot;,
+                hjust = 0.5,
+                lineheight = .8,
+                inherit.aes = FALSE
+              )+
+  
+              # overwriting legend aes and making points bigger and non-transparent
+              guides(
+                colour = guide_legend
+                (override.aes = list(alpha = 1, 
+                                     size = 2)))+
+              # add labels
+              labs(
+                # no title because it will be arranged next to mapldn3
+                title = &quot;&quot;,
+                   subtitle = &quot;London Police stops almost only men&quot;,
+                   colour = &quot;Gender&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL</code></pre>
+<pre class="r"><code>mapldn2 +
+ggsave(&#39;mapldn2.png&#39;, height=15, width = 25, units = &#39;cm&#39;)
+
+mapldn3 +
+ggsave(&#39;mapldn3.png&#39;, height=15, width = 25, units = &#39;cm&#39;)
+# no title because it will be arranged next to mapldn3</code></pre>
+<p>Putting both together…</p>
+<p>We find that almost only men are stopped and searched - either women are not involved in any crimes or the police just doesn’t assume they are. While generally, people from all ethnicities are stopped and searched, more people of Black- (South, South-East) and Asian-ethnicity (East) are stopped and searched in South and East London. As these areas generally have higher levels of poverty and greater shares of people with migration backgrounds, the police seems to be biased to stop and search more non-white people. Similarly, as often men are stereotypically thought to be more likely to be criminal, the policy seems to be highly biased towards almost only stopping and searching men.</p>
+<pre class="r"><code>grid.arrange(mapldn2,mapldn3, nrow = 1) </code></pre>
+<p><img src="/projects/stopandsearch1/index_files/figure-html/plot2and3-1.png" width="672" /></p>
+<p>Next, we want to investigate if there are any differences in stops and searches according to the different times of the day.</p>
+<pre class="r"><code># splitting date column into date column and time column
+sasldn$date2 &lt;- as.Date(sasldn$date, &quot;%YYYY-%MM-%DD&quot;)
+sasldn$time &lt;- format(sasldn$date, &quot;%H:%M:%S&quot;)
+
+# create time specific data sets (1 set per 2 hours in the day)
+sasldn_00to2 &lt;- sasldn %&gt;% filter(time &gt;= &#39;00:00:00&#39;, time &lt; &#39;02:00:00&#39;)
+sasldn_2to4 &lt;- sasldn %&gt;% filter(time &gt;= &#39;02:00:00&#39;, time &lt; &#39;04:00:00&#39;)
+sasldn_4to6 &lt;- sasldn %&gt;% filter(time &gt;= &#39;04:00:00&#39;, time &lt; &#39;06:00:00&#39;)
+sasldn_6to8 &lt;- sasldn %&gt;% filter(time &gt;= &#39;06:00:00&#39;, time &lt; &#39;08:00:00&#39;)
+sasldn_8to10 &lt;- sasldn %&gt;% filter(time &gt;= &#39;08:00:00&#39;, time &lt; &#39;10:00:00&#39;)
+sasldn_10to12 &lt;- sasldn %&gt;% filter(time &gt;= &#39;10:00:00&#39;, time &lt; &#39;12:00:00&#39;)
+sasldn_12to14 &lt;- sasldn %&gt;% filter(time &gt;= &#39;12:00:00&#39;, time &lt; &#39;14:00:00&#39;)
+sasldn_14to16 &lt;- sasldn %&gt;% filter(time &gt;= &#39;14:00:00&#39;, time &lt; &#39;16:00:00&#39;)
+sasldn_16to18 &lt;- sasldn %&gt;% filter(time &gt;= &#39;16:00:00&#39;, time &lt; &#39;18:00:00&#39;)
+sasldn_18to20 &lt;- sasldn %&gt;% filter(time &gt;= &#39;18:00:00&#39;, time &lt; &#39;20:00:00&#39;)
+sasldn_20to22 &lt;- sasldn %&gt;% filter(time &gt;= &#39;20:00:00&#39;, time &lt; &#39;22:00:00&#39;)
+sasldn_22to00 &lt;- sasldn %&gt;% filter(time &gt;= &#39;22:00:00&#39;, time &lt;= &#39;23:59:59&#39;)
+
+#create time specific maps
+map00to2 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_00to2, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#061d37&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 00:00-02:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map2to4 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_2to4, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#102849&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 02:00-04:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map4to6 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_4to6, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#3c5a8c&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 04:00-06:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map6to8 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_6to8, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#7194cc&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 06:00-08:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map8to10 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_8to10, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#89b7dc&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 08:00-10:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map10to12 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_10to12, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#78b6fa&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 10:00-12:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map12to14 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_12to14, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#6ab6fa&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 12:00-14:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map14to16 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_14to16, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#78b6fa&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 14:00-16:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map16to18 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_16to18, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#89b7dc&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 16:00-18:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map18to20 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_18to20, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#7194cc&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 18:00-20:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map20to22 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_20to22, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#3c5a8c&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 20:00-22:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+map22to00 &lt;- ggmap(ldn, extent = &quot;device&quot;) +
+            # add scatterplot to the map with coordinates
+            geom_point(data = sasldn_22to00, 
+                       aes(x = longitude,
+                           y = latitude), 
+                           # colour by time of day (sky)
+                           colour = &quot;#102849&quot;,
+                       # adjust size and transparency of the points
+                        size = 0.8, 
+                        alpha = 0.8)+
+              theme(
+                # edit text size and font
+                text = element_text(size=10, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # add plot margins
+                plot.margin = unit(c(0.5,0.5,0.5,0.5), &quot;lines&quot;)
+                ) +
+              # add time stamp
+              geom_label(aes(label = &quot;Time: 22:00-00:00&quot;), 
+                         hjust = &quot;left&quot;, vjust = &quot;top&quot;, 
+                         size = 4,
+                         family = &quot;Helvetica Neue Bold&quot;, 
+                         colour = &quot;#c94c4c&quot;) +
+              # add labels
+              labs(title = &quot;Stop&amp;Search London September 2020&quot;,
+                   subtitle = &quot;Most people stopped and searched in the afternoon and evening&quot;,
+                   caption = &quot;Source: https://data.police.uk/data/&quot;)+
+  NULL
+
+# save each map as png
+map00to2 + ggsave(&#39;map00to2.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map2to4 + ggsave(&#39;map2to4.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map4to6 + ggsave(&#39;map4to6.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map6to8 + ggsave(&#39;map6to8.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map8to10 + ggsave(&#39;map8to10.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map10to12 + ggsave(&#39;map10to12.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map12to14 + ggsave(&#39;map12to14.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map14to16 + ggsave(&#39;map14to16.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map16to18 + ggsave(&#39;map16to18.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map18to20 + ggsave(&#39;map18to20.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map20to22 + ggsave(&#39;map20to22.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+map22to00 + ggsave(&#39;map22to00.jpeg&#39;, height=6, width = 6, units = &#39;in&#39;)
+
+# create gif
+list.files(pattern = &#39;*.jpeg&#39;, full.names = TRUE) %&gt;% 
+        image_read() %&gt;% # reads each path file
+        image_join() %&gt;% # join images
+        image_animate(fps=4) %&gt;% # animates, opt for number of loops
+        image_write(&quot;ldnmap_sept_timeofday.gif&quot;) # save to current folder</code></pre>
+<p>Finally we can see through the visualization that the police stops most people during the afternoon and in the evening, especially from 2pm onward. This is most likely also the time when the most crimes occur as well as when the most people are on the streets or generally outside (e.g. after work, commuting, sports, shopping, etc.).</p>
+<p><img src="ldnmap_sept_timeofday.gif" align="middle" style="padding-left: 7.5px; padding-right: 7.5px"></p>
+<p>In a future analysis, it would be interesting to compare the share of stops and searches between weekday and weekend as well.</p>
+</div>
+<div id="analysis-with-plots" class="section level3">
+<h3>Analysis with plots</h3>
+<p>Let’s have a closer look at the objects that were most searched when people were stopped. We’ll also consider the age range of the people that were stopped.</p>
+<pre class="r"><code># edit data frame
+sasldn_3 &lt;- sasldn %&gt;% 
+  # only keep top 3 objects of search
+  filter(object_of_search != &quot;Fireworks&quot;,
+         object_of_search != &quot;Anything to threaten or harm anyone&quot;, 
+         object_of_search != &quot;Articles for use in criminal damage&quot;, 
+         object_of_search != &quot;Firearms&quot;,
+         object_of_search != &quot;Evidence of offences under the Act&quot;,
+         # delete under 10 age range (only few/no values)
+         age_range != &quot;under 10&quot;) 
+
+# redefine age_range order
+sasldn_3$age_range &lt;- factor(sasldn_3$age_range, levels = c(&quot;over 34&quot;, &quot;25-34&quot;, &quot;18-24&quot;, &quot;10-17&quot;))
+
+# define label
+label = &quot;~47% of all stops and searches\nare targeted at young adults \nwith controlled drugs*&quot;
+
+# create bar plot
+ object_age_plot &lt;- ggplot(sasldn_3, aes(x = object_of_search, 
+                      fill = age_range)) +
+  geom_bar(width = 0.6) +
+   theme(
+     # change plot ratio
+     aspect.ratio = (9/12),
+                # edit text size and font
+                text = element_text(size=9, family=&quot;Helvetica Neue Light&quot;),
+                # edit plot caption size and font
+                plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+                # edit plot title size and font
+                plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+                # edit legend                       
+                legend.position = &quot;top&quot;,
+                legend.background = element_rect(fill = &quot;white&quot;),
+                legend.title = element_text(size = 8, family=&quot;Helvetica Neue Bold&quot;),
+                legend.key = element_rect(size = 10),
+                legend.key.size = unit(8,&quot;point&quot;),
+                #edit axes
+         axis.title.y = element_text(size = 0),
+         axis.line.x = element_line(size = 0),
+         axis.ticks.x = element_line(size = 0), 
+         axis.ticks.length = unit(.2, &quot;cm&quot;),
+         axis.ticks.y = element_line(size = 0),
+         # edit panel
+        panel.grid.major = element_line(size = 0), 
+        panel.grid.minor = element_line(size = 0),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.y = element_line(size = 0.15, 
+                                          linetype = 1,
+                                          colour = &quot;gray&quot;)
+        ) +
+   # limit y scale
+   scale_y_continuous(limits = c(0,10000))+
+   # use blue brewer colour palette
+   scale_fill_brewer(palette = &quot;Blues&quot;)+
+   # insert labels
+   labs(title = &quot;Stop&amp;Search biggest target:\nYoung adults with drugs&quot;,
+        subtitle = &quot;Top 3 searched objects in London&#39;s Stop&amp;Search in Sep 2020&quot;,
+        caption = &quot;*18.322% 25-34 year-olds and 28.487% 18-24 year-olds\nSource: https://data.police.uk/data/&quot;,
+        fill = &quot;Age range&quot;,
+        x = &quot;&quot;,
+        y = &quot;Amount&quot;)+
+   # insert descriptive text
+   geom_text(data = data.frame(x = 2.3, y = 8000, label = label),
+          aes(x = x, y = y, label = label),
+          colour=&quot;black&quot;,
+          family=&quot;Helvetica Neue Medium&quot;,
+          size = 2.5,
+          inherit.aes = FALSE
+          )+
+   # insert arrow
+   geom_curve(aes(x = 2.3, y = 7000, xend = 1.5, yend = 5000),
+              arrow = arrow(length = unit(0.04, &quot;npc&quot;)),
+              curvature = -0.5,
+              size = 0.2)+
+   NULL
+ 
+ # checked percentages with this code:
+  #ggplot(sasldn_3, aes(x = object_of_search, fill = age_range, label = scales::percent(prop.table(stat(count))))) +
+  #geom_bar(width = 0.6, position = &quot;dodge&quot;) +
+  # geom_text(stat = &#39;count&#39;,
+   #          position = position_dodge(1), 
+    #         vjust = -0.5, 
+     #        size = 3) + </code></pre>
+<p>We find that the police mostly stops and searches young adults (almost 50% of the time). The most frequent object of search are controlled drugs.</p>
+<pre class="r"><code># save plot
+object_age_plot +
+ggsave(&#39;object_age_plot.png&#39;, height=15, width = 25, units = &#39;cm&#39;)</code></pre>
+<p><img src="/projects/stopandsearch1/index_files/figure-html/save4-1.png" width="672" /></p>
+<p>Lastly, we’ll have a look at the consequences (outcomes) of the stops and searches.</p>
+<pre class="r"><code>sasldn_4 &lt;- sasldn_3 %&gt;% 
+              mutate(outcome_simple = case_when(
+                        outcome == &quot;A no further action disposal&quot; ~ &quot;No further action&quot;,
+                        outcome == &quot;Arrest&quot; ~ &quot;Arrest&quot;,
+                        outcome == &quot;Community resolution&quot; ~ &quot;Community resolution&quot;, 
+                        TRUE ~ &quot;Other&quot;))
+
+#sasldn_4$outcome_simple &lt;- factor(sasldn_4$outcome_simple, levels = c(&quot;No further action&quot;, &quot;Arrest&quot;, &quot;Community resolution&quot;, &quot;Other&quot;))
+
+##### plot to find numbers
+##### i know this usually works differently but I couldn&#39;t get my summarise/count functions to work :-( sorry for the static df
+
+#sasldn_4 %&gt;% 
+ # ggplot(aes(x = outcome_simple, fill = outcome_simple, label = (stat(count)))) +
+  #geom_bar()+
+  #geom_text(stat = &#39;count&#39;,
+   #                 position = position_dodge(1), 
+    #                vjust = -0.5, 
+     #               size = 3) + 
+  #NULL
+
+sasldn_4_set &lt;- data.frame(
+  outcome_simple = c(&quot;No further action&quot;, &quot;Arrest&quot;, &quot;Community resolution&quot;, &quot;Other&quot;),
+  values = c(10287, 1952, 1271, 637))
+data_points_sum &lt;- 10287 + 1952 + 1271 + 637
+
+sasldn_4_set$outcome_simple &lt;- factor(sasldn_4_set$outcome_simple, 
+                                      levels = c(&quot;No further action&quot;, &quot;Arrest&quot;, &quot;Community resolution&quot;, &quot;Other&quot;))
+
+outcome_plot &lt;- sasldn_4_set %&gt;% 
+    ggplot(aes(x = &quot;&quot;, y = values, fill = outcome_simple))+
+    geom_bar(width = 1, stat = &quot;identity&quot;)+ 
+    coord_polar(&quot;y&quot;, start = 0)+
+    theme(
+    # edit text size and font
+    text = element_text(size=9, family=&quot;Helvetica Neue Light&quot;),
+    # edit plot caption size and font
+    plot.caption = element_text(size=6, family = &quot;Helvetica Neue Light&quot;),
+    # edit plot title size and font
+    plot.title = element_text(size=13, family = &quot;Helvetica Neue Bold&quot;),
+    # edit legend                       
+    legend.position = &quot;right&quot;,
+    legend.background = element_rect(fill = &quot;white&quot;),
+    legend.title = element_text(size = 8, family=&quot;Helvetica Neue Bold&quot;),
+    legend.key = element_rect(size = 10),
+    legend.key.size = unit(8,&quot;point&quot;),
+    #edit axes
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x=element_blank(),
+    panel.border = element_blank(),
+    panel.grid=element_blank(),
+    axis.ticks = element_blank()
+  ) +
+    # edit colour palette
+    scale_fill_manual(values=c(&quot;#618685&quot;, &quot;#93beae&quot;, &quot;#b1cbbb&quot;, &quot;#deeaee&quot;))+
+    # add pie piece labels
+    geom_text(aes(label = percent(round(values/data_points_sum,2),1)), 
+              position = position_stack(vjust = 0.5), 
+              size = 3, 
+              family=&quot;Helvetica Neue Bold&quot;)+
+    # edit plot labels
+    labs(title = &quot;Stop&amp;Search targets often let off the hook&quot;,
+          subtitle = &quot;Most frequent consequences of London&#39;s Stop&amp;Search in September 2020&quot;,
+          caption = &quot;Source: https://data.police.uk/data/&quot;,
+          fill = &quot;Stop&amp;Search Consequence&quot;
+          )+
+  NULL</code></pre>
+<p>We find that almost three quarters of the people that are stopped and searched face no further consequences. Perhaps this indicates that a lot of people that are stopped and searched were not actually involved in any criminal activity.</p>
+<pre class="r"><code>outcome_plot +
+ggsave(&#39;outcome_plot.png&#39;, height=15, width = 25, units = &#39;cm&#39;)</code></pre>
+<p><img src="/projects/stopandsearch1/index_files/figure-html/save5-1.png" width="672" /></p>
+</div>
+</div>
+<div id="mini-conclusion" class="section level2">
+<h2>Mini Conclusion</h2>
+<p>Although also a great share of all Stop&amp;Search targets are White, we find a bias towards stopping and searching people of Black and Asian ethnicities in certain areas of London. At the same time, mostly young adults and men are stopped and searched. Nevertheless, we can see that most of the people that are stopped and searched face no further consequences.</p>
+<p><strong>Generally, it looks like women can get away with anything here…</strong></p>
+</div>
+</div>
